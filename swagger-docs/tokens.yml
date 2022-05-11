@@ -1,0 +1,22 @@
+components:
+  schemas:
+  
+    Tokens:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              symbol:
+                type: string
+              logo:
+                type: string
+              balance:
+                type: number
+              percentChange:
+                type: number
+              price:
+                type: number
+              balancePrice:
+                type: number

@@ -1,0 +1,28 @@
+components:
+  schemas:
+  
+    Transactions:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                title: string
+              from:
+                type: string
+              to:
+                type: string
+              fee:
+                type: number
+              value:
+                type: number
+              tokenSymbol:
+                type: string
+              tokenAmount:
+                type: number
+              tokenAddress:
+                type: string
+              hash:
+                type: string
+              explorerUrl:
+                type: string
