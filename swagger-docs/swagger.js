@@ -11,6 +11,10 @@ const swaggerDef = {
     },
     servers: [
         {
+            url: `https://crypto-page-app.herokuapp.com/`,
+            description: 'Heroku Server'
+        },
+        {
             url: `http://localhost:3000/`,
             description: 'Local server'
         }
