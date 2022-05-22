@@ -42,12 +42,16 @@ class TronGridApi {
         }
     }
 
-    async getWalletAllTransactions(skip, limit) {
+    async getTransactionsFromApi(skip, limit) {
         const { data } = await axios.get(`${this.baseUrl}accounts/${this.address}/transactions?skip=${skip}&limit=${limit}`);
         if (!data?.data?.length) {
             return [];
         }
-        const items = data.data;
+        return data.data;
+    }
+
+    async getWalletAllTransactions(skip, limit) {
+        const items = await this.getTransactionsFromApi(skip, limit);
         const transactions = [];
         for (const item of items) {
             const transaction = this.getTransactionDataFromItem(item);

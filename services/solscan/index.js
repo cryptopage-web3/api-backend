@@ -34,11 +34,16 @@ class SolScanApi {
         }
     }
 
-    async getWalletAllTransactions(skip, limit) {
-        const { data } = await axios.get(`${this.baseUrl}/transactions?account=${this.address}&limit=1000`);
+    async getTransactionsFromApi() {
+        const { data } = await axios.get(`${this.baseUrl}/transactions?account=${this.address}&limit=200`);
         if (!data?.length) {
             return [];
         }
+        return data;
+    }
+
+    async getWalletAllTransactions(skip, limit) {
+        const data = await this.getTransactionsFromApi();
         const items = data.slice(skip * limit, skip * limit + limit);
         const transactions = [];
         for (const item of items) {

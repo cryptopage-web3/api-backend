@@ -4,7 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "test": "jest --verbose --config=jest.config.js",
+    "test:watch": "jest --watch --config=jest.config.js",
+    "test:cov": "jest --coverage --config=jest.config.js",
+    "prepare": "husky install"
   },
   "author": "",
   "license": "ISC",
@@ -14,5 +18,9 @@
     "swagger-jsdoc": "^6.2.0",
     "swagger-ui-express": "^4.3.0",
     "tronweb": "^4.1.0"
+  },
+  "devDependencies": {
+    "jest": "^28.1.0",
+    "husky": "^8.0.1"
   }
 }
