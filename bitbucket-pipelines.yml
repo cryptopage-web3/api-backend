@@ -3,16 +3,25 @@ pipelines:
   branches:
     master:
       - step:
+           name: Test App
+           caches:
+           - node
+           script:
+           - rm -rf package-lock.json
+           - rm -rf node_modules
+           - npm install
+           - npm run test
+      - step:
            name: Create artifact
            script: 
-             - git archive --format=tar.gz master -o                   application.tar.gz 
+           - git archive --format=tar.gz master -o                   application.tar.gz 
            artifacts: 
            - application.tar.gz
       - step:
            name: Deploy to heroku
            deployment: production
            caches:
-             - node
+            - node
            script:
              - pipe: atlassian/heroku-deploy:1.1.4
                variables:
