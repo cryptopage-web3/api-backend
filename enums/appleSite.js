@@ -1,5 +1,5 @@
 module.exports = {
-    'apple-app-site-association': {
+    'apple_app_site_association': {
         'applinks': {
             'apps': [],
             'details': [

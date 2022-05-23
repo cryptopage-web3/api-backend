@@ -28,4 +28,15 @@ router.get('/login*', async (_, res) => {
     }
 });
 
+router.get('/apple-app-site-association', async (_, res) => {
+
+    try {
+        res.json(appleSiteJson);
+    } catch (err) {
+        res.status(BAD_REQUEST).json({
+            message: err.message
+        });
+    }
+});
+
 module.exports = router;
