@@ -26,6 +26,14 @@ const BAD_REQUEST = 400;
  *         schema:
  *           type: string
  *         description: wallet address
+ *       - in: query
+ *         name: skip
+ *         schema:
+ *           type: number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: number
  *     responses:
  *       "200":
  *         description: OK
@@ -39,9 +47,10 @@ const BAD_REQUEST = 400;
  router.get('/:chain/:address', async (req, res) => {
 
     const { chain, address } = req.params;
+    const { skip = 0, limit = 20 } = req.query;
 
     try {
-        const tokens = await tokensModule.getWalletTokens(address, chain);
+        const tokens = await tokensModule.getWalletTokens(address, chain, Number(skip), Number(limit));
         res.json({ tokens });
     } catch (err) {
         res.status(BAD_REQUEST).json({

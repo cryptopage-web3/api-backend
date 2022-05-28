@@ -59,6 +59,12 @@ class TronGridApi {
         }
         return transactions;
     }
+
+    async getWalletTokenTransfers(skip, limit) {
+        const data = await this.getWalletAllTransactions(0, Number.MAX_VALUE);
+        const items = data.filter(e => e.title === 'Transfer').slice(skip * limit, skip * limit + limit);
+        return items;
+    }
 }
 
 module.exports = TronGridApi;

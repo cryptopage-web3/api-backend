@@ -23,13 +23,13 @@ function getTokenData(item) {
     };
 }
 
-async function getWalletTokens(address) {
+async function getWalletTokens(address, skip, limit) {
     const result = await axios.get(`https://apilist.tronscan.org/api/account?address=${address}`);
-    const tokens = [pageToken];
+    const tokens = [];
     if (!result.data?.tokens?.length) {
         return tokens;
     }
-    const list = result.data.tokens;
+    const list = result.data.tokens.slice(skip * limit, skip * limit + limit);
     for(let i = 0; i < list.length; i++) {
         const token = getTokenData(list[i]);
         tokens.push(token);

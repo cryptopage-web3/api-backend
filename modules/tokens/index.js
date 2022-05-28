@@ -5,13 +5,13 @@ for(let chain in chains) {
     blockchainModules[chain] = require(`./${chain}`)
 }
 
-async function getWalletTokens(address, blockchain) {
+async function getWalletTokens(address, blockchain, skip, limit) {
 
     if (!blockchainModules[blockchain]) {
         throw new Error(`${blockchain} not supported.`);
     }
 
-    return blockchainModules[blockchain].getWalletTokens(address);
+    return blockchainModules[blockchain].getWalletTokens(address, skip, limit);
 
 }
 

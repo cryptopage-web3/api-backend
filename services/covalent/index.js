@@ -49,16 +49,17 @@ class CovalentApi {
         }
     }
 
-    async getTokensFromApi() {
+    async getTokensFromApi(skip, limit) {
         const { data } = await axios.get(`${this.baseUrl}/${this.chainId}/address/${this.address}/balances_v2/?key=${this.apiKey}`);
         if (!data?.data?.items?.length) {
             return [];
         }
-        return data.data.items;
+        const items = data.data.items.slice(skip * limit, skip * limit + limit);
+        return items;
     }
 
-    async getWalletTokens() {
-        const data = await this.getTokensFromApi();
+    async getWalletTokens(skip, limit) {
+        const data = await this.getTokensFromApi(skip, limit);
 
         const tokens = [];
         for (const item of data) {
