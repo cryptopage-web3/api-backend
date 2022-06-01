@@ -38,7 +38,8 @@ class TronGridApi {
             value: item.raw_data.contract[0].parameter.value.amount / 10 ** 6 || 0,
             hash: item.txID,
             explorerUrl: this.explorerUrl + item.txID,
-            tokenSymbol: config.tron.nativeCoinSymbol
+            tokenSymbol: config.tron.nativeCoinSymbol,
+            date: new Date(item.block_timestamp)
         }
     }
 
@@ -57,13 +58,13 @@ class TronGridApi {
             const transaction = this.getTransactionDataFromItem(item);
             transactions.push(transaction);
         }
-        return transactions;
+        return { count: items.length, transactions };
     }
 
     async getWalletTokenTransfers(skip, limit) {
-        const data = await this.getWalletAllTransactions(0, Number.MAX_VALUE);
-        const items = data.filter(e => e.title === 'Transfer').slice(skip * limit, skip * limit + limit);
-        return items;
+        const { transactions, count } = await this.getWalletAllTransactions(0, Number.MAX_VALUE);
+        const items = transactions.filter(e => e.title === 'Transfer').slice(skip * limit, skip * limit + limit);
+        return { count, transactions: items };
     }
 }
 

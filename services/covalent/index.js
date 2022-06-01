@@ -17,7 +17,7 @@ class CovalentApi {
         if (this.chainId !== conf.sol.chainId && !address.match('^0x[a-fA-F0-9]{40}$')) {
             throw new Error('Address is invalid.');
         }
-        
+
         this.address = address;
     }
 
@@ -91,7 +91,8 @@ class CovalentApi {
             tokenAmount,
             tokenAddress,
             hash: item.tx_hash,
-            explorerUrl: this.explorerUrl + item.tx_hash
+            explorerUrl: this.explorerUrl + item.tx_hash,
+            date: new Date(item.block_signed_at)
         }
     }
 
@@ -111,13 +112,13 @@ class CovalentApi {
             const transaction = this.getTransactionDataFromItem(item);
             transactions.push(transaction);
         }
-        return transactions;
+        return { count: data.length, transactions };
     }
 
     async getWalletTokenTransfers(skip, limit) {
-        const data = await this.getWalletAllTransactions(0, Number.MAX_VALUE);
-        const items = data.filter(e => e.title === 'Transfer').slice(skip * limit, skip * limit + limit);
-        return items;
+        const { transactions, count } = await this.getWalletAllTransactions(0, Number.MAX_VALUE);
+        const items = transactions.filter(e => e.title === 'Transfer').slice(skip * limit, skip * limit + limit);
+        return { count, transactions: items };
     }
 }
 

@@ -50,8 +50,8 @@ router.get('/:chain/:address', async (req, res) => {
     const { skip = 0, limit = 20 } = req.query;
 
     try {
-        const transactions = await transactionsModule.getWalletAllTransactions(address, chain, Number(skip), Number(limit));
-        res.json({ transactions });
+        const { transactions, count } = await transactionsModule.getWalletAllTransactions(address, chain, Number(skip), Number(limit));
+        res.json({ transactions, count });
     } catch (err) {
         res.status(BAD_REQUEST).json({
             message: err.message
@@ -98,14 +98,14 @@ router.get('/:chain/:address', async (req, res) => {
  *       "400":
  *         $ref: '#/components/responses/NotFound'
  */
- router.get('/transfers/:chain/:address', async (req, res) => {
+router.get('/transfers/:chain/:address', async (req, res) => {
 
     const { chain, address } = req.params;
     const { skip = 0, limit = 20 } = req.query;
 
     try {
-        const transactions = await transactionsModule.getWalletTokenTransfers(address, chain, Number(skip), Number(limit));
-        res.json({ transactions });
+        const { transactions, count } = await transactionsModule.getWalletTokenTransfers(address, chain, Number(skip), Number(limit));
+        res.json({ transactions, count });
     } catch (err) {
         res.status(BAD_REQUEST).json({
             message: err.message

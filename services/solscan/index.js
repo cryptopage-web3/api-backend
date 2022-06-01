@@ -14,7 +14,7 @@ class SolScanApi {
         if (address.length !== 44) {
             throw new Error('Address is invalid.');
         }
-        
+
         this.address = address;
         this.explorerUrl = config.sol.explorerUrl;
     }
@@ -26,16 +26,17 @@ class SolScanApi {
             title: 'Transfer',
             from: item.signer[0],
             to: '',
-            fee: item.fee  / 10 ** 9,
+            fee: item.fee / 10 ** 9,
             value: item.lamport / 10 ** 9,
             hash: item.txHash,
             explorerUrl: this.explorerUrl + item.txHash,
-            tokenSymbol: config.sol.nativeCoinSymbol
+            tokenSymbol: config.sol.nativeCoinSymbol,
+            date: new Date(item.blockTime * 1000)
         }
     }
 
     async getTransactionsFromApi() {
-        const { data } = await axios.get(`${this.baseUrl}/transactions?account=${this.address}&limit=200`);
+        const { data } = await axios.get(`${this.baseUrl}transactions?account=${this.address}&limit=200`);
         if (!data?.length) {
             return [];
         }
@@ -50,13 +51,13 @@ class SolScanApi {
             const transaction = this.getTransactionDataFromItem(item);
             transactions.push(transaction);
         }
-        return transactions;
+        return { count: data.length, transactions };
     }
 
     async getWalletTokenTransfers(skip, limit) {
-        const data = await this.getWalletAllTransactions(0, Number.MAX_VALUE);
-        const items = data.filter(e => e.title === 'Transfer').slice(skip * limit, skip * limit + limit);
-        return items;
+        const { transactions, count } = await this.getWalletAllTransactions(0, Number.MAX_VALUE);
+        const items = transactions.filter(e => e.title === 'Transfer').slice(skip * limit, skip * limit + limit);
+        return { count, transactions: items };
     }
 }
 
