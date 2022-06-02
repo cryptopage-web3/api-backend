@@ -1,4 +1,4 @@
-const SolScanApi = require('../services/solscan');
+const SolScanApi = require('../src/services/solscan');
 
 describe('Solscan Service', () => {
 

@@ -1,0 +1,13 @@
+{
+    "delay": 2500,
+    "watch":[
+        "dist"
+    ],
+    "ext":"ts,js,json,ejs,env",
+    "ignore": [
+      "src/*",
+      "node_modules/*"
+    ],
+    "exec": "node -r source-map-support/register --enable-source-maps dist/index.js",
+    "inspect": "25018"
+}

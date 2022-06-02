@@ -1,4 +1,4 @@
-const TronGridApi = require('../services/trongrid');
+const TronGridApi = require('../src/services/trongrid');
 
 describe('TronGrid Service', () => {
 
