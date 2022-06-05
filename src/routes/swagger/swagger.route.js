@@ -6,7 +6,7 @@ const { serve, setup } = require('swagger-ui-express');
 
 const swaggerSpec = swaggerJsdoc({
     swaggerDefinition,
-    apis: ['swagger-docs/*.yml', 'routes/**/*.js'],
+    apis: ['src/swagger-docs/*.yml', 'src/routes/**/*.js'],
 });
 
 router.use('/', serve);

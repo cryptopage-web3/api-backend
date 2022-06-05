@@ -56,19 +56,19 @@ class CovalentApi {
         if (!data?.data?.items?.length) {
             return [];
         }
-        const items = data.data.items.slice(skip * limit, skip * limit + limit);
+        const { items } = data.data;
         return items;
     }
 
     async getWalletTokens(skip, limit) {
         const data = await this.getTokensFromApi(skip, limit);
 
-        const tokens = [];
+        const tokens = [this.getPageToken];
         for (const item of data) {
             const token = this.getTokenDataFromItem(item);
             tokens.push(token);
         }
-        return tokens.filter(e => e.balance);
+        return tokens.slice(skip * limit, skip * limit + limit).filter(e => (e.balance || e.symbol === 'PAGE'));
     }
 
     getTransactionDataFromItem(item) {
@@ -109,20 +109,28 @@ class CovalentApi {
     }
 
     async getWalletAllTransactions(skip, limit) {
-        const data = await this.getTransactionsFromApi();
-        const items = data.slice(skip * limit, skip * limit + limit);
-        const transactions = [];
-        for (const item of items) {
-            const transaction = this.getTransactionDataFromItem(item);
-            transactions.push(transaction);
+        try {
+            const data = await this.getTransactionsFromApi();
+            const items = data.slice(skip * limit, skip * limit + limit);
+            const transactions = [];
+            for (const item of items) {
+                const transaction = this.getTransactionDataFromItem(item);
+                transactions.push(transaction);
+            }
+            return { count: data.length, transactions };
+        } catch {
+            return { count: 0, transactions: [] };
         }
-        return { count: data.length, transactions };
     }
 
     async getWalletTokenTransfers(skip, limit) {
-        const { transactions, count } = await this.getWalletAllTransactions(0, Number.MAX_VALUE);
-        const items = transactions.filter(e => e.title === 'Transfer').slice(skip * limit, skip * limit + limit);
-        return { count, transactions: items };
+        try {
+            const { transactions, count } = await this.getWalletAllTransactions(0, Number.MAX_VALUE);
+            const items = transactions.filter(e => e.title === 'Transfer').slice(skip * limit, skip * limit + limit);
+            return { count, transactions: items };
+        } catch {
+            return { count: 0, transactions: [] };
+        }
     }
 }
 
