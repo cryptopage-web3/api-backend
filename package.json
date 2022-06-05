@@ -21,7 +21,10 @@
     "tronweb": "^4.1.0"
   },
   "devDependencies": {
+    "@types/node": "^17.0.38",
+    "@types/reflect-metadata": "^0.1.0",
+    "husky": "^8.0.1",
     "jest": "^28.1.0",
-    "husky": "^8.0.1"
+    "source-map-support": "^0.5.21"
   }
 }

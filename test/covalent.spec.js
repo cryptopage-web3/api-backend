@@ -1,5 +1,5 @@
-const CovalentApi = require('../services/covalent');
-const config = require('../enums/chains');
+const CovalentApi = require('../src/services/covalent');
+const config = require('../src/enums/chains');
 
 describe('Solscan Service', () => {
 
