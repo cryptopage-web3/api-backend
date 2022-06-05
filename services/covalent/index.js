@@ -1,6 +1,7 @@
 // @ts-nocheck
 const axios = require('axios');
 const conf = require('./../../enums/chains');
+const { getCoinPrice } = require('../../cache/coins');
 
 class CovalentApi {
     /**
@@ -11,6 +12,7 @@ class CovalentApi {
     constructor(data) {
         const { address, config } = data;
         this.chainId = config.chainId;
+        this.mainCoinId = config.nativeCoinId;
         this.explorerUrl = config.explorerUrl;
         this.nativeCoinSymbol = config.nativeCoinSymbol;
 
@@ -81,12 +83,14 @@ class CovalentApi {
             tokenAddress = data.decoded?.params[1]?.value;
             tokenAmount = data.decoded?.params[2]?.value / 10 ** data.sender_contract_decimals;
         }
+        const value = item.value / 10 ** 18;
         return {
             title: title || 'Transfer',
             from: item.from_address,
             to: item.to_address,
             fee: (item.gas_spent * item.gas_price) / 10 ** 18,
-            value: item.value / 10 ** 18,
+            value,
+            valueUSD: getCoinPrice(this.mainCoinId) * value,
             tokenSymbol,
             tokenAmount,
             tokenAddress,

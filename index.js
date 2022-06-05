@@ -1,7 +1,11 @@
 const express = require('express');
 const app = express();
 const httpServer = require('http').createServer(app);
+const cors = require('cors')
 const port = process.env.PORT || 3000;
+app.use(cors());
+
+require('./cache/coins');
 
 app.use(express.json({ limit: '15mb' }));
 
