@@ -6,6 +6,8 @@
     "noImplicitAny": false,
     "suppressExcessPropertyErrors": true,
     "noResolve": false,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
 
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
@@ -23,12 +25,12 @@
     "moduleResolution": "Node",
     "sourceMap": true,
     "outDir": "dist",
-    "baseUrl": "src",
+    "baseUrl": "./src",
 
     "paths": {
-
+      
     }
 
   },
-  "include": ["src"]
+  "include": ["src"],
 }
