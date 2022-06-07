@@ -50,8 +50,8 @@ const BAD_REQUEST = 400;
     const { skip = 0, limit = 20 } = req.query;
 
     try {
-        const tokens = await tokensModule.getWalletTokens(address, chain, Number(skip), Number(limit));
-        res.json({ tokens });
+        const result = await tokensModule.getWalletTokens(address, chain, Number(skip), Number(limit));
+        res.json(result);
     } catch (err) {
         res.status(BAD_REQUEST).json({
             message: err.message
