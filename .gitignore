@@ -52,3 +52,4 @@ Thumbs.db
 /.husky
 /firestore.json
 /*.env
+/data

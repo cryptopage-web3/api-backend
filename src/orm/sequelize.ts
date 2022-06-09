@@ -11,6 +11,11 @@ export const db = new sequelize.Sequelize(
             max: 5,
             acquire: 30000,
             idle: 10000,
-        }
+        },
+        define:{
+            charset: 'utf8mb4',
+            //collate: 'utf8mb4_bin'
+        },
+        logging: false
     }
 )

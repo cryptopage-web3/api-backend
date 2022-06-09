@@ -5,6 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
+    "build:dev": "tsc -w --pretty",
+    "server:dev": "nodemon",
+    "db:sync": "node dist/orm/sync-db.js",
     "test": "jest --verbose --config=jest.config.js",
     "test:watch": "jest --watch --config=jest.config.js",
     "test:cov": "jest --coverage --config=jest.config.js",
@@ -27,6 +30,7 @@
     "@types/reflect-metadata": "^0.1.0",
     "husky": "^8.0.1",
     "jest": "^28.1.0",
-    "source-map-support": "^0.5.21"
+    "source-map-support": "^0.5.21",
+    "ts-node": "^10.8.1"
   }
 }
