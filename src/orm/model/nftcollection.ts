@@ -10,6 +10,7 @@ export class NftCollection extends Model<InferAttributes<NftCollection>, InferCr
   declare imageUrl: string
   declare hasBid: boolean
   declare hasSell: boolean
+  declare isEnabled: boolean
 }
 
 NftCollection.init({
@@ -20,12 +21,14 @@ NftCollection.init({
   blockchain: DataTypes.STRING(25),
   imageUrl: DataTypes.STRING(300),
   hasBid: {type: DataTypes.BOOLEAN, allowNull:false},
-  hasSell: {type: DataTypes.BOOLEAN, allowNull:false}
+  hasSell: {type: DataTypes.BOOLEAN, allowNull:false},
+  isEnabled: {type: DataTypes.BOOLEAN, allowNull:false, defaultValue: true},
 }, {
   sequelize: db,
   modelName: 'NftCollection',
   indexes:[
     {unique: false, fields:['symbol']},
     {unique: false, fields:['collectionId']},
+    {unique: false, fields:['isEnabled']},
   ]
 });  

@@ -73,6 +73,14 @@ async function saveCollections(list:Array<any>):Promise<{inserted:number,updated
 }
 
 function buildCollection(data):InferAttributes<NftCollection> {
+    let isEnabled = false;
+
+    if(data.blockchain == Blockchains.ETHEREUM && !!data.bestBidOrder){
+        isEnabled = true
+    } else if(data.blockchain == Blockchains.POLYGON){
+        isEnabled = !!data.meta?.content[0]?.url
+    }
+
     return {
         collectionId: data.id,
         name: data.name,
@@ -81,7 +89,8 @@ function buildCollection(data):InferAttributes<NftCollection> {
         blockchain: data.blockchain,
         imageUrl: data.meta?.content[0]?.url,
         hasBid: !!data.bestBidOrder,
-        hasSell: !!data.bestSellOrder
+        hasSell: !!data.bestSellOrder,
+        isEnabled
     }
 }
 
