@@ -10,6 +10,16 @@ export enum Blockchains {
 export interface OptsGetAllCollections {
     size: number
     blockchains?: Blockchains
-    continuation?: string
+    continuation?: string | undefined
 }
 
+export interface OptsCollectionDirPath {
+    rootDirName?:string
+    blockchain:string
+}
+
+export interface OptsCollectionFilePath extends OptsCollectionDirPath  {
+    fileName:string
+}
+
+export type OptsCollectionPath = OptsCollectionDirPath | OptsCollectionFilePath

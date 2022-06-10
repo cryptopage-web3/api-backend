@@ -14,7 +14,7 @@ import { Blockchains } from './types';
 
 async function run(){
     let bulk, readCounter = 0, insertCounter = 0;
-    const generator = getCollectionsIterator(Blockchains.FLOW);
+    const generator = getCollectionsIterator(Blockchains.POLYGON);
 
     while(!(bulk = generator.next()).done){
         const result = await saveCollections(bulk.value)
