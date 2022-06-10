@@ -26,6 +26,7 @@
     "tronweb": "^4.1.0"
   },
   "devDependencies": {
+    "@types/express": "^4.17.13",
     "@types/node": "^17.0.38",
     "@types/reflect-metadata": "^0.1.0",
     "husky": "^8.0.1",

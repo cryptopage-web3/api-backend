@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 const appleSiteJson = require('../enums/appleSite');
+const { collectionsRouter } = require('./api/v1/collections');
 
 const BAD_REQUEST = 400;
 
@@ -38,5 +39,7 @@ router.get('/apple-app-site-association', async (_, res) => {
         });
     }
 });
+
+router.use('/api/v1/collections', collectionsRouter)
 
 module.exports = router;
