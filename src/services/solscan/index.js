@@ -2,6 +2,7 @@
 const axios = require('axios');
 
 const config = require('./../../enums/chains');
+const { getCoinPrice } = require('../../cache/coins');
 
 class SolScanApi {
     /**
@@ -16,18 +17,21 @@ class SolScanApi {
         }
 
         this.address = address;
+        this.mainCoinId = config.sol.nativeCoinId;
         this.explorerUrl = config.sol.explorerUrl;
     }
 
     baseUrl = 'https://public-api.solscan.io/account/';
 
     getTransactionDataFromItem(item) {
+        const value = item.lamport / 10 ** 9;
         return {
             title: 'Transfer',
             from: item.signer[0],
             to: '',
             fee: item.fee / 10 ** 9,
-            value: item.lamport / 10 ** 9,
+            value,
+            valueUSD: getCoinPrice(this.mainCoinId) * value,
             hash: item.txHash,
             explorerUrl: this.explorerUrl + item.txHash,
             tokenSymbol: config.sol.nativeCoinSymbol,

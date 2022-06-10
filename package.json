@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node src/index.js",
     "build:dev": "tsc -w --pretty",
     "server:dev": "nodemon",
     "db:sync": "node dist/orm/sync-db.js",
@@ -17,6 +17,7 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^0.26.1",
+    "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "express": "^4.17.3",
     "mysql2": "^2.3.3",

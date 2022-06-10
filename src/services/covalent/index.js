@@ -1,6 +1,7 @@
 // @ts-nocheck
 const axios = require('axios');
 const conf = require('./../../enums/chains');
+const { getCoinPrice } = require('../../cache/coins');
 
 class CovalentApi {
     /**
@@ -11,6 +12,7 @@ class CovalentApi {
     constructor(data) {
         const { address, config } = data;
         this.chainId = config.chainId;
+        this.mainCoinId = config.nativeCoinId;
         this.explorerUrl = config.explorerUrl;
         this.nativeCoinSymbol = config.nativeCoinSymbol;
 
@@ -28,7 +30,7 @@ class CovalentApi {
         return {
             name: 'Page',
             symbol: 'PAGE',
-            logo: 'data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjIiIGJhc2VQcm9maWxlPSJ0aW55LXBzIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4Ij48dGl0bGU+TG9nbzwvdGl0bGU+PHN0eWxlPnRzcGFuIHsgd2hpdGUtc3BhY2U6cHJlIH0gLnNocDAgeyBmaWxsOiAjMjg4YWYyIH0gLnNocDEgeyBmaWxsOiAjMjM3OWQ1IH0gLnNocDIgeyBmaWxsOiAjMjVhYWZmIH0gLnNocDMgeyBmaWxsOiAjMmE5MWZmIH0gPC9zdHlsZT48cGF0aCBpZD0iU2hhcGUgMTggY29weSIgY2xhc3M9InNocDAiIGQ9Ik0wLjU2IDQuMjlMMTEuMjYgOS4yMUwyMy43OSA0Ni45OUwwLjU2IDM1LjE1TDAuNTYgNC4yOVoiIC8+PHBhdGggaWQ9IlNoYXBlIDE4IiBjbGFzcz0ic2hwMSIgZD0iTTcuNTQgMEwyMy43OCAxNi4wNkwyMy44NSA0Ny41NEw3LjkyIDM0LjQ0TDcuNTQgMFoiIC8+PHBhdGggaWQ9IlNoYXBlIDE4IGNvcHkgMiIgY2xhc3M9InNocDIiIGQ9Ik00Ny4yMSA0LjI5TDM2LjUgOS4yMUwyMy45NyA0Ni45OUw0Ny4yMSAzNS4xNUw0Ny4yMSA0LjI5WiIgLz48cGF0aCBpZD0iU2hhcGUgMTggY29weSAzIiBjbGFzcz0ic2hwMyIgZD0iTTM5Ljk2IDBMMjMuMDcgMTYuMDZMMjMuMTQgNDcuNTRMMzkuNTggMzQuNDRMMzkuOTYgMFoiIC8+PC9zdmc+',
+            logo: 'https://crypto-page-app.herokuapp.com/page.png',
             balance: 0,
             percentChange: 0,
             price: 0,
@@ -54,19 +56,20 @@ class CovalentApi {
         if (!data?.data?.items?.length) {
             return [];
         }
-        const items = data.data.items.slice(skip * limit, skip * limit + limit);
+        const { items } = data.data;
         return items;
     }
 
     async getWalletTokens(skip, limit) {
         const data = await this.getTokensFromApi(skip, limit);
 
-        const tokens = [];
+        const items = [this.getPageToken];
         for (const item of data) {
             const token = this.getTokenDataFromItem(item);
-            tokens.push(token);
+            items.push(token);
         }
-        return tokens.filter(e => e.balance);
+        const tokens = items.slice(skip * limit, skip * limit + limit).filter(e => (e.balance || e.symbol === 'PAGE'));
+        return { tokens, count: items.length };
     }
 
     getTransactionDataFromItem(item) {
@@ -81,12 +84,14 @@ class CovalentApi {
             tokenAddress = data.decoded?.params[1]?.value;
             tokenAmount = data.decoded?.params[2]?.value / 10 ** data.sender_contract_decimals;
         }
+        const value = item.value / 10 ** 18;
         return {
             title: title || 'Transfer',
             from: item.from_address,
             to: item.to_address,
             fee: (item.gas_spent * item.gas_price) / 10 ** 18,
-            value: item.value / 10 ** 18,
+            value,
+            valueUSD: getCoinPrice(this.mainCoinId) * value,
             tokenSymbol,
             tokenAmount,
             tokenAddress,
@@ -105,20 +110,28 @@ class CovalentApi {
     }
 
     async getWalletAllTransactions(skip, limit) {
-        const data = await this.getTransactionsFromApi();
-        const items = data.slice(skip * limit, skip * limit + limit);
-        const transactions = [];
-        for (const item of items) {
-            const transaction = this.getTransactionDataFromItem(item);
-            transactions.push(transaction);
+        try {
+            const data = await this.getTransactionsFromApi();
+            const items = data.slice(skip * limit, skip * limit + limit);
+            const transactions = [];
+            for (const item of items) {
+                const transaction = this.getTransactionDataFromItem(item);
+                transactions.push(transaction);
+            }
+            return { count: data.length, transactions };
+        } catch {
+            return { count: 0, transactions: [] };
         }
-        return { count: data.length, transactions };
     }
 
     async getWalletTokenTransfers(skip, limit) {
-        const { transactions, count } = await this.getWalletAllTransactions(0, Number.MAX_VALUE);
-        const items = transactions.filter(e => e.title === 'Transfer').slice(skip * limit, skip * limit + limit);
-        return { count, transactions: items };
+        try {
+            const { transactions, count } = await this.getWalletAllTransactions(0, Number.MAX_VALUE);
+            const items = transactions.filter(e => e.title === 'Transfer').slice(skip * limit, skip * limit + limit);
+            return { count, transactions: items };
+        } catch {
+            return { count: 0, transactions: [] };
+        }
     }
 }
 
