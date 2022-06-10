@@ -1,8 +1,10 @@
 const { readFileSync } = require("fs");
+const { resolve } = require("path");
 
 /** readFileSync for avoid create package.json inside dist directory */
-const rawPackage = readFileSync('../../package.json','utf-8');
-const { version } = JSON.parse(rawCred); 
+const packagePath = resolve(__dirname, '../../package.json')
+const rawPackage = readFileSync(packagePath,'utf-8');
+const { version } = JSON.parse(rawPackage); 
 
 const swaggerDef = {
     openapi: '3.0.1',
