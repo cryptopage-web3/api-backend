@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { FindOptions, InferAttributes } from "sequelize/types";
-import { NftCollection } from "../../../orm/model/nftcollection";
+import { NftCollection } from "../orm/model/nftcollection";
 
 export const collectionsRouter = Router();
 
