@@ -2,6 +2,7 @@ module.exports = {
     eth: {
         evm: true,
         chainId: 1,
+        chain: 'eth',
         explorerUrl: 'https://etherscan.io/tx/',
         nativeCoinSymbol: 'ETH',
         nativeCoinId: 'ethereum'
@@ -9,6 +10,7 @@ module.exports = {
     bsc: {
         evm: true,
         chainId: 56,
+        chain: 'bsc',
         explorerUrl: 'https://bscscan.com/tx/',
         nativeCoinSymbol: 'BNB',
         nativeCoinId: 'binancecoin'
@@ -16,6 +18,7 @@ module.exports = {
     matic: {
         evm: true,
         chainId: 137,
+        chain: 'matic',
         explorerUrl: 'https://polygonscan.com/tx/',
         nativeCoinSymbol: 'MATIC',
         nativeCoinId: 'matic-network'
