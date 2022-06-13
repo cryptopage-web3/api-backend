@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "build:dev": "tsc -w --pretty",
+    "build": "tsc --pretty",
     "server:dev": "nodemon",
     "db:sync": "node dist/orm/sync-db.js",
     "test": "jest --verbose --config=jest.config.js",
