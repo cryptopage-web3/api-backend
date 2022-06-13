@@ -6,6 +6,7 @@ import { InferAttributes, Op } from 'sequelize';
 config();
 
 import { NftCollection } from '../../orm/model/nftcollection';
+import { envToString } from '../../util/env-util';
 
 import { safeStart } from '../../util/safe-start';
 import { getCollectionsIterator } from './collections-file-storage';
@@ -14,7 +15,7 @@ import { Blockchains } from './types';
 
 async function run(){
     let bulk, readCounter = 0, insertCounter = 0;
-    const generator = getCollectionsIterator(Blockchains.POLYGON);
+    const generator = getCollectionsIterator(envToString('UPDATE_NFT_COLLECTION_BLOCKCHAIN') as Blockchains);
 
     while(!(bulk = generator.next()).done){
         const result = await saveCollections(bulk.value)
