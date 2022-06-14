@@ -1,0 +1,23 @@
+components:
+  schemas:
+    NftCollections:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            properties:
+              collectionId:
+                type: string
+              name:
+                type: string
+              type: 
+                type: string
+              symbol: 
+                type: string
+              blockchain: 
+                type: string
+              imageUrl: 
+                type: string
+        itemsTotal:
+          type: number
