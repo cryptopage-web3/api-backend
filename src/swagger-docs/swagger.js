@@ -17,7 +17,7 @@ const swaggerDef = {
     },
     servers: [
         {
-            url: 'http://api-m.crypto.page/',
+            url: 'https://api-m.crypto.page/',
             description: 'Dev server'
         },
         {
