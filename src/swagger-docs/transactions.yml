@@ -26,3 +26,67 @@ components:
                 type: string
               explorerUrl:
                 type: string
+
+    Transaction:
+          type: object
+          properties:
+            txHash:
+              type: string
+            block:
+              type: number
+            date:
+              type: string
+            nonce:
+              type: number
+            status:
+              type: string
+            value:
+              type: number
+            fee:
+              type: number
+            valueUSD:
+              type: number
+            feeUSD:
+              type: number
+            transfers:
+              type: array
+              items:
+                type: object
+                properties:
+                  from:
+                    type: string
+                  to:
+                    type: string
+                  symbol:
+                    type: string
+                  name:
+                    type: string
+                  logo:
+                    type: string
+                  amount:
+                    type: number
+            logs:
+              type: array
+              items:
+                type: object
+                properties:
+                  address:
+                    type: string
+                  topics:
+                    type: array
+                    items:
+                      type: string
+                  data:
+                    type: string
+                  blockNumber:
+                    type: string
+                  transactionHash:
+                    type: string
+                  transactionIndex:
+                    type: string
+                  blockHash:
+                    type: string
+                  logIndex:
+                    type: string
+                  removed:
+                    type: boolean

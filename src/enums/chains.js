@@ -3,24 +3,33 @@ module.exports = {
         evm: true,
         chainId: 1,
         chain: 'eth',
+        chainName: 'ethereum',
         explorerUrl: 'https://etherscan.io/tx/',
         nativeCoinSymbol: 'ETH',
+        apiUrl: 'https://api.etherscan.io/api?',
+        apiKey: 'VQDBC4GZA5MQT2F6IRW2U6RPH66HJRSF6S',
         nativeCoinId: 'ethereum'
     },
     bsc: {
         evm: true,
         chainId: 56,
         chain: 'bsc',
+        chainName: 'bsc',
         explorerUrl: 'https://bscscan.com/tx/',
         nativeCoinSymbol: 'BNB',
+        apiUrl: 'https://api.bscscan.com/api?',
+        apiKey: 'TQDPK4XAU4BZT8WQNN6IETRRXXDI37W64Y',
         nativeCoinId: 'binancecoin'
     },
     matic: {
         evm: true,
         chainId: 137,
         chain: 'matic',
+        chainName: 'matic',
         explorerUrl: 'https://polygonscan.com/tx/',
         nativeCoinSymbol: 'MATIC',
+        apiUrl: 'https://api.polygonscan.com/api?',
+        apiKey: '4DCKF5U2YGR1HNG1KHWP8DSK47AH85W28Z',
         nativeCoinId: 'matic-network'
     },
     sol: {

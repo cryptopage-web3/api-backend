@@ -28,7 +28,7 @@ class SolScanApi {
         return {
             title: 'Transfer',
             from: item.signer[0],
-            to: '',
+            to: item.signer[1] || item.signer[0],
             fee: item.fee / 10 ** 9,
             value,
             valueUSD: getCoinPrice(this.mainCoinId) * value,

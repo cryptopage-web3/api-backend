@@ -70,6 +70,8 @@ class DebankApi {
 
     getNFTDataFromItem(item) {
         return {
+            to: this.address,
+            date: new Date(),
             name: item.name || '',
             collectionName: item.contract_name || '',
             description: item.description || '',
