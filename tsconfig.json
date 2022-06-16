@@ -17,8 +17,8 @@
 
     "lib": ["es6","DOM"],
 
-    "noUnusedParameters": true,
-    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "noUnusedLocals": false,
     "strictNullChecks": true,
     "types":["reflect-metadata","node"],
 
