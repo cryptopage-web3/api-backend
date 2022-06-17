@@ -5,7 +5,7 @@ export const DATA_DIR = resolve(__dirname, '../../data');
 
 export function getJson(path: string){
     if(existsSync(path)){
-        console.log('Load', path)
+        //console.log('Load', path)
 
         const data = readFileSync(path, 'utf-8');
 

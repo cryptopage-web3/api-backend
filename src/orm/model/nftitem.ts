@@ -17,6 +17,9 @@ export class NftItem extends Model<InferAttributes<NftItem, {omit: 'meta'}>,  Nf
     declare metaName: string | null
     declare metaDescr: string | null
 
+    declare bestSellMakePriceUsd: number | null
+    declare bestSellMakePrice: number | null
+
     declare getMetaContent: HasManyGetAssociationsMixin<MetaContent>
     declare meta?: NonAttribute<MetaContent[]>
     declare static associations:{
@@ -27,7 +30,9 @@ export class NftItem extends Model<InferAttributes<NftItem, {omit: 'meta'}>,  Nf
 NftItem.init({
     itemId: DataTypes.STRING(300),
     metaName: DataTypes.STRING(128),
-    metaDescr: DataTypes.STRING(2000)
+    metaDescr: DataTypes.STRING(2000),
+    bestSellMakePriceUsd: {type: DataTypes.DECIMAL(20,2), allowNull: true},
+    bestSellMakePrice: {type: DataTypes.DECIMAL(30,8), allowNull: true}
 },{
     sequelize: db,
     indexes:[
