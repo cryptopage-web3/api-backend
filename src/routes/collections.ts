@@ -42,6 +42,36 @@ collectionsRouter.get('/',async (req,res)=>{
     res.json({data, itemsTotal})
 })
 
+/**
+ * @swagger
+ * /collections/{id}:
+ *  get:
+ *      description: Get collection items
+ *      tags: [NftItems]
+ *      parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: number
+ *           default: 10
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: number
+ *           default: 0
+ *      responses:
+ *       "200":
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *                 $ref: '#/components/schemas/NftItems'
+ */
 collectionsRouter.get('/:id', async(req, res)=>{
     const findOpts: FindOptions<InferAttributes<NftItem, {omit: never;}>> = {
             attributes:['id','itemId','metaName','metaDescr'],
@@ -52,6 +82,8 @@ collectionsRouter.get('/:id', async(req, res)=>{
             where:{    
                 collectionId: parseInt(req.params.id)
             },
+            limit: parseInt(req.query.limit as string) || 10,
+            offset: parseInt(req.query.offset as string) || 0,
         },
         data = await NftItem.findAll(findOpts),
         itemsTotal = await NftItem.count({where: findOpts.where})
