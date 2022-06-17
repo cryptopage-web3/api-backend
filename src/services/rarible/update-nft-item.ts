@@ -1,12 +1,11 @@
 import { config } from "dotenv";
 config()
 
-import { InferCreationAttributes, Op, QueryTypes } from "sequelize";
+import { InferCreationAttributes, Op } from "sequelize";
 import { MetaContent } from "../../orm/model/meta-content";
 import { NftCollection } from "../../orm/model/nftcollection";
 
 import { NftItem, NftitemCreationAttributes } from "../../orm/model/nftitem";
-import { db } from "../../orm/sequelize";
 import { safeStart } from "../../util/safe-start";
 import { getNftItemIterator } from "./nft-item-file-storage";
 import { Blockchains, NftItemFilesIterator } from "./types";
@@ -38,10 +37,6 @@ async function saveItems(collection:NftCollection, fileItems:Array<any>):Promise
 
     let updated = 0,
         inserted = 0;
-
-    if(fileIds.length > 0){
-        updated = await updateCollectionId(fileIds, collection.id)
-    }
 
     for(let fItem of fileItems){
         const dbItem = existsItems.find(i => i.itemId === fItem.id)
@@ -75,12 +70,12 @@ async function saveItems(collection:NftCollection, fileItems:Array<any>):Promise
                 })
             }
         })
+    }
 
-        if(!collection.contract && fileItems[0].contract){
-            collection.contract = fileItems[0].contract
-            
-            await collection.save()
-        }
+    if(!collection.contract && fileItems[0].contract){
+        collection.contract = fileItems[0].contract
+        
+        await collection.save()
     }
 
     return {updated, inserted}
@@ -107,17 +102,6 @@ function buildNftItemMeta(data):InferCreationAttributes<MetaContent>[] | undefin
         representation: m.representation,
         mimeType: m.mimeType
     }))
-}
-
-async function updateCollectionId(nftIds, collectionId){
-    const res = await db.query(`UPDATE NftItems SET collectionId = :collectionId WHERE itemId IN(:id)`,{
-        replacements:{collectionId, id: nftIds},
-        type: QueryTypes.UPDATE        
-    })
-
-    console.log('update res', res);
-
-    return res[1]
 }
 
 safeStart(run)
