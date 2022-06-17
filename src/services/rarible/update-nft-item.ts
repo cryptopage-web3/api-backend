@@ -1,27 +1,30 @@
 import { config } from "dotenv";
 config()
 
-import { InferCreationAttributes, Op } from "sequelize";
+import { InferCreationAttributes, Op, QueryTypes } from "sequelize";
 import { MetaContent } from "../../orm/model/meta-content";
 import { NftCollection } from "../../orm/model/nftcollection";
 
 import { NftItem, NftitemCreationAttributes } from "../../orm/model/nftitem";
+import { db } from "../../orm/sequelize";
 import { safeStart } from "../../util/safe-start";
 import { getNftItemIterator } from "./nft-item-file-storage";
 import { Blockchains, NftItemFilesIterator } from "./types";
 
 async function run(){
-    let bulk:NftItemFilesIterator//, readCounter = 0, insertCounter = 0;
+    let bulk:NftItemFilesIterator, readCounter = 0
 
-    const generator = getNftItemIterator(Blockchains.ETHEREUM)
+    const {generator, itemsTotal} = getNftItemIterator(Blockchains.ETHEREUM)
 
     while(!(bulk = generator.next()).done){
+        readCounter++
+
         const collection = await  NftCollection.findByPk(parseInt(bulk.value.collection),{
             include: []
         })
         if(collection){
-            const {inserted} = await await saveItems(collection, bulk.value.items)
-            console.log({inserted})
+            const {inserted, updated} = await await saveItems(collection, bulk.value.items)
+            console.log(`processed ${readCounter} of ${itemsTotal}`,{inserted, updated})
         }
     }
 }
@@ -36,12 +39,18 @@ async function saveItems(collection:NftCollection, fileItems:Array<any>):Promise
     let updated = 0,
         inserted = 0;
 
-    for(let fItem of fileItems){  
-        if(existsItems.find(i => i.itemId === fItem.id)){
-            continue
-        }
+    if(fileIds.length > 0){
+        updated = await updateCollectionId(fileIds, collection.id)
+    }
 
-        saveBulk.push(buildNftItem(collection, fItem))
+    for(let fItem of fileItems){
+        const dbItem = existsItems.find(i => i.itemId === fItem.id)
+
+        if(dbItem){
+            continue;
+        } else {
+            saveBulk.push(buildNftItem(collection, fItem))
+        }
     }
 
     if(saveBulk.length > 0){
@@ -86,7 +95,8 @@ function buildNftItem(collection:NftCollection, nftData):NftitemCreationAttribut
         metaName: nftData.meta?.name,
         metaDescr: nftData.meta?.description,
         meta,
-        collection
+        collection,
+        collectionId: collection.id
     }
 }
 
@@ -97,6 +107,17 @@ function buildNftItemMeta(data):InferCreationAttributes<MetaContent>[] | undefin
         representation: m.representation,
         mimeType: m.mimeType
     }))
+}
+
+async function updateCollectionId(nftIds, collectionId){
+    const res = await db.query(`UPDATE NftItems SET collectionId = :collectionId WHERE itemId IN(:id)`,{
+        replacements:{collectionId, id: nftIds},
+        type: QueryTypes.UPDATE        
+    })
+
+    console.log('update res', res);
+
+    return res[1]
 }
 
 safeStart(run)

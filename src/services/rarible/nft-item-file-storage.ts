@@ -36,7 +36,7 @@ export function getNftItemIterator(blockchain:Blockchains){
         }
     }
 
-    return generator()
+    return {generator: generator(), itemsTotal: files.length}
 }
 
 export function saveNftItemsToFile(blockchain:Blockchains,collectionId: string, fileName:string,collections){

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { FindOptions, InferAttributes } from "sequelize/types";
 import { NftCollection } from "../orm/model/nftcollection";
+import { NftItem } from "../orm/model/nftitem";
 
 export const collectionsRouter = Router();
 
@@ -37,6 +38,23 @@ collectionsRouter.get('/',async (req,res)=>{
         },
         data = await NftCollection.findAll(where),
         itemsTotal = await NftCollection.count(where)
+
+    res.json({data, itemsTotal})
+})
+
+collectionsRouter.get('/:id', async(req, res)=>{
+    const findOpts: FindOptions<InferAttributes<NftItem, {omit: never;}>> = {
+            attributes:['id','itemId','metaName','metaDescr'],
+            include: {
+                association: NftItem.associations.meta, 
+                attributes:['url','type','representation','mimeType']
+            },
+            where:{    
+                collectionId: parseInt(req.params.id)
+            },
+        },
+        data = await NftItem.findAll(findOpts),
+        itemsTotal = await NftItem.count({where: findOpts.where})
 
     res.json({data, itemsTotal})
 })
