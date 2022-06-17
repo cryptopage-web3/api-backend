@@ -1,9 +1,9 @@
-const CovalentApi = require('./../../services/covalent');
+const UnmarshalApi = require('./../../services/unmarshal');
 
 const config = require('./../../enums/chains');
 
 function getWalletTokens(address, skip, limit) {
-    const service = new CovalentApi({ address, config: config.bsc });
+    const service = new UnmarshalApi({ address, config: config.bsc });
     return service.getWalletTokens(skip, limit);
 }
 

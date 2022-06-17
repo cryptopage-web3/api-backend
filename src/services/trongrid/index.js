@@ -6,6 +6,7 @@ const tronWeb = new TronWeb({
     fullHost: 'https://api.trongrid.io',
 });
 const config = require('./../../enums/chains');
+const { getCoinPrice } = require('../../cache/coins');
 
 class TronGridApi {
     /**
@@ -20,12 +21,14 @@ class TronGridApi {
         }
 
         this.address = address;
+        this.mainCoinId = config.tron.nativeCoinId;
         this.explorerUrl = config.tron.explorerUrl;
     }
 
     baseUrl = 'https://api.trongrid.io/v1/';
 
     getTransactionDataFromItem(item) {
+        const value = item.raw_data.contract[0].parameter.value.amount / 10 ** 6 || 0;
         return {
             title: 'Transfer',
             from: tronWeb.address.fromHex(
@@ -35,7 +38,8 @@ class TronGridApi {
                 item.raw_data.contract[0].parameter.value.to_address
             ),
             fee: 0,
-            value: item.raw_data.contract[0].parameter.value.amount / 10 ** 6 || 0,
+            value,
+            valueUSD: getCoinPrice(this.mainCoinId) * value,
             hash: item.txID,
             explorerUrl: this.explorerUrl + item.txID,
             tokenSymbol: config.tron.nativeCoinSymbol,
