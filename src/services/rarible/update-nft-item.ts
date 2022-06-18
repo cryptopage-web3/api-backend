@@ -30,7 +30,8 @@ async function run(){
 
 async function saveItems(collection:NftCollection, fileItems:Array<any>):Promise<{inserted:number,updated:number}>{
     const saveBulk:NftitemCreationAttributes[] = [],
-        fileIds = fileItems.map(i => i.id),
+        fileItemsWithPrice = fileItems.filter(f => f.bestSellOrder),
+        fileIds = fileItemsWithPrice.map(i => i.id),
         existsItems = await NftItem.findAll({
             where:{ itemId:{[Op.in]: fileIds}
         }})
@@ -38,7 +39,7 @@ async function saveItems(collection:NftCollection, fileItems:Array<any>):Promise
     let updated = 0,
         inserted = 0;
 
-    for(let fItem of fileItems){
+    for(let fItem of fileItemsWithPrice){
         const dbItem = existsItems.find(i => i.itemId === fItem.id)
 
         if(dbItem){
