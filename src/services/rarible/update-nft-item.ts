@@ -94,6 +94,7 @@ function buildNftItem(collection:NftCollection, nftData):NftitemCreationAttribut
         collectionId: collection.id,
         bestSellMakePriceUsd: nftData.bestSellOrder?.makePriceUsd,
         bestSellMakePrice: nftData.bestSellOrder?.makePrice,
+        bestSellDate: nftData.bestSellOrder ? new Date(nftData.bestSellOrder.lastUpdatedAt) : null,
     }
 }
 

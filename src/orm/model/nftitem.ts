@@ -1,4 +1,4 @@
-import { Model, DataTypes, InferAttributes, InferCreationAttributes, HasManyGetAssociationsMixin, NonAttribute, Association, ForeignKey } from 'sequelize'
+import { Model, DataTypes, InferAttributes, InferCreationAttributes, HasManyGetAssociationsMixin, NonAttribute, Association, ForeignKey, CreationOptional } from 'sequelize'
 import { db } from '../sequelize'
 import { MetaContent } from './meta-content'
 import { NftCollection } from './nftcollection'
@@ -19,6 +19,7 @@ export class NftItem extends Model<InferAttributes<NftItem, {omit: 'meta'}>,  Nf
 
     declare bestSellMakePriceUsd: number | null
     declare bestSellMakePrice: number | null
+    declare bestSellDate: Date | null
 
     declare getMetaContent: HasManyGetAssociationsMixin<MetaContent>
     declare meta?: NonAttribute<MetaContent[]>
@@ -32,11 +33,14 @@ NftItem.init({
     metaName: DataTypes.STRING(128),
     metaDescr: DataTypes.STRING(2000),
     bestSellMakePriceUsd: {type: DataTypes.DECIMAL(20,2), allowNull: true},
-    bestSellMakePrice: {type: DataTypes.DECIMAL(30,8), allowNull: true}
+    bestSellMakePrice: {type: DataTypes.DECIMAL(30,8), allowNull: true},
+    bestSellDate: { type: DataTypes.DATE}
 },{
     sequelize: db,
     indexes:[
         {unique: false, fields:['itemId']},
+        {unique: false, fields:['bestSellDate']},
+        {unique: false, fields:['bestSellMakePriceUsd']},
     ]
 });
 
