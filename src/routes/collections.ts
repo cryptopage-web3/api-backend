@@ -2,6 +2,7 @@ import { Router } from "express";
 import { FindOptions, InferAttributes } from "sequelize/types";
 import { NftCollection } from "../orm/model/nftcollection";
 import { NftItem } from "../orm/model/nftitem";
+import { asyncHandler } from "../util/router";
 
 export const collectionsRouter = Router();
 
@@ -47,7 +48,7 @@ collectionsRouter.get('/',async (req,res)=>{
  * /collections/{id}:
  *  get:
  *      description: Get collection items
- *      tags: [NftItems]
+ *      tags: [Collections]
  *      parameters:
  *       - in: path
  *         name: id
@@ -72,7 +73,7 @@ collectionsRouter.get('/',async (req,res)=>{
  *             schema:
  *                 $ref: '#/components/schemas/NftItems'
  */
-collectionsRouter.get('/:id', async(req, res)=>{
+collectionsRouter.get('/:id(\\d+)', async(req, res)=>{
     const findOpts: FindOptions<InferAttributes<NftItem, {omit: never;}>> = {
             attributes:['id','itemId','metaName','metaDescr'],
             include: {
@@ -90,3 +91,45 @@ collectionsRouter.get('/:id', async(req, res)=>{
 
     res.json({data, itemsTotal})
 })
+
+/**
+ * @swagger
+ * /collections/last-updated:
+ *  get:
+ *      description: Get Nft items with order by last update DESC
+ *      tags: [Collections]
+ *      parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: number
+ *           default: 10
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: number
+ *           default: 0
+ *      responses:
+ *       "200":
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *                 $ref: '#/components/schemas/NftItems'
+ */
+collectionsRouter.get('/last-updated', asyncHandler(async (req, res)=>{
+    const findOpts: FindOptions<InferAttributes<NftItem, {omit: never;}>> = {
+        attributes:['id','itemId','metaName','metaDescr','bestSellDate'],
+        include: {
+            association: NftItem.associations.meta, 
+            attributes:['url','type','representation','mimeType']
+        },
+        order: [['bestSellDate', 'DESC']],
+        limit: parseInt(req.query.limit as string) || 10,
+        offset: parseInt(req.query.offset as string) || 0,
+    },
+    data = await NftItem.findAll(findOpts),
+    itemsTotal = await NftItem.count()
+
+    res.json({data, itemsTotal})
+}))
