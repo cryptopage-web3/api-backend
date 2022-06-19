@@ -4,8 +4,8 @@ import { getCollectionsIterator } from "./collections-file-storage";
 import { Blockchains } from "./types";
 
 async function run(){
-    let col, bidCount = 0, sellCount = 0;
-    const generator = getCollectionsIterator(Blockchains.POLYGON);
+    let col, bidCount = 0, sellCount = 0, withPrice = 0;
+    const generator = getCollectionsIterator(Blockchains.ETHEREUM);
     
     col = generator.next()
 
@@ -18,9 +18,18 @@ async function run(){
             if(c.bestSellOrder){
                 sellCount ++;
             }
+
+            if(c.bestBidOrder?.takePriceUsd){
+                const price = Math.floor( parseFloat(c.bestBidOrder.takePriceUsd) * 100) / 100
+
+                if(price > 100){
+                    withPrice++
+                    console.log(price)
+                }
+            }
         })
         
-        console.log({bidCount, sellCount})
+        console.log({withPrice, bidCount, sellCount})
 
         col = generator.next()
     }

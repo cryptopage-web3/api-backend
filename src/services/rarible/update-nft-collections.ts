@@ -1,7 +1,7 @@
 //run once per hour
 
 import { config } from 'dotenv'
-import { InferAttributes, Op } from 'sequelize';
+import { InferAttributes, InferCreationAttributes, Op } from 'sequelize';
 
 config();
 
@@ -45,6 +45,7 @@ async function saveCollections(list:Array<any>):Promise<{inserted:number,updated
         } else {
             existsRow.hasBid = updatedRow.hasBid
             existsRow.hasSell = updatedRow.hasSell
+            existsRow.takePriceUsd = updatedRow.takePriceUsd
 
             await existsRow.save()
 
@@ -73,10 +74,11 @@ async function saveCollections(list:Array<any>):Promise<{inserted:number,updated
     return {inserted , updated}
 }
 
-function buildCollection(data):InferAttributes<NftCollection> {
-    let isEnabled = false;
+function buildCollection(data):InferCreationAttributes<NftCollection> {
+    let isEnabled = false,
+        takePriceUsd = Math.floor( parseFloat(data.bestBidOrder?.takePriceUsd || 0) * 100) / 100;
 
-    if(data.blockchain == Blockchains.ETHEREUM && !!data.bestBidOrder){
+    if(data.blockchain == Blockchains.ETHEREUM && !!data.bestBidOrder && takePriceUsd > 10){
         isEnabled = true
     } else if(data.blockchain == Blockchains.POLYGON){
         isEnabled = !!data.meta?.content[0]?.url
@@ -85,13 +87,15 @@ function buildCollection(data):InferAttributes<NftCollection> {
     return {
         collectionId: data.id,
         name: data.name,
+        takePriceUsd,
         type: data.type,
         symbol: data.symbol,
         blockchain: data.blockchain,
         imageUrl: data.meta?.content[0]?.url,
         hasBid: !!data.bestBidOrder,
         hasSell: !!data.bestSellOrder,
-        isEnabled
+        isEnabled,
+        lastReadFromApi: new Date()
     }
 }
 

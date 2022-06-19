@@ -53,3 +53,4 @@ Thumbs.db
 /firestore.json
 /*.env
 /data
+/src/services/rarible/nft-items-info.ts

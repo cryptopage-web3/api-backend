@@ -6,7 +6,7 @@
   "scripts": {
     "start": "npm run build & node dist/index.js",
     "build:dev": "tsc -w --pretty",
-    "build": "tsc --pretty",
+    "build": "tsc --pretty  --project tsconfig.prod.json",
     "server:dev": "nodemon",
     "db:sync": "node dist/orm/sync-db.js",
     "test": "jest --verbose --config=jest.config.js",
