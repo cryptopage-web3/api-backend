@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npm run build & node dist/index.js",
+    "start": "node dist/index.js",
     "build:dev": "tsc -w --pretty",
     "build": "tsc --pretty  --project tsconfig.prod.json",
     "server:dev": "nodemon",
