@@ -11,7 +11,13 @@ components:
               collectionName:
                 type: string
               description:
-                type: string
+                type: string 
+              from:
+                type: string 
+              to:
+                type: string 
+              comments:
+                type: number
               usdPrice:
                 type: number
               image:
