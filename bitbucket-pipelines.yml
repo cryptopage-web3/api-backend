@@ -14,7 +14,7 @@ pipelines:
                   LOCAL_PATH: './deploy/*'
                   EXTRA_ARGS: ['-r']
              - >- 
-                ssh $USER@$SERVER 
+                ssh $DEV_SSH_USER@$DEV_SSH_SERVER 
                 "export TG_BOT_ID=$TG_BOT_ID && 
                 export TG_CHAT_ID=$TG_CHAT_ID && 
                 export TG_TEXT_PREFIX=$TG_TEXT_PREFIX && 
