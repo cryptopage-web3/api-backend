@@ -4,7 +4,7 @@ pipelines:
     master:
       - step:
            name: Deploy to staging server
-           deployment: Staging
+           deployment: Production
            script:
              - pipe: atlassian/scp-deploy:1.2.1
                variables:
