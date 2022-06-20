@@ -6,20 +6,20 @@ pipelines:
            name: Deploy to staging server
            deployment: Staging
            script:
-           - pipe: atlassian/scp-deploy:1.2.1
-              variables:
-                USER: $DEV_SSH_USER
-                SERVER: $DEV_SSH_SERVER
-                REMOTE_PATH: '/tmp/'
-                LOCAL_PATH: './deploy/*'
-                EXTRA_ARGS: ['-r']
-           - >- 
-              ssh $USER@$SERVER 
-              "export TG_BOT_ID=$TG_BOT_ID && 
-              export TG_CHAT_ID=$TG_CHAT_ID && 
-              export TG_TEXT_PREFIX=$TG_TEXT_PREFIX && 
-              export PM2_NAME=$PM2_NAME && 
-              /bin/bash /tmp/deploy.sh > $DEPLOY_LOG_FILE"
+             - pipe: atlassian/scp-deploy:1.2.1
+               variables:
+                  USER: $DEV_SSH_USER
+                  SERVER: $DEV_SSH_SERVER
+                  REMOTE_PATH: '/tmp/'
+                  LOCAL_PATH: './deploy/*'
+                  EXTRA_ARGS: ['-r']
+             - >- 
+                ssh $USER@$SERVER 
+                "export TG_BOT_ID=$TG_BOT_ID && 
+                export TG_CHAT_ID=$TG_CHAT_ID && 
+                export TG_TEXT_PREFIX=$TG_TEXT_PREFIX && 
+                export PM2_NAME=$PM2_NAME && 
+                /bin/bash /tmp/deploy.sh > $DEPLOY_LOG_FILE"
       - step:
            name: Create artifact
            script: 
