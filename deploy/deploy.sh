@@ -1,4 +1,5 @@
 # ENV variables required 
+# PM2_NAME - pm2 service name
 # DEPLOY_LOG_FILE - absolute path to deoploy log file
 # TG_TEXT_PREFIX - text added to each tg message
 # TG_CHAT_ID - telegram chatid for send messages
