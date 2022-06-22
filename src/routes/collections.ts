@@ -26,7 +26,8 @@ export const collectionsRouter = Router();
  *           default: 0
  *       - in: query
  *         name: filter[name]
- *         type: string
+ *         schema:
+ *           type: string
  *       - in: query
  *         name: filter[blockchain]
  *         schema:
