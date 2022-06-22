@@ -27,6 +27,7 @@ tg_message()
         -X POST
          -H 'Content-Type: application/json'
          -d "$data"
+         --connect-timeout 4
          --silent --output /tmp/tg.log --show-error --fail
          https://api.telegram.org/bot$bot_id/sendMessage
     )
@@ -37,6 +38,7 @@ tg_message()
 
     if [ -f "$FILE" ]; then #send file
         curl -F document=@"$FILE" \
+        --connect-timeout 4
         --silent --output /tmp/tg.log --show-error --fail \
         https://api.telegram.org/bot$bot_id/sendDocument?chat_id=$chat_id
     fi
