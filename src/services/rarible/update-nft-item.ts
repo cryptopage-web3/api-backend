@@ -5,7 +5,7 @@ import { InferCreationAttributes, Op } from "sequelize";
 import { MetaContent } from "../../orm/model/meta-content";
 import { NftCollection } from "../../orm/model/nftcollection";
 
-import { NftItem, NftitemCreationAttributes } from "../../orm/model/nftitem";
+import { NftItem, NftItemCreationAttributes } from "../../orm/model/nftitem";
 import { safeStart } from "../../util/safe-start";
 import { getNftItemIterator } from "./nft-item-file-storage";
 import { Blockchains, NftItemFilesIterator } from "./types";
@@ -29,7 +29,7 @@ async function run(){
 }
 
 async function saveItems(collection:NftCollection, fileItems:Array<any>):Promise<{inserted:number,updated:number}>{
-    const saveBulk:NftitemCreationAttributes[] = [],
+    const saveBulk:NftItemCreationAttributes[] = [],
         fileItemsWithPrice = fileItems.filter(f => f.bestSellOrder),
         fileIds = fileItemsWithPrice.map(i => i.id),
         existsItems = await NftItem.findAll({
@@ -82,7 +82,7 @@ async function saveItems(collection:NftCollection, fileItems:Array<any>):Promise
     return {updated, inserted}
 }
 
-function buildNftItem(collection:NftCollection, nftData):NftitemCreationAttributes{
+function buildNftItem(collection:NftCollection, nftData):NftItemCreationAttributes{
     const meta = buildNftItemMeta(nftData)
 
     return {

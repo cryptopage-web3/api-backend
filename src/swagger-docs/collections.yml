@@ -7,8 +7,8 @@ components:
           type: array
           items:
             properties:
-              collectionId:
-                type: string
+              id:
+                type: number
               name:
                 type: string
               type: 

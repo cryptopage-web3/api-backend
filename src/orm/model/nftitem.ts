@@ -3,9 +3,10 @@ import { db } from '../sequelize'
 import { MetaContent } from './meta-content'
 import { NftCollection } from './nftcollection'
 
-export type NftitemCreationAttributes = InferCreationAttributes<NftItem, { omit: 'meta'}>
+export type NftItemCreationAttributes = InferCreationAttributes<NftItem, { omit: 'meta'}>
+export type NftItemInferAttributes = InferAttributes<NftItem, {omit: 'meta'}> 
 
-export class NftItem extends Model<InferAttributes<NftItem, {omit: 'meta'}>,  NftitemCreationAttributes> {
+export class NftItem extends Model<NftItemInferAttributes,  NftItemCreationAttributes> {
     get id():NonAttribute<number>{
         return (this as any).id
     }
