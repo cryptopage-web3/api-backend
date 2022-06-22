@@ -24,6 +24,9 @@ export const collectionsRouter = Router();
  *         schema:
  *           type: number
  *           default: 0
+ *       - in: query
+ *         name: filter[name]
+ *         type: string
  *     responses:
  *       "200":
  *         description: OK
