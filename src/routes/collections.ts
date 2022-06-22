@@ -27,6 +27,11 @@ export const collectionsRouter = Router();
  *       - in: query
  *         name: filter[name]
  *         type: string
+ *       - in: query
+ *         name: filter[blockchain]
+ *         schema:
+ *           type: string
+ *           enum: [ETHEREUM,POLYGON]
  *     responses:
  *       "200":
  *         description: OK
@@ -45,13 +50,18 @@ collectionsRouter.get('/',asyncHandler(async (req:Request<{}, any,any, Collectio
         
     }
 
+    if(req.query.filter?.blockchain){
+        where.blockchain = req.query.filter.blockchain
+    }
+
     const findOptions: FindOptions<InferAttributes<NftCollection, {omit: never;}>> = {
+            attributes:['id','name','type','symbol','blockchain', 'contract', 'imageUrl'],
             where,
             limit: parseInt(req.query.limit as string) || 10,
             offset: parseInt(req.query.offset as string) || 0
         },
         data = await NftCollection.findAll(findOptions),
-        itemsTotal = await NftCollection.count(findOptions)
+        itemsTotal = await NftCollection.count({where: findOptions.where})
 
     res.json({data, itemsTotal})
 }))

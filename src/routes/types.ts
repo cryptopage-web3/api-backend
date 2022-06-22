@@ -6,5 +6,6 @@ export interface PaginationQuery {
 export interface CollectionsQuery extends PaginationQuery {
     filter?:{
         name?: string
+        blockchain?: string
     }
 }
