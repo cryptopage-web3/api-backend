@@ -20,7 +20,13 @@ components:
                 type: number
               usdPrice:
                 type: number
+              url:
+                type: string
               image:
+                type: string
+              likes:
+                type: string
+              dislikes:
                 type: string
               contractAddress:
                 type: string
