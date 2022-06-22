@@ -1,8 +1,9 @@
-import { Router } from "express";
-import { FindOptions, InferAttributes } from "sequelize/types";
-import { NftCollection } from "../orm/model/nftcollection";
-import { NftItem } from "../orm/model/nftitem";
+import { Request, Router } from "express";
+import { FindOptions, InferAttributes, Op, WhereOptions } from "sequelize";
+import { NftCollection, NftCollectionInferAttributes } from "../orm/model/nftcollection";
+import { NftItem, NftItemCreationAttributes } from "../orm/model/nftitem";
 import { asyncHandler } from "../util/router";
+import { CollectionsQuery } from "./types";
 
 export const collectionsRouter = Router();
 
@@ -31,17 +32,26 @@ export const collectionsRouter = Router();
  *             schema:
  *                 $ref: '#/components/schemas/NftCollections'
  */
-collectionsRouter.get('/',async (req,res)=>{
-    const where: FindOptions<InferAttributes<NftCollection, {omit: never;}>> = {
-            where: {isEnabled: true},
+collectionsRouter.get('/',asyncHandler(async (req:Request<{}, any,any, CollectionsQuery>,res)=>{
+    let where:WhereOptions<NftCollectionInferAttributes> = {isEnabled: true}
+
+    if(req.query.filter?.name){
+        where.name = req.query.filter.name.at(-1) == '%'
+            ? {[Op.like]: req.query.filter?.name }
+            : req.query.filter?.name
+        
+    }
+
+    const findOptions: FindOptions<InferAttributes<NftCollection, {omit: never;}>> = {
+            where,
             limit: parseInt(req.query.limit as string) || 10,
             offset: parseInt(req.query.offset as string) || 0
         },
-        data = await NftCollection.findAll(where),
-        itemsTotal = await NftCollection.count(where)
+        data = await NftCollection.findAll(findOptions),
+        itemsTotal = await NftCollection.count(findOptions)
 
     res.json({data, itemsTotal})
-})
+}))
 
 /**
  * @swagger
@@ -74,13 +84,15 @@ collectionsRouter.get('/',async (req,res)=>{
  *                 $ref: '#/components/schemas/NftItems'
  */
 collectionsRouter.get('/:id(\\d+)', async(req, res)=>{
-    const findOpts: FindOptions<InferAttributes<NftItem, {omit: never;}>> = {
+    
+
+    const findOpts: FindOptions<NftItemCreationAttributes> = {
             attributes:['id','itemId','metaName','metaDescr'],
             include: {
                 association: NftItem.associations.meta, 
                 attributes:['url','type','representation','mimeType']
             },
-            where:{    
+            where: {    
                 collectionId: parseInt(req.params.id)
             },
             limit: parseInt(req.query.limit as string) || 10,

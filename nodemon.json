@@ -8,6 +8,5 @@
       "src/*",
       "node_modules/*"
     ],
-    "exec": "node -r source-map-support/register --enable-source-maps dist/index.js",
-    "inspect": "25018"
+    "exec": "node -r source-map-support/register --enable-source-maps --inspect=25018 dist/index.js"
 }

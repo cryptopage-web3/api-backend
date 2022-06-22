@@ -2,7 +2,9 @@ import { Model, DataTypes, InferAttributes, InferCreationAttributes, HasManyGetA
 import { db } from '../sequelize';
 import { NftItem } from './nftitem';
 
-export class NftCollection extends Model<InferAttributes<NftCollection>, InferCreationAttributes<NftCollection>> {
+export type NftCollectionInferAttributes = InferAttributes<NftCollection>
+
+export class NftCollection extends Model<NftCollectionInferAttributes, InferCreationAttributes<NftCollection>> {
   get id():NonAttribute<number>{
     return (this as any).id
   }
