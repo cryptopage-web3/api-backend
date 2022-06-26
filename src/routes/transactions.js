@@ -61,6 +61,51 @@ router.get('/:chain/:address', async (req, res) => {
 
 /**
  * @swagger
+ * /transactions/detail/{chain}/{txHash}:
+ *   get:
+ *     summary: Get transaction.
+ *     description: Get transactions.
+ *     tags: [Transactions]
+ *     parameters:
+ *       - in: path
+ *         name: chain
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [eth, bsc, matic, sol, tron]
+ *           default: eth
+ *         description: chain name
+ *       - in: path
+ *         name: txHash
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       "200":
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *                 $ref: '#/components/schemas/Transaction'
+ *       "400":
+ *         $ref: '#/components/responses/NotFound'
+ */
+router.get('/detail/:chain/:txHash', async (req, res) => {
+
+    const { chain, txHash } = req.params;
+
+    try {
+        const result = await transactionsModule.getTransactionDetails(txHash, chain);
+        res.json(result);
+    } catch (err) {
+        res.status(BAD_REQUEST).json({
+            message: err.message
+        });
+    }
+});
+
+/**
+ * @swagger
  * /transactions/transfers/{chain}/{address}:
  *   get:
  *     summary: Get transactions from address.

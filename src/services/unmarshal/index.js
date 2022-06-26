@@ -150,6 +150,38 @@ class UnmarshalApi {
         }
     }
 
+    async getTransactionDetails(txHash) {
+        const { data } = await axios.get(`${this.baseUrl}/v2/${this.chainName}/transactions/${txHash}?auth_key=${this.apiKey}`);
+
+        const transfers = [...(data.sent || []), ...(data.other || []), ...(data.received || [])];
+        const tranfersInfo = transfers.map(e => {
+            return {
+                from: e.from,
+                to: e.to,
+                symbol: e.symbol,
+                name: e.name,
+                logo: e.logo_url,
+                amount: e.value / 10 ** e.decimals
+            }
+        });
+
+        const value = data.value / 10 ** 18;
+        const fee = data.fee / 10 ** 18;
+
+        return {
+            txHash,
+            block: data.block,
+            date: new Date(data.date * 1000),
+            nonce: data.nonce,
+            status: this.txStatus[data.status],
+            value,
+            fee,
+            valueUSD: getCoinPrice(this.mainCoinId) * value,
+            feeUSD: getCoinPrice(this.mainCoinId) * value,
+            transfers: tranfersInfo,
+            logs: data.logDetails
+        }
+    }
 }
 
 module.exports = UnmarshalApi;
