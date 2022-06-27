@@ -135,6 +135,12 @@ collectionsRouter.get('/:id(\\d+)', async(req, res)=>{
  *         schema:
  *           type: number
  *           default: 0
+ *       - in: query
+ *         name: filter[collectionId]
+ *         schema:
+ *           type: array
+ *           items:
+ *              type: number
  *      responses:
  *       "200":
  *         description: OK
