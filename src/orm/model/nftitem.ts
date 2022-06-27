@@ -1,4 +1,4 @@
-import { Model, DataTypes, InferAttributes, InferCreationAttributes, HasManyGetAssociationsMixin, NonAttribute, Association, ForeignKey, HasOneGetAssociationMixin, BelongsToGetAssociationMixin } from 'sequelize'
+import { Model, DataTypes, InferAttributes, InferCreationAttributes, HasManyGetAssociationsMixin, NonAttribute, Association, ForeignKey, BelongsToGetAssociationMixin } from 'sequelize'
 import { db } from '../sequelize'
 import { MetaContent } from './meta-content'
 import { NftCollection } from './nftcollection'
