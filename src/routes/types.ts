@@ -9,3 +9,9 @@ export interface CollectionsQuery extends PaginationQuery {
         blockchain?: string
     }
 }
+
+export interface NftItemsQuery extends PaginationQuery {
+    filter?:{
+        collectionId?: Array<number>
+    }
+}

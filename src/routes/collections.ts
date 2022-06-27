@@ -1,9 +1,9 @@
 import { Request, Router } from "express";
 import { FindOptions, InferAttributes, Op, WhereOptions } from "sequelize";
 import { NftCollection, NftCollectionInferAttributes } from "../orm/model/nftcollection";
-import { NftItem, NftItemCreationAttributes } from "../orm/model/nftitem";
+import { NftItem, NftItemCreationAttributes, NftItemInferAttributes } from "../orm/model/nftitem";
 import { asyncHandler } from "../util/router";
-import { CollectionsQuery } from "./types";
+import { CollectionsQuery, NftItemsQuery } from "./types";
 
 export const collectionsRouter = Router();
 
@@ -143,19 +143,29 @@ collectionsRouter.get('/:id(\\d+)', async(req, res)=>{
  *             schema:
  *                 $ref: '#/components/schemas/NftItems'
  */
-collectionsRouter.get('/last-updated', asyncHandler(async (req, res)=>{
-    const findOpts: FindOptions<InferAttributes<NftItem, {omit: never;}>> = {
+collectionsRouter.get('/last-updated', asyncHandler(async (req:Request<{}, any,any, NftItemsQuery>, res)=>{
+    const collectionFilter = req.query.filter?.collectionId ? [{
+            association: NftItem.associations.collection,
+            where: { id: req.query.filter.collectionId },
+            attributes: []
+        }] : [],
+        findOpts: FindOptions<NftItemInferAttributes> = {
         attributes:['id','itemId','metaName','metaDescr','bestSellDate'],
-        include: {
+        include: [{
             association: NftItem.associations.meta, 
             attributes:['url','type','representation','mimeType']
-        },
+        }, ...(collectionFilter)],
         order: [['bestSellDate', 'DESC']],
         limit: parseInt(req.query.limit as string) || 10,
         offset: parseInt(req.query.offset as string) || 0,
-    },
-    data = await NftItem.findAll(findOpts),
-    itemsTotal = await NftItem.count()
+    }
+
+    const data = await NftItem.findAll(findOpts),
+        itemsTotal = await NftItem.count({
+            where: findOpts.where, 
+            include: collectionFilter, 
+            logging: console.log
+        })
 
     res.json({data, itemsTotal})
 }))

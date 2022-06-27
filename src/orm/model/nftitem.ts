@@ -1,4 +1,4 @@
-import { Model, DataTypes, InferAttributes, InferCreationAttributes, HasManyGetAssociationsMixin, NonAttribute, Association, ForeignKey } from 'sequelize'
+import { Model, DataTypes, InferAttributes, InferCreationAttributes, HasManyGetAssociationsMixin, NonAttribute, Association, ForeignKey, HasOneGetAssociationMixin, BelongsToGetAssociationMixin } from 'sequelize'
 import { db } from '../sequelize'
 import { MetaContent } from './meta-content'
 import { NftCollection } from './nftcollection'
@@ -12,6 +12,8 @@ export class NftItem extends Model<NftItemInferAttributes,  NftItemCreationAttri
     }
     declare collectionId: ForeignKey<NftCollection['id']>
     declare collection?: NonAttribute<NftCollection>
+    declare getCollection: BelongsToGetAssociationMixin<NftCollection>
+
 
     declare itemId: string
     //declare raribleCollectionId: string
@@ -25,7 +27,8 @@ export class NftItem extends Model<NftItemInferAttributes,  NftItemCreationAttri
     declare getMetaContent: HasManyGetAssociationsMixin<MetaContent>
     declare meta?: NonAttribute<MetaContent[]>
     declare static associations:{
-        meta: Association<NftItem, MetaContent>
+        meta: Association<NftItem, MetaContent>,
+        collection: Association<NftItem, NftCollection>
     }
 }
 

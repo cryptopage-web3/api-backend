@@ -58,3 +58,8 @@ NftCollection.hasMany(NftItem,{
   foreignKey: 'collectionId',
   as: 'items'
 })
+
+NftItem.belongsTo(NftCollection,{
+  foreignKey: 'collectionId',
+  as: 'collection'
+})
