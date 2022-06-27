@@ -69,16 +69,21 @@ class DebankApi {
     }
 
     getNFTDataFromItem(item) {
+        const type = item.content_type.split('_')[0];
         return {
             from: this.address,
             to: this.address,
+            likes: 0,
+            dislikes: 0,
             comments: 0,
             date: new Date(),
             name: item.name || '',
+            type,
             collectionName: item.contract_name || '',
             description: item.description || '',
             usdPrice: item.usd_price,
-            image: item.content,
+            url: item.content,
+            image: item.thumbnail_url || item.content,
             contract_address: item.contract_id || '',
             tokenId: item.inner_id,
             attributes: item.attributes

@@ -15,6 +15,14 @@ async function getWalletAllTransactions(address, blockchain, skip, limit) {
     return blockchainModules[blockchain].getWalletAllTransactions(address, skip, limit);
 }
 
+async function getTransactionDetails(txHash, blockchain) {
+    if (!blockchainModules[blockchain]) {
+        throw new Error(`${blockchain} not supported.`);
+    }
+
+    return blockchainModules[blockchain].getTransactionDetails(txHash);
+}
+
 async function getWalletTokenTransfers(address, blockchain, skip, limit) {
     if (!blockchainModules[blockchain]) {
         throw new Error(`${blockchain} not supported.`);
@@ -25,5 +33,6 @@ async function getWalletTokenTransfers(address, blockchain, skip, limit) {
 
 module.exports = {
     getWalletAllTransactions,
-    getWalletTokenTransfers
+    getWalletTokenTransfers,
+    getTransactionDetails
 }
