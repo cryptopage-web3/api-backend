@@ -2,6 +2,7 @@
 const axios = require('axios');
 const conf = require('./../../enums/chains');
 const { getCoinPrice } = require('../../cache/coins');
+const { getDataFromUrl, getFieldFromContract, getDateFromBlock } = require('./helper');
 
 const EtherscanApi = require('../etherscan');
 
@@ -17,6 +18,7 @@ class UnmarshalApi {
         this.mainCoinId = config.nativeCoinId;
         this.explorerUrl = config.explorerUrl;
         this.nativeCoinSymbol = config.nativeCoinSymbol;
+        this.rpc = config.rpc;
 
         if (address && !address.match('^0x[a-fA-F0-9]{40}$')) {
             throw new Error('Address is invalid.');
@@ -97,7 +99,7 @@ class UnmarshalApi {
             tokenAddress = info.token_id;
             tokenAmount = info.value / 10 ** info.decimals;
         }
-        
+
         const value = item.value / 10 ** 18;
         return {
             title: title || 'Transfer',
@@ -135,7 +137,7 @@ class UnmarshalApi {
                 transactions.push(transaction);
             }
             return { count, transactions };
-        } catch(e) {
+        } catch (e) {
             return { count: 0, transactions: [] };
         }
     }
@@ -181,6 +183,100 @@ class UnmarshalApi {
             transfers: tranfersInfo,
             logs: data.logDetails
         }
+    }
+
+    async getNFTDataFromItem(item) {
+        const { url, type, name, price, description, attributes } = await this.getNFTDetailsFromApi(item.contract_address, item.token_id);
+
+        return {
+            from: item.sender,
+            to: item.to,
+            likes: 0,
+            dislikes: 0,
+            comments: 0,
+            date: new Date(),
+            name: name || '',
+            collectionName: name || '',
+            description: description || '',
+            type,
+            usdPrice: Number(price),
+            url,
+            image: url,
+            contract_address: item.contract_address || '',
+            tokenId: item.token_id,
+            attributes
+        }
+    }
+
+    async getNFTTransactionDataFromItem(item) {
+        const { name, symbol, date } = await this.getNFTDetailsFromBlockchain(item.contract_address, item.block_number);
+
+        return {
+            name, 
+            symbol, 
+            date,
+            from: item.sender,
+            to: item.to,
+            txHash: item.transaction_hash,
+            date: new Date(),
+            contract_address: item.contract_address || '',
+            tokenId: item.token_id
+        }
+    }
+
+
+    async getNFTDetailsFromApi(address, tokenId) {
+        try {
+            const { data } = await axios.get(`${this.baseUrl}/v2/${this.chainName}/address/${address}/details?page=1&pageSize=1&tokenId=${tokenId}&auth_key=${this.apiKey}`);
+            const info = data.nft_token_details[0];
+            const { url, type } = await getDataFromUrl(info.image_url);
+            return {
+                url,
+                type,
+                name: info.name,
+                price: info.price,
+                description: info.description,
+                attributes: info.properties
+            }
+        } catch (err) {
+            return {}
+        }
+    }
+
+    async getNFTDetailsFromBlockchain(address, blockNumber) {
+        const name = await getFieldFromContract(this.rpc, address, 'name');
+        const symbol = await getFieldFromContract(this.rpc, address, 'symbol');
+        const date = await getDateFromBlock(this.rpc, blockNumber);
+        return { symbol, name, date };
+    }
+
+    async getNFTTransactionsFromApi(skip, limit) {
+        const { data } = await axios.get(`${this.baseUrl}/v2/${this.chainName}/address/${this.address}/nft-transactions?page=${skip}&pageSize=${limit}&auth_key=${this.apiKey}`);
+        return data;
+    }
+
+    async getWalletAllNFTs(skip, limit) {
+        const data = await this.getNFTTransactionsFromApi(skip, limit);
+
+        const promises = [];
+        for (const item of data.transactions) {
+            const promise = this.getNFTDataFromItem(item);
+            promises.push(promise);
+        }
+        const list = await Promise.all(promises);
+        return { list, count: data.total_txs };
+    }
+
+    async getWalletNFTTransactions(skip, limit) {
+        const data = await this.getNFTTransactionsFromApi(skip, limit);
+
+        const promises = [];
+        for (const item of data.transactions) {
+            const promise = this.getNFTTransactionDataFromItem(item);
+            promises.push(promise);
+        }
+        const list = await Promise.all(promises);
+        return { list, count: data.total_txs };
     }
 }
 

@@ -8,6 +8,7 @@ module.exports = {
         nativeCoinSymbol: 'ETH',
         apiUrl: 'https://api.etherscan.io/api?',
         apiKey: 'VQDBC4GZA5MQT2F6IRW2U6RPH66HJRSF6S',
+        rpc: 'https://eth.public-rpc.com',
         nativeCoinId: 'ethereum'
     },
     bsc: {
@@ -19,6 +20,7 @@ module.exports = {
         nativeCoinSymbol: 'BNB',
         apiUrl: 'https://api.bscscan.com/api?',
         apiKey: 'TQDPK4XAU4BZT8WQNN6IETRRXXDI37W64Y',
+        rpc: 'https://bscrpc.com',
         nativeCoinId: 'binancecoin'
     },
     matic: {
@@ -30,6 +32,7 @@ module.exports = {
         nativeCoinSymbol: 'MATIC',
         apiUrl: 'https://api.polygonscan.com/api?',
         apiKey: '4DCKF5U2YGR1HNG1KHWP8DSK47AH85W28Z',
+        rpc: 'https://polygon-rpc.com',
         nativeCoinId: 'matic-network'
     },
     sol: {
@@ -45,4 +48,4 @@ module.exports = {
         nativeCoinSymbol: 'TRX',
         nativeCoinId: 'tron'
     }
-}
+};
