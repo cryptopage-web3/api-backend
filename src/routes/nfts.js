@@ -94,7 +94,7 @@ router.get('/:chain/:address', async (req, res) => {
  *         content:
  *           application/json:
  *             schema:
- *                 $ref: '#/components/schemas/NFTs'
+ *                 $ref: '#/components/schemas/NFTTransactions'
  *       "400":
  *         $ref: '#/components/responses/NotFound'
  */
