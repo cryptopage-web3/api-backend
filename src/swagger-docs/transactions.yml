@@ -2,12 +2,15 @@ components:
   schemas:
   
     Transactions:
+      type: object
+      properties:
+        transactions:
           type: array
           items:
             type: object
             properties:
-              name:
-                title: string
+              title:
+                type: string
               from:
                 type: string
               to:
@@ -15,6 +18,8 @@ components:
               fee:
                 type: number
               value:
+                type: number
+              valueUSD:
                 type: number
               tokenSymbol:
                 type: string
@@ -26,6 +31,11 @@ components:
                 type: string
               explorerUrl:
                 type: string
+              date:
+                type: string
+        count:
+          type: number
+
 
     Transaction:
           type: object

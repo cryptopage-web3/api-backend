@@ -2,6 +2,9 @@ components:
   schemas:
   
     Tokens:
+      type: object
+      properties:
+        tokens:
           type: array
           items:
             type: object
@@ -20,3 +23,5 @@ components:
                 type: number
               balancePrice:
                 type: number
+        count:
+          type: number

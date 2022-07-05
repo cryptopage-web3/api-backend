@@ -2,37 +2,95 @@ components:
   schemas:
   
     NFTs:
+      type: object
+      properties:
+        list:
           type: array
           items:
             type: object
             properties:
+              from:
+                type: string
+              to:
+                type: string
+              likes:
+                type: number
+              dislikes:
+                type: number
+              comments:
+                type: number
+              date:
+                type: string
               name:
-                title: string
+                type: string
               collectionName:
                 type: string
               description:
-                type: string 
-              from:
-                type: string 
-              to:
-                type: string 
-              comments:
-                type: number
+                type: string
+              type:
+                type: string
               usdPrice:
                 type: number
               url:
                 type: string
               image:
                 type: string
-              likes:
-                type: string
-              dislikes:
-                type: string
-              contractAddress:
+              contract_address:
                 type: string
               tokenId:
                 type: string
-              tokenAddress:
+              attributes:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    trait_type:
+                      type: string
+                    value:
+                      type: string
+        count:
+          type: number
+
+    NFTTransactions:
+      type: object
+      properties:
+        list:
+          type: array
+          items:
+            type: object
+            properties:
+              url:
+                type: string
+              type:
+                type: string
+              price:
+                type: string
+              description:
                 type: string
               attributes:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    trait_type:
+                      type: string
+                    value:
+                      type: string
+              name:
                 type: string
+              symbol:
+                type: string
+              date:
+                type: string
+              from:
+                type: string
+              to:
+                type: string
+              txHash:
+                type: string
+              contract_address:
+                type: string
+              tokenId:
+                type: string
+        count:
+          type: number
