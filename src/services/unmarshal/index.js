@@ -106,6 +106,8 @@ class UnmarshalApi {
             from: item.from,
             to: item.to,
             fee: item.fee / 10 ** 18,
+            type: item.type,
+            description: item.description,
             value,
             valueUSD: getCoinPrice(this.mainCoinId) * value,
             tokenSymbol,
@@ -119,7 +121,8 @@ class UnmarshalApi {
 
     async getTransactionsFromApi(skip, limit) {
         if (skip === 0) skip = 1;
-        const { data } = await axios.get(`${this.baseUrl}/v2/${this.chainName}/address/${this.address}/transactions?page=${skip}&pageSize=${limit}&auth_key=${this.apiKey}`);
+        const url = `${this.baseUrl}/v2/${this.chainName}/address/${this.address}/transactions?page=${skip}&pageSize=${limit}&auth_key=${this.apiKey}`;
+        const { data } = await axios.get(url);
         const { transactions, total_txs } = data;
         if (!transactions?.length) {
             return { items: [], count: 0 };
