@@ -1,6 +1,7 @@
-import { Blockchains } from "./services/rarible/types"
+import { Blockchains } from "../services/rarible/types"
 
 export interface Env {
+    PORT: string
     HOST: string | undefined
 
     DB_HOST: string
@@ -11,6 +12,8 @@ export interface Env {
 
     UPDATE_NFT_COLLECTION_CRON_READ_SIZE: string
     UPDATE_NFT_COLLECTION_BLOCKCHAIN: Blockchains
+
+    ETHERSCAN_API_KEY: string
 }
 
 export type EnvVarName = keyof Env

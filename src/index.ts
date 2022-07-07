@@ -1,11 +1,17 @@
 require('dotenv').config();
 
+import 'reflect-metadata'
+
+import { InversifyExpressServer } from 'inversify-express-utils';
+
+import { container } from './ioc'
+import { envToInt, envToString } from './util/env-util';
+
 const express = require('express');
 const app = express();
-const httpServer = require('http').createServer(app);
 const cors = require('cors')
-const port = process.env.PORT || 3000;
-const host = process.env.HOST
+const port = envToInt('PORT', 3000);
+const host = envToString('HOST','');
 app.use(cors());
 
 app.use(express.static('public'))
@@ -22,6 +28,8 @@ app.use('/nfts', require('./routes/nfts'));
 const swaggerRoutes = require('./routes/swagger/swagger.route');
 app.use('/', swaggerRoutes);
 
-httpServer.listen(port, host, function () {
+let server = new InversifyExpressServer(container, null, null, app);
+
+server.build().listen(port, host, function () {
     console.log(`app listening to ${host? host+':': ''} ${port}`);
-});
+})

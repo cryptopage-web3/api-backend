@@ -1,10 +1,7 @@
 // @ts-nocheck
 const axios = require('axios');
-const conf = require('./../../enums/chains');
 const { getCoinPrice } = require('../../cache/coins');
 const { getDataFromUrl, getFieldFromContract, getDateFromBlock } = require('./helper');
-
-const EtherscanApi = require('../etherscan');
 
 class UnmarshalApi {
     /**
@@ -25,7 +22,6 @@ class UnmarshalApi {
         }
 
         this.address = address;
-        this.etherscan = new EtherscanApi(data);
     }
 
     apiKey = '3Z1C4SxhUE6Cj7P5zxWv47katMQQXlffeHz61xe9';
@@ -127,7 +123,7 @@ class UnmarshalApi {
         if (!transactions?.length) {
             return { items: [], count: 0 };
         }
-        //const count = await this.etherscan.getTxCount();
+        
         return { items: transactions, count: total_txs };
     }
 

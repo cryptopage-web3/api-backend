@@ -1,4 +1,4 @@
-import { EnvVarName } from "../environment";
+import { EnvVarName } from "../types/environment";
 
 const stringYes: string[] = ['yes', '1','true','on'];
 
