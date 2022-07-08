@@ -226,7 +226,10 @@ class UnmarshalApi {
             txHash: item.transaction_hash,
             date: new Date(),
             contract_address: item.contract_address || '',
-            tokenId: item.token_id
+            tokenId: item.token_id,
+            likes: 0,
+            dislikes: 0,
+            comments: 0
         }
     }
 

@@ -92,5 +92,11 @@ components:
                 type: string
               tokenId:
                 type: string
+              likes:
+                type: number
+              dislikes:
+                type: number
+              comments:
+                type: number
         count:
           type: number
