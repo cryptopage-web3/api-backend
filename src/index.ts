@@ -22,7 +22,7 @@ app.use(express.json({ limit: '15mb' }));
 
 app.use('/', require('./routes'));
 app.use('/tokens', require('./routes/tokens'));
-app.use('/transactions', require('./routes/transactions'));
+//app.use('/transactions', require('./routes/transactions'));
 app.use('/nfts', require('./routes/nfts'));
 
 const swaggerRoutes = require('./routes/swagger/swagger.route');
