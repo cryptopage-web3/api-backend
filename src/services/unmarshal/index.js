@@ -265,7 +265,7 @@ class UnmarshalApi {
     }
 
     async getNFTAssetsFromApi(skip, limit) {
-        const { data } = await axios.get(`${this.baseUrl}/v3/${this.chainName}/address/${this.address}/nft-assets?page=${skip}&pageSize=${limit}&auth_key=${this.apiKey}`);
+        const { data } = await axios.get(`${this.baseUrl}/v2/${this.chainName}/address/${this.address}/nft-assets?page=${skip}&pageSize=${limit}&auth_key=${this.apiKey}`);
         return data;
     }
 
@@ -278,7 +278,7 @@ class UnmarshalApi {
             promises.push(promise);
         }
         const list = await Promise.all(promises);
-        return { list, count: data.total_txs };
+        return { list, count: data.total_assets };
     }
 
     async getWalletNFTTransactions(skip, limit) {
