@@ -47,10 +47,10 @@ const BAD_REQUEST = 400;
 router.get('/:chain/:address', async (req, res) => {
 
     const { chain, address } = req.params;
-    const { skip = 1, limit = 20 } = req.query;
+    const { skip = 0, limit = 20 } = req.query;
 
     try {
-        const { list, count } = await nftsModule.getWalletAllNFTs(address, chain, Number(skip), Number(limit));
+        const { list, count } = await nftsModule.getWalletAllNFTs(address, chain, Number(skip)++, Number(limit));
         res.json({ list, count });
     } catch (err) {
         res.status(BAD_REQUEST).json({
