@@ -50,7 +50,7 @@ router.get('/:chain/:address', async (req, res) => {
     const { skip = 0, limit = 20 } = req.query;
 
     try {
-        const { list, count } = await nftsModule.getWalletAllNFTs(address, chain, Number(skip)++, Number(limit));
+        const { list, count } = await nftsModule.getWalletAllNFTs(address, chain, Number(skip)+1, Number(limit));
         res.json({ list, count });
     } catch (err) {
         res.status(BAD_REQUEST).json({
