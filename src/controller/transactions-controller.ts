@@ -1,7 +1,7 @@
 import { inject } from "inversify";
 import { controller, httpGet, interfaces, queryParam, requestParam, response } from "inversify-express-utils";
 import { IDS } from '../types/index';
-import { ITransactionManager } from '../modules/transactions/types';
+import { ITransactionManager, ITransactionsPagination } from '../modules/transactions/types';
 import * as express from "express";
 
 const BAD_REQUEST = 400;
@@ -53,14 +53,13 @@ export class TransactionsController implements interfaces.Controller {
     private async getAddressTransactions(
         @requestParam('chain') chain:string, 
         @requestParam('address') address:string,
-        @queryParam('skip') skip: number = 0,
-        @queryParam('limit') limit: number = 20,
+        @queryParam('continue') paginator:ITransactionsPagination,
         @response() res: express.Response){
         
             const manager = this._txManagerFactory(chain);
             try {
-                const { transactions, count } = await manager.getWalletAllTransactions(address, skip, limit);
-                res.json({ transactions, count });
+                const resultPage = await manager.getWalletAllTransactions(address, paginator);
+                res.json(resultPage);
             } catch (err) {
                 res.status(BAD_REQUEST).json({
                     message: err.message

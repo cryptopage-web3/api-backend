@@ -1,7 +1,7 @@
 import { Container } from "inversify"
 import { IDS } from './types/index';
 import { envToString } from './util/env-util';
-import { EtherscanApi } from './services/etherscan/index';
+import { EtherscanApi } from './services/etherscan/etherscan-api';
 
 //autoload controllers
 import './controller/transactions-controller'
@@ -11,9 +11,9 @@ import { ChainId } from './modules/transactions/types';
 
 export const container = new Container();
 
-container.bind(IDS.SERVICE.EtherscanApi).toConstantValue(() =>{
-    return new EtherscanApi(envToString('ETHERSCAN_API_KEY'));
-})
+container.bind(IDS.SERVICE.EtherscanApi).toConstantValue(
+    new EtherscanApi(envToString('ETHERSCAN_API_KEY'))
+)
 
 container.bind(IDS.MODULES.TransactionManager).to(EthTransactionManager).inSingletonScope().whenTargetNamed(ChainId.eth)
 container.bind(IDS.MODULES.TransactionManager).toConstantValue(require('./modules/transactions/bsc')).whenTargetNamed(ChainId.bsc)
