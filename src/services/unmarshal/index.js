@@ -119,9 +119,10 @@ class UnmarshalApi {
         if (skip === 0) skip = 1;
         const url = `${this.baseUrl}/v2/${this.chainName}/address/${this.address}/transactions?page=${skip}&pageSize=${limit}&auth_key=${this.apiKey}`;
         const { data } = await axios.get(url);
-        const { transactions, total_txs } = data;
+        const { transactions } = data;
+        const count = await this.etherscan.getTxCount();
         if (!transactions?.length) {
-            return { items: [], count: 0 };
+            return { items: [], count };
         }
         
         return { items: transactions, count: total_txs };
@@ -185,11 +186,11 @@ class UnmarshalApi {
     }
 
     async getNFTDataFromItem(item) {
-        const { url, type, name, price, description, attributes } = await this.getNFTDetailsFromApi(item.contract_address, item.token_id);
+        const { url, type, name, price, description, attributes } = await this.getNFTDetailsFromApi(item.asset_contract, item.token_id);
 
         return {
-            from: item.sender,
-            to: item.to,
+            from: item.creator,
+            to: item.owner,
             likes: 0,
             dislikes: 0,
             comments: 0,
@@ -209,8 +210,14 @@ class UnmarshalApi {
 
     async getNFTTransactionDataFromItem(item) {
         const { name, symbol, date } = await this.getNFTDetailsFromBlockchain(item.contract_address, item.block_number);
+        const { url, type, price, description, attributes } = await this.getNFTDetailsFromApi(item.contract_address, item.token_id);
 
         return {
+            url, 
+            type, 
+            price, 
+            description, 
+            attributes,
             name, 
             symbol, 
             date,
@@ -219,7 +226,10 @@ class UnmarshalApi {
             txHash: item.transaction_hash,
             date: new Date(),
             contract_address: item.contract_address || '',
-            tokenId: item.token_id
+            tokenId: item.token_id,
+            likes: 0,
+            dislikes: 0,
+            comments: 0
         }
     }
 
@@ -254,16 +264,21 @@ class UnmarshalApi {
         return data;
     }
 
+    async getNFTAssetsFromApi(skip, limit) {
+        const { data } = await axios.get(`${this.baseUrl}/v2/${this.chainName}/address/${this.address}/nft-assets?page=${skip}&pageSize=${limit}&auth_key=${this.apiKey}`);
+        return data;
+    }
+
     async getWalletAllNFTs(skip, limit) {
-        const data = await this.getNFTTransactionsFromApi(skip, limit);
+        const data = await this.getNFTAssetsFromApi(skip, limit);
 
         const promises = [];
-        for (const item of data.transactions) {
+        for (const item of data.nft_assets) {
             const promise = this.getNFTDataFromItem(item);
             promises.push(promise);
         }
         const list = await Promise.all(promises);
-        return { list, count: data.total_txs };
+        return { list, count: data.total_assets };
     }
 
     async getWalletNFTTransactions(skip, limit) {

@@ -81,6 +81,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EthErc20SubTransaction'
+              date:
+                type: string
+        count:
+          type: number
 
     Erc20Transaction:
       type: object
