@@ -1,0 +1,157 @@
+components:
+  schemas:
+    EthTransaction:
+      type: object
+      properties:
+        transactionType:
+          type: string
+        operationType: 
+          type: string
+        blockNumber:
+          type: number
+        timeStamp:
+          type: number
+        hash:
+          type: string
+        nonce:
+          type: number
+        blockHash:
+          type: number
+        transactionIndex:
+          type: number
+        from:
+          type: string
+        to:
+          type: string
+        value:
+          type: number
+        gas:
+          type: number
+        gasPrice:
+          type: number
+        isError:
+          type: string
+        txreceipt_status:
+          type: string
+        input:
+          type: string
+        contractAddress:
+          type: string
+        cumulativeGasUsed:
+          type: number
+        gasUsed:
+          type: string
+        confirmations:
+          type: number
+        methodId:
+          type: string
+        functionName: 
+          type: string
+        send:
+          type: array
+          items:
+            $ref: '#/components/schemas/EthErc20SubTransaction'
+        receive:
+          type: array
+          items:
+            $ref: '#/components/schemas/EthErc20SubTransaction'
+
+    Erc20Transaction:
+      type: object
+      properties:
+        transactionType:
+          type: string
+        operationType:
+          type: string
+        blockNumber:
+          type: number
+        timeStamp:
+          type: number
+        hash:
+          type: string
+        nonce:
+          type: number
+        blockHash:
+          type: string
+        from:
+          type: string
+        contractAddress:
+          type: string
+        to:
+          type: string
+        value:
+          type: number
+        tokenName:
+          type: string
+        tokenSymbol:
+          type: string
+        tokenDecimal:
+          type: number
+        transactionIndex:
+          type: number
+        gas:
+          type: number
+        gasPrice:
+          type: number
+        gasUsed:
+          type: number
+        cumulativeGasUsed:
+          type: number
+        input:
+          type: string
+        confirmations:
+          type: number
+        send:
+          type: array
+          items:
+            $ref: '#/components/schemas/EthErc20SubTransaction'
+        receive:
+          type: array
+          items:
+            $ref: '#/components/schemas/EthErc20SubTransaction'
+            
+    EthErc20SubTransaction:
+      type: object
+      properties:
+        transactionType:
+          type: string
+        operationType:
+          type: string
+        blockNumber:
+          type: number
+        timeStamp:
+          type: number
+        hash:
+          type: string
+        nonce:
+          type: number
+        blockHash:
+          type: string
+        from:
+          type: string
+        contractAddress:
+          type: string
+        to:
+          type: string
+        value:
+          type: number
+        tokenName:
+          type: string
+        tokenSymbol:
+          type: string
+        tokenDecimal:
+          type: number
+        transactionIndex:
+          type: number
+        gas:
+          type: number
+        gasPrice:
+          type: number
+        gasUsed:
+          type: number
+        cumulativeGasUsed:
+          type: number
+        input:
+          type: string
+        confirmations:
+          type: number
