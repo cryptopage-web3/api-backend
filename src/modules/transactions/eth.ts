@@ -11,12 +11,12 @@ const config = require('./../../enums/chains');
 export class EthTransactionManager implements ITransactionManager {
     @inject(IDS.SERVICE.EtherscanApi) private _etherscan: EtherscanApi;
 
-    async getWalletAllTransactions(address:string, paginator:ITransactionsPagination) {
+    async getWalletAllTransactions(address:string, offset:ITransactionsPagination) {
         let transactions:Etherscan.ITransactionData[] = [],
             erc20Transactions:Etherscan.IErc20TransactionData[] = [];
 
-        const txGlobalOffset = paginator?.tx || 0,
-            erc20GlobalOffset = paginator?.erc20 || 0,
+        const txGlobalOffset = offset?.tx || 0,
+            erc20GlobalOffset = offset?.erc20 || 0,
             txPaginator = this.buildFloatPaginator(txGlobalOffset),
             erc20Paginator = this.buildFloatPaginator(erc20GlobalOffset)
 

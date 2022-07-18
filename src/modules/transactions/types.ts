@@ -27,7 +27,7 @@ export interface ITransactionsNexPagePagination {
 export interface Paginator {
     transactions: any[],
     count?: number,
-    nextPage?: ITransactionsNexPagePagination
+    continue?: ITransactionsNexPagePagination
 }
 
 export namespace Etherscan {

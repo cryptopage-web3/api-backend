@@ -25,7 +25,7 @@ const swaggerDef = {
             description: 'Heroku server'
         },
         {
-            url: `http://localhost:3000/`,
+            url: `http://localhost:${process.env.LOCAL_SERVER_PORT || 3000}/`,
             description: 'Local server'
         }
     ],

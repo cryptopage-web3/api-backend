@@ -12,6 +12,57 @@ export class TransactionsController implements interfaces.Controller {
 
     /**
      * @swagger
+     * /transactions/eth/{address}:
+     *   get:
+     *     summary: Get transactions from eth address.
+     *     description: Get transactions from address.
+     *     tags: [Transactions]
+     *     parameters:
+     *       - in: path
+     *         name: address
+     *         required: true
+     *         schema:
+     *           type: string
+     *       - in: query
+     *         name: continue[tx]
+     *         schema:
+     *           type: number
+     *         description: Pagination for eth chain from prev page response
+     *       - in: query
+     *         name: continue[erc20]
+     *         schema:
+     *           type: number
+     *         description: Pagination for eth chain from prev page response
+     *     responses:
+     *       "200":
+     *         description: OK
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 transactions:
+     *                   type: array
+     *                   items:
+     *                     anyOf:
+     *                       - $ref: '#/components/schemas/EthTransaction'
+     *                       - $ref: '#/components/schemas/Erc20Transaction'
+     *                 continue:
+     *                   type: object
+     *                   properties:
+     *                     tx:
+     *                       type: number
+     *                     erc20:
+     *                       type: number
+     *             examples:
+     *               EthTransactionExample:
+     *                 $ref: '#/components/examples/EthTransactionExample'
+     *       "400":
+     *         $ref: '#/components/responses/NotFound'
+     */
+
+    /**
+     * @swagger
      * /transactions/{chain}/{address}:
      *   get:
      *     summary: Get transactions from address.
@@ -23,7 +74,7 @@ export class TransactionsController implements interfaces.Controller {
      *         required: true
      *         schema:
      *           type: string
-     *           enum: [eth, bsc, matic, sol, tron]
+     *           enum: [bsc, matic, sol, tron]
      *           default: eth
      *         description: chain name
      *       - in: path
@@ -54,11 +105,13 @@ export class TransactionsController implements interfaces.Controller {
         @requestParam('chain') chain:string, 
         @requestParam('address') address:string,
         @queryParam('continue') paginator:ITransactionsPagination,
+        @queryParam('skip') skip: number,
+        @queryParam('limit') limit: number,
         @response() res: express.Response){
         
             const manager = this._txManagerFactory(chain);
             try {
-                const resultPage = await manager.getWalletAllTransactions(address, paginator);
+                const resultPage = await manager.getWalletAllTransactions(address, Object.assign({}, paginator,{skip, limit}));
                 res.json(resultPage);
             } catch (err) {
                 res.status(BAD_REQUEST).json({
