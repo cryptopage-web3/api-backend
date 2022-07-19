@@ -13,7 +13,8 @@ export class EthTransactionManager implements ITransactionManager {
 
     async getWalletAllTransactions(address:string, offset:ITransactionsPagination) {
         let transactions:Etherscan.ITransactionData[] = [],
-            erc20Transactions:Etherscan.IErc20TransactionData[] = [];
+            erc20Transactions:Etherscan.IErc20TransactionData[] = [],
+            count = 0;
 
         const txGlobalOffset = offset?.tx || 0,
             erc20GlobalOffset = offset?.erc20 || 0,
@@ -24,7 +25,10 @@ export class EthTransactionManager implements ITransactionManager {
             this._etherscan.getTransactions(address, txPaginator.page, txPaginator.limit)
                 .then(txs => {transactions = txs.map(r => this.mapTransactionType(r,Etherscan.TransactionType.normal))}),
             this._etherscan.getErc20Trnsactions(address, erc20Paginator.page, erc20Paginator.limit)
-                .then(txs => {erc20Transactions = txs.map(r => this.mapTransactionType(r, Etherscan.TransactionType.erc20))})
+                .then(txs => {erc20Transactions = txs.map(r => this.mapTransactionType(r, Etherscan.TransactionType.erc20))}),
+            this.getTransactionsCount(address)
+                .then(cnt => { count = cnt })
+                .catch(err => { console.error('Failed to get transactions count', address, err)})
         ])
 
         transactions = this.continuePaginate(transactions, txPaginator.limit, txGlobalOffset)
@@ -35,7 +39,8 @@ export class EthTransactionManager implements ITransactionManager {
             transactions,
             erc20Transactions, 
             txGlobalOffset,
-            erc20GlobalOffset
+            erc20GlobalOffset,
+            count
         )
     }
 
@@ -66,7 +71,7 @@ export class EthTransactionManager implements ITransactionManager {
         return items
     }
     
-    private buildTransactionsPage(address: string, txs: Etherscan.ITransactionData[], erc20txs: Etherscan.IErc20TransactionData[], txOffset: number, erc20Offset: number): Paginator {
+    private buildTransactionsPage(address: string, txs: Etherscan.ITransactionData[], erc20txs: Etherscan.IErc20TransactionData[], txOffset: number, erc20Offset: number, totalTxCount: number): Paginator {
         const result: Etherscan.EthTransaction[] = [],
             txTotal = txs.length,
             erc20Total = erc20txs.length
@@ -116,7 +121,8 @@ export class EthTransactionManager implements ITransactionManager {
             continue:{
                 tx: txOffset + countTxOnPage + (countTxOnPage > 0 ? 1 : 0),
                 erc20: erc20Offset + countErc20OnPage + (countErc20OnPage > 0 ? 1 : 0)
-            }
+            },
+            count: totalTxCount
         }
     }
 
@@ -132,6 +138,11 @@ export class EthTransactionManager implements ITransactionManager {
         }
 
         return Object.assign({},tx, {operationType})
+    }
+
+    getTransactionsCount(address:string):Promise<number>{
+        const service = new UnmarshalApi({ address, config: config.eth });
+        return service.getTransactionsCount(config.eth.chainName, address)
     }
 
     getTransactionDetails(txHash) {

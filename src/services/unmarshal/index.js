@@ -128,6 +128,13 @@ class UnmarshalApi {
         return { items: transactions, count: total_txs };
     }
 
+    async getTransactionsCount(chainName, address){
+        const url = `${this.baseUrl}/v2/${chainName}/address/${address}/transactions?page=1&pageSize=1&auth_key=${this.apiKey}`;
+        const { data:{ total_txs } } = await axios.get(url);
+
+        return total_txs;
+    }
+
     async getWalletAllTransactions(skip, limit) {
         try {
             const { items, count } = await this.getTransactionsFromApi(skip, limit);
