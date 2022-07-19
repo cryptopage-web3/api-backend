@@ -28,7 +28,7 @@ export class EthTransactionManager implements ITransactionManager {
                 .then(txs => {erc20Transactions = txs.map(r => this.mapTransactionType(r, Etherscan.TransactionType.erc20))}),
             this.getTransactionsCount(address)
                 .then(cnt => { count = cnt })
-                .catch(err => { console.error('Failed to get transactions count', address, err)})
+                .catch(err => { console.error('Failed to get transactions count', address, err.message)})
         ])
 
         transactions = this.continuePaginate(transactions, txPaginator.limit, txGlobalOffset)
