@@ -119,13 +119,13 @@ class UnmarshalApi {
         if (skip === 0) skip = 1;
         const url = `${this.baseUrl}/v2/${this.chainName}/address/${this.address}/transactions?page=${skip}&pageSize=${limit}&auth_key=${this.apiKey}`;
         const { data } = await axios.get(url);
-        const { transactions } = data;
-        const count = await this.etherscan.getTxCount();
-        if (!transactions?.length) {
-            return { items: [], count };
+        
+        //const count = await this.etherscan.getTxCount();
+        if (data.transactions?.length == 0) {
+            return { items: [], count: 0 };
         }
         
-        return { items: transactions, count: total_txs };
+        return { items: data.transactions, count: data.total_txs };
     }
 
     async getTransactionsCount(chainName, address){

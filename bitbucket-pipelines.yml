@@ -19,6 +19,7 @@ pipelines:
                 export TG_CHAT_ID=$TG_CHAT_ID && 
                 export TG_TEXT_PREFIX=$TG_TEXT_PREFIX && 
                 export PM2_NAME=$PM2_NAME && 
+                export DEPLOY_LOG_FILE=$DEPLOY_LOG_FILE && 
                 /bin/bash /tmp/deploy.sh > $DEPLOY_LOG_FILE"
       - step:
            name: Create artifact
