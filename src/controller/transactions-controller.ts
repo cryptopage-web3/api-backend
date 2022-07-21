@@ -111,7 +111,7 @@ export class TransactionsController implements interfaces.Controller {
         
             const manager = this._txManagerFactory(chain);
             try {
-                const resultPage = await manager.getWalletAllTransactions(address, Object.assign({}, paginator,{skip, limit}));
+                const resultPage = await manager.getWalletAllTransactions(address, Object.assign({}, paginator,{skip: Number(skip), limit: Number(limit)}));
                 res.json(resultPage);
             } catch (err) {
                 res.status(BAD_REQUEST).json({
