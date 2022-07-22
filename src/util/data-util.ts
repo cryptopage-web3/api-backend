@@ -28,3 +28,7 @@ export function createDirIfNotExists(path:string){
         mkdirSync(path, {recursive: true})
     }
 }
+
+export function buildAbsoluteDataPath(path: string){
+    return resolve(DATA_DIR, path);
+}
