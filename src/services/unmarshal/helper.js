@@ -73,8 +73,28 @@ async function getDateFromBlock(rpc, blockNum) {
     }
 }
 
+async function getContractName(blockchain, address) {
+    const urls = {
+        ethereum: 'https://api.etherscan.io',
+        binance: 'https://api.bscscan.com',
+        polygon: 'https://api.polygonscan.com',
+    }
+    const keys = {
+        ethereum: 'VQDBC4GZA5MQT2F6IRW2U6RPH66HJRSF6S',
+        polygon: 'TQDPK4XAU4BZT8WQNN6IETRRXXDI37W64Y',
+        binance: '4DCKF5U2YGR1HNG1KHWP8DSK47AH85W28Z'
+    }
+    try {
+        const { data } = await axios.get(`${urls[blockchain]}/api?module=contract&action=getsourcecode&address=${address}&apikey=${keys[blockchain]}`);
+        return data.result[0].ContractName;
+    } catch (e) {
+        return address;
+    }
+}
+
 module.exports = {
     getDataFromUrl,
     getFieldFromContract,
-    getDateFromBlock
+    getDateFromBlock,
+    getContractName
 }

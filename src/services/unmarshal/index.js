@@ -1,7 +1,7 @@
 // @ts-nocheck
 const axios = require('axios');
 const { getCoinPrice } = require('../../cache/coins');
-const { getDataFromUrl, getFieldFromContract, getDateFromBlock } = require('./helper');
+const { getDataFromUrl, getFieldFromContract, getDateFromBlock, getContractName } = require('./helper');
 
 class UnmarshalApi {
     /**
@@ -119,18 +119,18 @@ class UnmarshalApi {
         if (skip === 0) skip = 1;
         const url = `${this.baseUrl}/v2/${this.chainName}/address/${this.address}/transactions?page=${skip}&pageSize=${limit}&auth_key=${this.apiKey}`;
         const { data } = await axios.get(url);
-        
+
         //const count = await this.etherscan.getTxCount();
         if (data.transactions?.length == 0) {
             return { items: [], count: 0 };
         }
-        
+
         return { items: data.transactions, count: data.total_txs };
     }
 
-    async getTransactionsCount(chainName, address){
+    async getTransactionsCount(chainName, address) {
         const url = `${this.baseUrl}/v2/${chainName}/address/${address}/transactions?page=1&pageSize=1&auth_key=${this.apiKey}`;
-        const { data:{ total_txs } } = await axios.get(url);
+        const { data: { total_txs } } = await axios.get(url);
 
         return total_txs;
     }
@@ -177,6 +177,12 @@ class UnmarshalApi {
         const value = data.value / 10 ** 18;
         const fee = data.fee / 10 ** 18;
 
+        let action = data.description;
+        if (data.type === 'swap') {
+            const contractName = await getContractName(this.chainName, data.to);
+            action += ` on ${contractName}`;
+        }
+
         return {
             txHash,
             block: data.block,
@@ -188,6 +194,7 @@ class UnmarshalApi {
             valueUSD: getCoinPrice(this.mainCoinId) * value,
             feeUSD: getCoinPrice(this.mainCoinId) * value,
             transfers: tranfersInfo,
+            action,
             logs: data.logDetails
         }
     }
@@ -220,13 +227,13 @@ class UnmarshalApi {
         const { url, type, price, description, attributes } = await this.getNFTDetailsFromApi(item.contract_address, item.token_id);
 
         return {
-            url, 
-            type, 
-            price, 
-            description, 
+            url,
+            type,
+            price,
+            description,
             attributes,
-            name, 
-            symbol, 
+            name,
+            symbol,
             date,
             from: item.sender,
             to: item.to,
