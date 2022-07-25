@@ -4,6 +4,7 @@ import { IDS } from '../types/index';
 import { ITransactionManager, ITransactionsPagination, ChainId } from '../modules/transactions/types';
 import * as express from "express";
 import { errorHandler } from "./decorator/error-handler";
+import { getTransactionsValidator } from './validator/get-transactionsv-validator';
 
 const chainValidator = [ChainId.bsc,ChainId.eth,ChainId.matic,ChainId.sol,ChainId.tron].join('|')
 
@@ -101,7 +102,7 @@ export class TransactionsController implements interfaces.Controller {
      *       "400":
      *         $ref: '#/components/responses/NotFound'
      */
-    @httpGet(`/:chain(${chainValidator})/:address`)
+    @httpGet(`/:chain(${chainValidator})/:address`, ...getTransactionsValidator())
     @errorHandler()
     private async getAddressTransactions(
         @requestParam('chain') chain:string, 
@@ -110,10 +111,12 @@ export class TransactionsController implements interfaces.Controller {
         @queryParam('skip') skip: number,
         @queryParam('limit') limit: number,
         @response() res: express.Response){
-            const manager = this._txManagerFactory(chain);
-            const resultPage = await manager.getWalletAllTransactions(address, Object.assign({}, paginator,{skip: Number(skip), limit: Number(limit)}));
+            const manager = this._txManagerFactory(chain)
+            const resultPage = await manager.getWalletAllTransactions(
+                address, Object.assign({}, paginator,{skip, limit})
+            )
             
-            res.json(resultPage);
+            res.json(resultPage)
     }
 
     /**
@@ -199,7 +202,7 @@ export class TransactionsController implements interfaces.Controller {
      *       "400":
      *         $ref: '#/components/responses/NotFound'
      */
-    @httpGet(`/transfers/:chain${chainValidator}/:address`)
+    @httpGet(`/transfers/:chain(${chainValidator})/:address`)
     @errorHandler()
     private async getAddressTransfers(
         @requestParam('chain') chain: string,
