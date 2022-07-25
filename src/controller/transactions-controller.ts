@@ -1,10 +1,11 @@
 import { inject } from "inversify";
 import { controller, httpGet, interfaces, queryParam, requestParam, response } from "inversify-express-utils";
 import { IDS } from '../types/index';
-import { ITransactionManager, ITransactionsPagination } from '../modules/transactions/types';
+import { ITransactionManager, ITransactionsPagination, ChainId } from '../modules/transactions/types';
 import * as express from "express";
+import { errorHandler } from "./decorator/error-handler";
 
-const BAD_REQUEST = 400;
+const chainValidator = [ChainId.bsc,ChainId.eth,ChainId.matic,ChainId.sol,ChainId.tron].join('|')
 
 @controller('/transactions')
 export class TransactionsController implements interfaces.Controller {
@@ -100,7 +101,8 @@ export class TransactionsController implements interfaces.Controller {
      *       "400":
      *         $ref: '#/components/responses/NotFound'
      */
-    @httpGet('/:chain/:address')
+    @httpGet(`/:chain(${chainValidator})/:address`)
+    @errorHandler()
     private async getAddressTransactions(
         @requestParam('chain') chain:string, 
         @requestParam('address') address:string,
@@ -108,16 +110,10 @@ export class TransactionsController implements interfaces.Controller {
         @queryParam('skip') skip: number,
         @queryParam('limit') limit: number,
         @response() res: express.Response){
-        
             const manager = this._txManagerFactory(chain);
-            try {
-                const resultPage = await manager.getWalletAllTransactions(address, Object.assign({}, paginator,{skip: Number(skip), limit: Number(limit)}));
-                res.json(resultPage);
-            } catch (err) {
-                res.status(BAD_REQUEST).json({
-                    message: err.message
-                });
-            }
+            const resultPage = await manager.getWalletAllTransactions(address, Object.assign({}, paginator,{skip: Number(skip), limit: Number(limit)}));
+            
+            res.json(resultPage);
     }
 
     /**
@@ -151,21 +147,17 @@ export class TransactionsController implements interfaces.Controller {
      *       "400":
      *         $ref: '#/components/responses/NotFound'
      */
-    @httpGet('/detail/:chain/:txHash')
+    @httpGet(`/detail/:chain(${chainValidator})/:txHash`)
+    @errorHandler()
     private async getTransactionDetails(
         @requestParam('chain') chain: string,
         @requestParam('txHash') txHash: string,
         @response() res: express.Response
     ){
-        try {
-            const manager = this._txManagerFactory(chain);
-            const result = await manager.getTransactionDetails(txHash);
-            res.json(result);
-        } catch (err) {
-            res.status(BAD_REQUEST).json({
-                message: err.message
-            });
-        }
+        const manager = this._txManagerFactory(chain);
+        const result = await manager.getTransactionDetails(txHash);
+
+        res.json(result);  
     }
 
     /**
@@ -207,7 +199,8 @@ export class TransactionsController implements interfaces.Controller {
      *       "400":
      *         $ref: '#/components/responses/NotFound'
      */
-    @httpGet('/transfers/:chain/:address')
+    @httpGet(`/transfers/:chain${chainValidator}/:address`)
+    @errorHandler()
     private async getAddressTransfers(
         @requestParam('chain') chain: string,
         @requestParam('address') address: string,
@@ -215,14 +208,9 @@ export class TransactionsController implements interfaces.Controller {
         @queryParam('limit') limit: number = 20,
         @response() res: express.Response
     ){
-        try {
-            const manager = this._txManagerFactory(chain);
-            const result = await manager.getWalletTokenTransfers(address, skip, limit);
-            res.json(result);
-        } catch (err) {
-            res.status(BAD_REQUEST).json({
-                message: err.message
-            });
-        }
+        const manager = this._txManagerFactory(chain);
+        const result = await manager.getWalletTokenTransfers(address, skip, limit);
+        
+        res.json(result);
     }
 }
