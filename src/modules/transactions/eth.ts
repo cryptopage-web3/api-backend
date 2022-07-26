@@ -3,7 +3,7 @@ import { Etherscan, ITransactionManager, Paginator, ITransactionsPagination } fr
 import { IDS } from '../../types/index';
 import { EtherscanApi } from '../../services/etherscan/etherscan-api';
 
-const UnmarshalApi = require('./../../services/unmarshal');
+const { UnmarshalApi } = require('./../../services/unmarshal/UnmarhalApi');
 
 const config = require('./../../enums/chains');
 
