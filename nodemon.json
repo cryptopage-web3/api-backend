@@ -1,11 +1,11 @@
 {
     "delay": 2500,
     "watch":[
-        "dist"
+        "dist",
+        "src/swagger-docs"
     ],
-    "ext":"ts,js,json,ejs,env",
+    "ext":".ts, .js, .json, .ejs, .env, .yml",
     "ignore": [
-      "src/*",
       "node_modules/*"
     ],
     "exec": "node -r source-map-support/register --enable-source-maps --inspect=25018 dist/index.js"

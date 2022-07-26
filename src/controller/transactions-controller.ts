@@ -12,96 +12,6 @@ const chainValidator = [ChainId.bsc,ChainId.eth,ChainId.matic,ChainId.sol,ChainI
 export class TransactionsController implements interfaces.Controller {
     @inject(IDS.MODULES.TransactionManagerFactory) private _txManagerFactory: (named:string) => ITransactionManager
 
-    /**
-     * @swagger
-     * /transactions/eth/{address}:
-     *   get:
-     *     summary: Get transactions from eth address.
-     *     description: Get transactions from address.
-     *     tags: [Transactions]
-     *     parameters:
-     *       - in: path
-     *         name: address
-     *         required: true
-     *         schema:
-     *           type: string
-     *       - in: query
-     *         name: continue[tx]
-     *         schema:
-     *           type: number
-     *         description: Pagination for eth chain from prev page response
-     *       - in: query
-     *         name: continue[erc20]
-     *         schema:
-     *           type: number
-     *         description: Pagination for eth chain from prev page response
-     *     responses:
-     *       "200":
-     *         description: OK
-     *         content:
-     *           application/json:
-     *             schema:
-     *               type: object
-     *               properties:
-     *                 transactions:
-     *                   type: array
-     *                   items:
-     *                     anyOf:
-     *                       - $ref: '#/components/schemas/EthTransaction'
-     *                       - $ref: '#/components/schemas/Erc20Transaction'
-     *                 continue:
-     *                   type: object
-     *                   properties:
-     *                     tx:
-     *                       type: number
-     *                     erc20:
-     *                       type: number
-     *             examples:
-     *               EthTransactionExample:
-     *                 $ref: '#/components/examples/EthTransactionExample'
-     *       "400":
-     *         $ref: '#/components/responses/NotFound'
-     */
-
-    /**
-     * @swagger
-     * /transactions/{chain}/{address}:
-     *   get:
-     *     summary: Get transactions from address.
-     *     description: Get transactions from address.
-     *     tags: [Transactions]
-     *     parameters:
-     *       - in: path
-     *         name: chain
-     *         required: true
-     *         schema:
-     *           type: string
-     *           enum: [bsc, matic, sol, tron]
-     *           default: eth
-     *         description: chain name
-     *       - in: path
-     *         name: address
-     *         required: true
-     *         schema:
-     *           type: string
-     *       - in: query
-     *         name: skip
-     *         schema:
-     *           type: number
-     *       - in: query
-     *         name: limit
-     *         schema:
-     *           type: number
-     *     responses:
-     *       "200":
-     *         description: OK
-     *         content:
-     *           application/json:
-     *             schema:
-     *                 $ref: '#/components/schemas/Transactions'
-     *       "400":
-     *         $ref: '#/components/responses/NotFound'
-     */
     @httpGet(`/:chain(${chainValidator})/:address`, ...getTransactionsValidator())
     @errorHandler()
     private async getAddressTransactions(
@@ -119,37 +29,6 @@ export class TransactionsController implements interfaces.Controller {
             res.json(resultPage)
     }
 
-    /**
-     * @swagger
-     * /transactions/detail/{chain}/{txHash}:
-     *   get:
-     *     summary: Get transaction.
-     *     description: Get transactions.
-     *     tags: [Transactions]
-     *     parameters:
-     *       - in: path
-     *         name: chain
-     *         required: true
-     *         schema:
-     *           type: string
-     *           enum: [eth, bsc, matic, sol, tron]
-     *           default: eth
-     *         description: chain name
-     *       - in: path
-     *         name: txHash
-     *         required: true
-     *         schema:
-     *           type: string
-     *     responses:
-     *       "200":
-     *         description: OK
-     *         content:
-     *           application/json:
-     *             schema:
-     *                 $ref: '#/components/schemas/Transaction'
-     *       "400":
-     *         $ref: '#/components/responses/NotFound'
-     */
     @httpGet(`/detail/:chain(${chainValidator})/:txHash`)
     @errorHandler()
     private async getTransactionDetails(
@@ -163,45 +42,6 @@ export class TransactionsController implements interfaces.Controller {
         res.json(result);  
     }
 
-    /**
-     * @swagger
-     * /transactions/transfers/{chain}/{address}:
-     *   get:
-     *     summary: Get transactions from address.
-     *     description: Get transactions from address.
-     *     tags: [Transactions]
-     *     parameters:
-     *       - in: path
-     *         name: chain
-     *         required: true
-     *         schema:
-     *           type: string
-     *           enum: [eth, bsc, matic, sol, tron]
-     *           default: eth
-     *         description: chain name
-     *       - in: path
-     *         name: address
-     *         required: true
-     *         schema:
-     *           type: string
-     *       - in: query
-     *         name: skip
-     *         schema:
-     *           type: number
-     *       - in: query
-     *         name: limit
-     *         schema:
-     *           type: number
-     *     responses:
-     *       "200":
-     *         description: OK
-     *         content:
-     *           application/json:
-     *             schema:
-     *                 $ref: '#/components/schemas/Transactions'
-     *       "400":
-     *         $ref: '#/components/responses/NotFound'
-     */
     @httpGet(`/transfers/:chain(${chainValidator})/:address`)
     @errorHandler()
     private async getAddressTransfers(

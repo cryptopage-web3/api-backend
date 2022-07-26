@@ -1,0 +1,47 @@
+parameters:
+  pagination:
+    eth:
+      continueTx:
+        in: query
+        name: continue[tx]
+        schema:
+          type: integer
+          minimum: 0
+        description: Pagination for eth chain from prev page response
+      continueErc20:
+        in: query
+        name: continue[erc20]
+        schema:
+          type: integer
+          minimum: 0
+        description: Pagination for eth chain from prev page response
+    page:
+      in: query
+      name: page
+      schema:
+        type: integer
+        minimum: 1
+      description: Page number start from 1
+    pageSize:
+      in: query
+      name: pageSize
+      schema:
+        type: integer
+        minimum: 1
+      description: Items per pege (min=1)
+  path:
+    address:
+      in: path
+      name: address
+      required: true
+      schema:
+        type: string
+    chain:
+      in: path
+      name: chain
+      required: true
+      schema:
+        type: string
+        enum: [eth, bsc, matic, sol, tron]
+        default: eth
+      description: chain name

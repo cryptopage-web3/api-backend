@@ -1,0 +1,83 @@
+paths:  
+  /transactions/eth/{address}:
+    get:
+      summary: Get transactions from eth address.
+      description: Get paginated transactions from eth address.
+      tags: [Transactions]
+      parameters:
+        - $ref: '#/parameters/path/address'
+        - $ref: '#/parameters/pagination/eth/continueTx'
+        - $ref: '#/parameters/pagination/eth/continueErc20'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transactions:
+                    type: array
+                    items:
+                      anyOf:
+                        - $ref: '#/components/schemas/EthTransaction'
+                        - $ref: '#/components/schemas/Erc20Transaction'
+                  continue:
+                    type: object
+                    properties:
+                      tx:
+                        type: number
+                      erc20:
+                        type: number
+              examples:
+                EthTransactionExample:
+                  $ref: '#/responses/examples/EthTransactionExample'
+        "400":
+          $ref: '#/components/responses/NotFound'
+  /transactions/{chain}/{address}:
+    get:
+      summary: Get transactions from address.
+      description: Get transactions from address.
+      tags: [Transactions]
+      parameters:
+        - in: path
+          name: chain
+          required: true
+          schema:
+            type: string
+            enum: [bsc, matic, sol, tron]
+            default: eth
+          description: chain name
+        - $ref: '#/parameters/path/address'
+        - $ref: '#/parameters/pagination/page'
+        - $ref: '#/parameters/pagination/pageSize'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Transactions'
+        "400":
+          $ref: '#/components/responses/NotFound'
+  /transactions/detail/{chain}/{txHash}:
+    get:
+      summary: Get transaction.
+      description: Get transactions.
+      tags: [Transactions]
+      parameters:
+        - $ref: '#/parameters/path/chain'
+        - in: path
+          name: txHash
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Transaction'
+        "400":
+          $ref: '#/components/responses/NotFound'

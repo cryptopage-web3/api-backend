@@ -1,4 +1,4 @@
-components:
+responses:
   examples:
     EthTransactionExample:
       summary: A sample Eth transaction
