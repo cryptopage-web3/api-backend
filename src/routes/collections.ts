@@ -7,40 +7,6 @@ import { CollectionsQuery, NftItemsQuery } from "./types";
 
 export const collectionsRouter = Router();
 
-/**
- * @swagger
- * /collections:
- *   get:
- *     description: Get nft collections
- *     tags: [Collections]
- *     parameters:
- *       - in: query
- *         name: limit
- *         schema:
- *           type: number
- *           default: 10
- *       - in: query
- *         name: offset
- *         schema:
- *           type: number
- *           default: 0
- *       - in: query
- *         name: filter[name]
- *         schema:
- *           type: string
- *       - in: query
- *         name: filter[blockchain]
- *         schema:
- *           type: string
- *           enum: [ETHEREUM,POLYGON]
- *     responses:
- *       "200":
- *         description: OK
- *         content:
- *           application/json:
- *             schema:
- *                 $ref: '#/components/schemas/NftCollections'
- */
 collectionsRouter.get('/',asyncHandler(async (req:Request<{}, any,any, CollectionsQuery>,res)=>{
     let where:WhereOptions<NftCollectionInferAttributes> = {isEnabled: true}
 
@@ -67,36 +33,6 @@ collectionsRouter.get('/',asyncHandler(async (req:Request<{}, any,any, Collectio
     res.json({data, itemsTotal})
 }))
 
-/**
- * @swagger
- * /collections/{id}:
- *  get:
- *      description: Get collection items
- *      tags: [Collections]
- *      parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: number
- *       - in: query
- *         name: limit
- *         schema:
- *           type: number
- *           default: 10
- *       - in: query
- *         name: offset
- *         schema:
- *           type: number
- *           default: 0
- *      responses:
- *       "200":
- *         description: OK
- *         content:
- *           application/json:
- *             schema:
- *                 $ref: '#/components/schemas/NftItems'
- */
 collectionsRouter.get('/:id(\\d+)', async(req, res)=>{
     
 
@@ -118,37 +54,6 @@ collectionsRouter.get('/:id(\\d+)', async(req, res)=>{
     res.json({data, itemsTotal})
 })
 
-/**
- * @swagger
- * /collections/last-updated:
- *  get:
- *      description: Get Nft items with order by last update DESC
- *      tags: [Collections]
- *      parameters:
- *       - in: query
- *         name: limit
- *         schema:
- *           type: number
- *           default: 10
- *       - in: query
- *         name: offset
- *         schema:
- *           type: number
- *           default: 0
- *       - in: query
- *         name: filter[collectionId]
- *         schema:
- *           type: array
- *           items:
- *              type: number
- *      responses:
- *       "200":
- *         description: OK
- *         content:
- *           application/json:
- *             schema:
- *                 $ref: '#/components/schemas/NftItems'
- */
 collectionsRouter.get('/last-updated', asyncHandler(async (req:Request<{}, any,any, NftItemsQuery>, res)=>{
     const collectionFilter = req.query.filter?.collectionId ? [{
             association: NftItem.associations.collection,
