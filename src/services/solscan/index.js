@@ -47,9 +47,9 @@ class SolScanApi {
         return data;
     }
 
-    async getWalletAllTransactions(skip, limit) {
+    async getWalletAllTransactions(page, pageSize) {
         const data = await this.getTransactionsFromApi();
-        const items = data.slice(skip * limit, skip * limit + limit);
+        const items = data.slice(page * pageSize, page * pageSize + pageSize);
         const transactions = [];
         for (const item of items) {
             const transaction = this.getTransactionDataFromItem(item);

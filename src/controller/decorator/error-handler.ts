@@ -9,7 +9,7 @@ export function errorHandler(){
                 return await originalMethod.apply(this, args)
             } catch (error) {
                 console.error('Failed to call controller:', error)
-                args[args.length - 2].status(400).json({message: 'Unexpected error'})
+                args[args.length - 2].status(500).json({message: 'Unexpected error'})
             }
         }
     

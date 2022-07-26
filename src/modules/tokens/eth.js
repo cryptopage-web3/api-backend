@@ -1,4 +1,4 @@
-const UnmarshalApi = require('./../../services/unmarshal');
+const { UnmarshalApi } = require('../../services/unmarshal/UnmarhalApi');
 
 const config = require('./../../enums/chains');
 

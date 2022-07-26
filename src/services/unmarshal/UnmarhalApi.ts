@@ -3,7 +3,7 @@ const axios = require('axios');
 const { getCoinPrice } = require('../../cache/coins');
 const { getDataFromUrl, getFieldFromContract, getDateFromBlock, getContractName } = require('./helper');
 
-class UnmarshalApi {
+export class UnmarshalApi {
     /**
     * @param {Object} data - Info about wallet instance.
     * @param data.address - The address of the wallet.
@@ -115,12 +115,10 @@ class UnmarshalApi {
         }
     }
 
-    async getTransactionsFromApi(skip, limit) {
-        if (skip === 0) skip = 1;
-        const url = `${this.baseUrl}/v2/${this.chainName}/address/${this.address}/transactions?page=${skip}&pageSize=${limit}&auth_key=${this.apiKey}`;
+    async getTransactionsFromApi(page, pageSize) {
+        const url = `${this.baseUrl}/v2/${this.chainName}/address/${this.address}/transactions?page=${page}&pageSize=${pageSize}&auth_key=${this.apiKey}`;
         const { data } = await axios.get(url);
 
-        //const count = await this.etherscan.getTxCount();
         if (data.transactions?.length == 0) {
             return { items: [], count: 0 };
         }
@@ -135,9 +133,9 @@ class UnmarshalApi {
         return total_txs;
     }
 
-    async getWalletAllTransactions(skip, limit) {
+    async getWalletAllTransactions(page, pageSize) {
         try {
-            const { items, count } = await this.getTransactionsFromApi(skip, limit);
+            const { items, count } = await this.getTransactionsFromApi(page, pageSize);
             const transactions = [];
             for (const item of items) {
                 const transaction = this.getTransactionDataFromItem(item);
@@ -149,9 +147,9 @@ class UnmarshalApi {
         }
     }
 
-    async getWalletTokenTransfers(skip, limit) {
+    async getWalletTokenTransfers(page, pageSize) {
         try {
-            const { transactions, count } = await this.getWalletAllTransactions(skip, limit);
+            const { transactions, count } = await this.getWalletAllTransactions(page, pageSize);
             const items = transactions.filter(e => e.title === 'Transfer');
             return { count, transactions: items };
         } catch {
@@ -307,6 +305,3 @@ class UnmarshalApi {
         return { list, count: data.total_txs };
     }
 }
-
-module.exports = UnmarshalApi;
-

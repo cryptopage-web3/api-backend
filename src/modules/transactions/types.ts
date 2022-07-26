@@ -15,8 +15,8 @@ export interface ITransactionManager {
 export interface ITransactionsPagination {
     tx?: number,
     erc20?: number,
-    skip?:number, 
-    limit?: number
+    page?:number, 
+    pageSize?: number
 }
 
 export interface ITransactionsNexPagePagination {

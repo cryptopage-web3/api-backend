@@ -18,12 +18,12 @@ export class TransactionsController implements interfaces.Controller {
         @requestParam('chain') chain:string, 
         @requestParam('address') address:string,
         @queryParam('continue') paginator:ITransactionsPagination,
-        @queryParam('skip') skip: number,
-        @queryParam('limit') limit: number,
+        @queryParam('page') page: number,
+        @queryParam('pageSize') pageSize: number,
         @response() res: express.Response){
             const manager = this._txManagerFactory(chain)
             const resultPage = await manager.getWalletAllTransactions(
-                address, Object.assign({}, paginator,{skip, limit})
+                address, Object.assign({}, paginator,{page, pageSize})
             )
             
             res.json(resultPage)

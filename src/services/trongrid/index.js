@@ -55,8 +55,10 @@ class TronGridApi {
         return data.data;
     }
 
-    async getWalletAllTransactions(skip, limit) {
-        const items = await this.getTransactionsFromApi(skip, limit);
+    async getWalletAllTransactions(page, pageSize) {
+        const skip = (page - 1) * pageSize;
+
+        const items = await this.getTransactionsFromApi(skip, pageSize);
         const transactions = [];
         for (const item of items) {
             const transaction = this.getTransactionDataFromItem(item);
