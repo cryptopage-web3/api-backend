@@ -24,7 +24,7 @@ paths:
               schema:
                   $ref: '#/components/schemas/NFTs'
         "400":
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/responses/PaginationError'
   /nfts/transactions/{chain}/{address}:
     get:
       summary: Get nft transactions from address.
@@ -50,4 +50,4 @@ paths:
               schema:
                   $ref: '#/components/schemas/NFTTransactions'
         "400":
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/responses/PaginationError'

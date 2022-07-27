@@ -64,7 +64,7 @@ paths:
                 TronTransactionsExample:
                   $ref: '#/responses/examples/TronTransactionsExample'
         "400":
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/responses/PaginationError'
   /transactions/detail/{chain}/{txHash}:
     get:
       summary: Get transaction.

@@ -1,0 +1,8 @@
+responses:
+  PaginationError:
+    description: Validation error
+    content:
+      application/json:
+        examples:
+          PaginationErrorExample:
+            $ref: '#/responses/examples/PaginationErrorExample'
