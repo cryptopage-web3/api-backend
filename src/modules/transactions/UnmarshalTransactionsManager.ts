@@ -23,7 +23,7 @@ export class UnmarshalTransactionsManager implements ITransactionManager {
         return service.getTransactionDetails(txHash);
     }
     
-    getWalletTokenTransfers(address, page, pageSize) {
+    getWalletTokenTransfers(address, {page, pageSize}) {
         const service = new UnmarshalApi({ address, config: this._config });
         return service.getWalletTokenTransfers(page, pageSize);
     }

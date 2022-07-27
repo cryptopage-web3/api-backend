@@ -150,8 +150,8 @@ export class EthTransactionManager implements ITransactionManager {
         return service.getTransactionDetails(txHash);
     }
     
-    getWalletTokenTransfers(address, skip, limit) {
+    getWalletTokenTransfers(address, {page, pageSize}) {
         const service = new UnmarshalApi({ address, config: config.eth });
-        return service.getWalletTokenTransfers(skip, limit);
+        return service.getWalletTokenTransfers(page, pageSize);
     }
 }

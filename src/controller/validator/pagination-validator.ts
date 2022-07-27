@@ -4,9 +4,9 @@ import { handleValidationErrors } from '../middleware/validator-middleware';
 
 export function _paginationValidator(){
     return [
-        query('page').toInt().customSanitizer(v => isNaN(v) ? 1 : v).isInt({min: 1})
+        query('page').optional().isInt({min: 1}).toInt()
             .withMessage('Minimal value is 1'),
-        query('pageSize').toInt().customSanitizer(v => isNaN(v) ? 10 : v).isInt({min: 1})
+        query('pageSize').optional().isInt({min: 1}).toInt()
             .withMessage('Minimal value is 1')
     ]
 }

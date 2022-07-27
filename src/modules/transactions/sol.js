@@ -5,9 +5,9 @@ function getWalletAllTransactions(address, {page, pageSize}) {
     return service.getWalletAllTransactions(page, pageSize);
 }
 
-function getWalletTokenTransfers(address, skip, limit) {
+function getWalletTokenTransfers(address, {page, pageSize}) {
     const service = new SolScanApi({ address });
-    return service.getWalletTokenTransfers(skip, limit);
+    return service.getWalletTokenTransfers(page, pageSize);
 }
 
 module.exports = {

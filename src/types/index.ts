@@ -7,5 +7,6 @@ export const IDS = {
     },
     SERVICE:{
         EtherscanApi: Symbol('EtherscanApi'),
+        TrongridApi: Symbol('TronGridApi')
     }
 }

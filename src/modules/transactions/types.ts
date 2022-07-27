@@ -9,19 +9,21 @@ export enum ChainId {
 export interface ITransactionManager {
     getWalletAllTransactions(address:string, opts: ITransactionsPagination): Promise<Paginator>
     getTransactionDetails(txHash:string)
-    getWalletTokenTransfers(address:string, skip:number, limit:number)
+    getWalletTokenTransfers(address:string, opts: ITransactionsPagination)
 }
 
 export interface ITransactionsPagination {
     tx?: number,
     erc20?: number,
-    page?:number, 
-    pageSize?: number
+    page?:number,
+    pageSize: number
+    fingerprint?: string
 }
 
 export interface ITransactionsNexPagePagination {
     tx?: number,
     erc20?: number,
+    fingerprint?: string
 }
 
 export interface Paginator {

@@ -58,6 +58,11 @@ paths:
             application/json:
               schema:
                   $ref: '#/components/schemas/Transactions'
+              examples:
+                CommonTransactionsExample:
+                  $ref: '#/responses/examples/CommonTransactionsExample'
+                TronTransactionsExample:
+                  $ref: '#/responses/examples/TronTransactionsExample'
         "400":
           $ref: '#/components/responses/NotFound'
   /transactions/detail/{chain}/{txHash}:

@@ -5,6 +5,7 @@ import { ITransactionManager, ITransactionsPagination, ChainId } from '../module
 import * as express from "express";
 import { errorHandler } from "./decorator/error-handler";
 import { getTransactionsValidator } from './validator/get-transactionsv-validator';
+import { paginationValidator } from './validator/pagination-validator';
 
 const chainValidator = [ChainId.bsc,ChainId.eth,ChainId.matic,ChainId.sol,ChainId.tron].join('|')
 
@@ -18,8 +19,8 @@ export class TransactionsController implements interfaces.Controller {
         @requestParam('chain') chain:string, 
         @requestParam('address') address:string,
         @queryParam('continue') paginator:ITransactionsPagination,
-        @queryParam('page') page: number,
-        @queryParam('pageSize') pageSize: number,
+        @queryParam('page') page: number = 1,
+        @queryParam('pageSize') pageSize: number = 10,
         @response() res: express.Response){
             const manager = this._txManagerFactory(chain)
             const resultPage = await manager.getWalletAllTransactions(
@@ -39,20 +40,20 @@ export class TransactionsController implements interfaces.Controller {
         const manager = this._txManagerFactory(chain);
         const result = await manager.getTransactionDetails(txHash);
 
-        res.json(result);  
+        res.json(result);
     }
 
-    @httpGet(`/transfers/:chain(${chainValidator})/:address`)
+    @httpGet(`/transfers/:chain(${chainValidator})/:address`, ...paginationValidator())
     @errorHandler()
     private async getAddressTransfers(
         @requestParam('chain') chain: string,
         @requestParam('address') address: string,
-        @queryParam('skip') skip: number = 0,
-        @queryParam('limit') limit: number = 20,
+        @queryParam('page') page: number = 0,
+        @queryParam('pageSize') pageSize: number = 10,
         @response() res: express.Response
     ){
         const manager = this._txManagerFactory(chain);
-        const result = await manager.getWalletTokenTransfers(address, skip, limit);
+        const result = await manager.getWalletTokenTransfers(address, {page, pageSize});
         
         res.json(result);
     }

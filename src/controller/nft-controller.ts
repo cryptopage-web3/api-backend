@@ -26,6 +26,8 @@ export class NftsController implements interfaces.Controller {
         res.json(result)
     }
 
+    @httpGet(`/transactions/:chain(${chainValidator})/:address`, ...paginationValidator())
+    @errorHandler()
     async getAddressNftTransactions(
         @requestParam('chain') chain: ChainId,
         @requestParam('address') address: string,
