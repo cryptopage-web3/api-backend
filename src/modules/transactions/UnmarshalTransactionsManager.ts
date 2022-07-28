@@ -1,30 +1,25 @@
-import { ITransactionManager, ChainId } from './types';
+import { ITransactionManager } from './types';
 import { UnmarshalApi } from '../../services/unmarshal/UnmarhalApi';
+import { inject, injectable } from 'inversify';
+import { IDS } from '../../types/index';
 
-const config = require('../../enums/chains')
-
+@injectable()
 export class UnmarshalTransactionsManager implements ITransactionManager {
-    _config: any
+    _unmarshalApi: UnmarshalApi
 
-    constructor(chain: ChainId){
-        if(!config[chain]){
-            throw new Error(`Invalid chain: ${chain}`)
-        }
-        this._config = config[chain]
+    constructor(@inject(IDS.SERVICE.UnmarshalApiFactory) _unmarshalApiFactory: () => UnmarshalApi){
+        this._unmarshalApi = _unmarshalApiFactory()
     }
 
     getWalletAllTransactions(address, {page, pageSize}) {
-        const service = new UnmarshalApi({ address, config: this._config });
-        return service.getWalletAllTransactions(page, pageSize);
+        return this._unmarshalApi.getWalletAllTransactions(address, page, pageSize);
     }
     
     getTransactionDetails(txHash) {
-        const service = new UnmarshalApi({ config: this._config });
-        return service.getTransactionDetails(txHash);
+        return this._unmarshalApi.getTransactionDetails(txHash);
     }
     
     getWalletTokenTransfers(address, {page, pageSize}) {
-        const service = new UnmarshalApi({ address, config: this._config });
-        return service.getWalletTokenTransfers(page, pageSize);
+        return this._unmarshalApi.getWalletTokenTransfers(address, page, pageSize);
     }
 }

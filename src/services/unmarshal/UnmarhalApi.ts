@@ -1,27 +1,24 @@
-// @ts-nocheck
+import { ChainId } from '../../modules/transactions/types';
+import { getChainConf } from '../../enums/chains';
 const axios = require('axios');
 const { getCoinPrice } = require('../../cache/coins');
 const { getDataFromUrl, getFieldFromContract, getDateFromBlock, getContractName } = require('./helper');
 
 export class UnmarshalApi {
-    /**
-    * @param {Object} data - Info about wallet instance.
-    * @param data.address - The address of the wallet.
-    * @param {Object} data.config - The config of the network.
-    */
-    constructor(data) {
-        const { address, config } = data;
+    chainName: string
+    mainCoinId: string
+    explorerUrl: string
+    nativeCoinSymbol: string
+    rpc: string
+
+    constructor(chain: ChainId) {
+        const config: any = getChainConf(chain);
+
         this.chainName = config.chainName;
         this.mainCoinId = config.nativeCoinId;
         this.explorerUrl = config.explorerUrl;
         this.nativeCoinSymbol = config.nativeCoinSymbol;
         this.rpc = config.rpc;
-
-        if (address && !address.match('^0x[a-fA-F0-9]{40}$')) {
-            throw new Error('Address is invalid.');
-        }
-
-        this.address = address;
     }
 
     apiKey = '3Z1C4SxhUE6Cj7P5zxWv47katMQQXlffeHz61xe9';
@@ -58,16 +55,16 @@ export class UnmarshalApi {
         }
     }
 
-    async getTokensFromApi(skip, limit) {
-        const { data } = await axios.get(`${this.baseUrl}/v1/${this.chainName}/address/${this.address}/assets?auth_key=${this.apiKey}`);
+    async getTokensFromApi(address: string, skip, limit) {
+        const { data } = await axios.get(`${this.baseUrl}/v1/${this.chainName}/address/${address}/assets?auth_key=${this.apiKey}`);
         if (!data?.length) {
             return [];
         }
         return data;
     }
 
-    async getWalletTokens(skip, limit) {
-        const data = await this.getTokensFromApi(skip, limit);
+    async getWalletTokens(address: string, skip, limit) {
+        const data = await this.getTokensFromApi(address, skip, limit);
 
         const items = [this.getPageToken];
         for (const item of data) {
@@ -115,8 +112,8 @@ export class UnmarshalApi {
         }
     }
 
-    async getTransactionsFromApi(page, pageSize) {
-        const url = `${this.baseUrl}/v2/${this.chainName}/address/${this.address}/transactions?page=${page}&pageSize=${pageSize}&auth_key=${this.apiKey}`;
+    async getTransactionsFromApi(address: string, page, pageSize) {
+        const url = `${this.baseUrl}/v2/${this.chainName}/address/${address}/transactions?page=${page}&pageSize=${pageSize}&auth_key=${this.apiKey}`;
         const { data } = await axios.get(url);
 
         if (data.transactions?.length == 0) {
@@ -126,17 +123,17 @@ export class UnmarshalApi {
         return { items: data.transactions, count: data.total_txs };
     }
 
-    async getTransactionsCount(chainName, address) {
-        const url = `${this.baseUrl}/v2/${chainName}/address/${address}/transactions?page=1&pageSize=1&auth_key=${this.apiKey}`;
+    async getTransactionsCount(address) {
+        const url = `${this.baseUrl}/v2/${this.chainName}/address/${address}/transactions?page=1&pageSize=1&auth_key=${this.apiKey}`;
         const { data: { total_txs } } = await axios.get(url);
 
         return total_txs;
     }
 
-    async getWalletAllTransactions(page, pageSize) {
+    async getWalletAllTransactions(address: string, page, pageSize) {
         try {
-            const { items, count } = await this.getTransactionsFromApi(page, pageSize);
-            const transactions = [];
+            const { items, count } = await this.getTransactionsFromApi(address, page, pageSize);
+            const transactions: any[] = [];
             for (const item of items) {
                 const transaction = this.getTransactionDataFromItem(item);
                 transactions.push(transaction);
@@ -147,9 +144,9 @@ export class UnmarshalApi {
         }
     }
 
-    async getWalletTokenTransfers(page, pageSize) {
+    async getWalletTokenTransfers(address: string, page, pageSize) {
         try {
-            const { transactions, count } = await this.getWalletAllTransactions(page, pageSize);
+            const { transactions, count } = await this.getWalletAllTransactions(address, page, pageSize);
             const items = transactions.filter(e => e.title === 'Transfer');
             return { count, transactions: items };
         } catch {
@@ -236,7 +233,7 @@ export class UnmarshalApi {
             from: item.sender,
             to: item.to,
             txHash: item.transaction_hash,
-            date: new Date(),
+            //date: new Date(),
             contract_address: item.contract_address || '',
             tokenId: item.token_id,
             likes: 0,
@@ -271,20 +268,20 @@ export class UnmarshalApi {
         return { symbol, name, date };
     }
 
-    async getNFTTransactionsFromApi(page, pageSize) {
-        const { data } = await axios.get(`${this.baseUrl}/v2/${this.chainName}/address/${this.address}/nft-transactions?page=${page}&pageSize=${pageSize}&auth_key=${this.apiKey}`);
+    async getNFTTransactionsFromApi(address: string, page, pageSize) {
+        const { data } = await axios.get(`${this.baseUrl}/v2/${this.chainName}/address/${address}/nft-transactions?page=${page}&pageSize=${pageSize}&auth_key=${this.apiKey}`);
         return data;
     }
 
-    async getNFTAssetsFromApi(page, pageSize) {
-        const { data } = await axios.get(`${this.baseUrl}/v2/${this.chainName}/address/${this.address}/nft-assets?page=${page}&pageSize=${pageSize}&auth_key=${this.apiKey}`);
+    async getNFTAssetsFromApi(address: string, page, pageSize) {
+        const { data } = await axios.get(`${this.baseUrl}/v2/${this.chainName}/address/${address}/nft-assets?page=${page}&pageSize=${pageSize}&auth_key=${this.apiKey}`);
         return data;
     }
 
-    async getWalletAllNFTs(page, pageSize) {
-        const data = await this.getNFTAssetsFromApi(page, pageSize);
+    async getWalletAllNFTs(address: string, page, pageSize) {
+        const data = await this.getNFTAssetsFromApi(address, page, pageSize);
 
-        const promises = [];
+        const promises: Promise<any>[] = [];
         for (const item of data.nft_assets) {
             const promise = this.getNFTDataFromItem(item);
             promises.push(promise);
@@ -293,10 +290,10 @@ export class UnmarshalApi {
         return { list, count: data.total_assets };
     }
 
-    async getWalletNFTTransactions(page, pageSize) {
-        const data = await this.getNFTTransactionsFromApi(page, pageSize);
+    async getWalletNFTTransactions(address: string, page, pageSize) {
+        const data = await this.getNFTTransactionsFromApi(address, page, pageSize);
 
-        const promises = [];
+        const promises: Promise<any>[] = [];
         for (const item of data.transactions) {
             const promise = this.getNFTTransactionDataFromItem(item);
             promises.push(promise);

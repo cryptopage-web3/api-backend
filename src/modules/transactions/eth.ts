@@ -1,16 +1,19 @@
 import { inject, injectable } from 'inversify';
-import { Etherscan, ITransactionManager, Paginator, ITransactionsPagination } from './types';
+import { Etherscan, ITransactionManager, Paginator, ITransactionsPagination, ChainId } from './types';
 import { IDS } from '../../types/index';
 import { EtherscanApi } from '../../services/etherscan/etherscan-api';
-
-const { UnmarshalApi } = require('./../../services/unmarshal/UnmarhalApi');
-
-const config = require('./../../enums/chains');
+import { UnmarshalApi } from '../../services/unmarshal/UnmarhalApi';
 
 @injectable()
 export class EthTransactionManager implements ITransactionManager {
     @inject(IDS.SERVICE.EtherscanApi) private _etherscan: EtherscanApi;
 
+    _unmarshalApi: UnmarshalApi
+
+    constructor(@inject(IDS.SERVICE.UnmarshalApiFactory) _unmarshalApiFactory: ()=> UnmarshalApi){
+        this._unmarshalApi = _unmarshalApiFactory()
+    }
+    
     async getWalletAllTransactions(address:string, offset:ITransactionsPagination) {
         let transactions:Etherscan.ITransactionData[] = [],
             erc20Transactions:Etherscan.IErc20TransactionData[] = [],
@@ -141,17 +144,14 @@ export class EthTransactionManager implements ITransactionManager {
     }
 
     getTransactionsCount(address:string):Promise<number>{
-        const service = new UnmarshalApi({ address, config: config.eth });
-        return service.getTransactionsCount(config.eth.chainName, address)
+        return this._unmarshalApi.getTransactionsCount(address)
     }
 
     getTransactionDetails(txHash) {
-        const service = new UnmarshalApi({ config: config.eth });
-        return service.getTransactionDetails(txHash);
+        return this._unmarshalApi.getTransactionDetails(txHash);
     }
     
     getWalletTokenTransfers(address, {page, pageSize}) {
-        const service = new UnmarshalApi({ address, config: config.eth });
-        return service.getWalletTokenTransfers(page, pageSize);
+        return this._unmarshalApi.getWalletTokenTransfers(address, page, pageSize);
     }
 }

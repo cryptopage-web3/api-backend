@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const tokensModule = require('./../modules/tokens');
+//const tokensModule = require('./../modules/tokens');
 const BAD_REQUEST = 400;
 
 /**

@@ -1,5 +1,7 @@
-module.exports = {
-    eth: {
+import { ChainId } from '../modules/transactions/types';
+
+export const chainConfig = {
+    [ChainId.eth]: {
         evm: true,
         chainId: 1,
         chain: 'eth',
@@ -11,7 +13,7 @@ module.exports = {
         rpc: 'https://eth.public-rpc.com',
         nativeCoinId: 'ethereum'
     },
-    bsc: {
+    [ChainId.bsc]: {
         evm: true,
         chainId: 56,
         chain: 'bsc',
@@ -23,7 +25,7 @@ module.exports = {
         rpc: 'https://bscrpc.com',
         nativeCoinId: 'binancecoin'
     },
-    matic: {
+    [ChainId.matic]: {
         evm: true,
         chainId: 137,
         chain: 'matic',
@@ -35,17 +37,25 @@ module.exports = {
         rpc: 'https://polygon-rpc.com',
         nativeCoinId: 'matic-network'
     },
-    sol: {
+    [ChainId.sol]: {
         evm: false,
         chainId: 1399811149,
         explorerUrl: 'https://solscan.io/tx/',
         nativeCoinSymbol: 'SOL',
         nativeCoinId: 'solana'
     },
-    tron: {
+    [ChainId.tron]: {
         evm: false,
         explorerUrl: 'https://tronscan.org/#/transaction/',
         nativeCoinSymbol: 'TRX',
         nativeCoinId: 'tron'
     }
-};
+}
+
+export function getChainConf(chain: ChainId){
+    if(!chainConfig[chain]){
+        throw new Error(`Invalid chain config ${chain}`)
+    }
+
+    return chainConfig[chain]
+}
