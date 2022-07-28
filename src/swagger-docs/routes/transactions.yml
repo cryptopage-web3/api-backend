@@ -34,6 +34,32 @@ paths:
                   $ref: '#/responses/examples/EthTransactionExample'
         "400":
           $ref: '#/components/responses/NotFound'
+  /transactions/tron/{address}:
+    get:
+      summary: Get paginated tron transactions from address.
+      description: Get tron transactions from address.
+      tags: [Transactions]
+      parameters:
+        - $ref: '#/parameters/path/address'
+        - $ref: '#/parameters/pagination/pageSize'
+        - in: query
+          name: continue[fingerprint]
+          schema:
+            type: string
+            required: false
+          description: Continue pagination token
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Transactions'
+              examples:
+                TronTransactionsExample:
+                  $ref: '#/responses/examples/TronTransactionsExample'
+        "400":
+          $ref: '#/responses/PaginationError'
   /transactions/{chain}/{address}:
     get:
       summary: Get transactions from address.
@@ -45,7 +71,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [bsc, matic, sol, tron]
+            enum: [bsc, matic, sol]
             default: eth
           description: chain name
         - $ref: '#/parameters/path/address'
@@ -61,8 +87,6 @@ paths:
               examples:
                 CommonTransactionsExample:
                   $ref: '#/responses/examples/CommonTransactionsExample'
-                TronTransactionsExample:
-                  $ref: '#/responses/examples/TronTransactionsExample'
         "400":
           $ref: '#/responses/PaginationError'
   /transactions/detail/{chain}/{txHash}:
