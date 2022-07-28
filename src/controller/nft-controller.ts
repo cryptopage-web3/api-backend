@@ -4,12 +4,14 @@ import { errorHandler } from "./decorator/error-handler";
 import { ChainId } from '../modules/transactions/types';
 import { paginationValidator } from "./validator/pagination-validator";
 import * as express from 'express';
+import { inject } from "inversify";
+import { IDS } from '../types/index';
 
 const chainValidator = [ChainId.bsc,ChainId.eth,ChainId.matic].join('|')
 
 @controller('/nfts')
 export class NftsController implements interfaces.Controller {
-    private _nftManagerFactory: (named:string) => INftsManager
+    @inject(IDS.MODULES.NftsManagerFactory) private _nftManagerFactory: (named:string) => INftsManager
 
     @httpGet(`/:chain(${chainValidator})/:address`, ...paginationValidator())
     @errorHandler()
