@@ -16,14 +16,16 @@ export interface ITransactionsPagination {
     tx?: number,
     erc20?: number,
     page?:number,
-    pageSize: number
-    fingerprint?: string
+    pageSize: number,
+    fingerprint?: string,
+    beforeHash?: string
 }
 
 export interface ITransactionsNexPagePagination {
     tx?: number,
     erc20?: number,
-    fingerprint?: string
+    fingerprint?: string,
+    beforeHash?: string
 }
 
 export interface Paginator {

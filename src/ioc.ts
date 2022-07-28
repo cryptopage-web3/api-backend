@@ -12,6 +12,8 @@ import { UnmarshalTransactionsManager } from './modules/transactions/UnmarshalTr
 import { UnmarshalNftsManager } from './modules/nfts/UnmarshalNftsManager';
 import { TronGridApi } from './services/trongrid/trongrid-api';
 import { TronGridApiTransactionsManager } from './modules/transactions/tron';
+import { SolScanApi } from './services/solscan/solscan-api';
+import { SolscanTtransactionsManager } from './modules/transactions/sol';
 
 export const container = new Container();
 
@@ -19,6 +21,7 @@ container.bind(IDS.SERVICE.EtherscanApi).toConstantValue(
     new EtherscanApi(envToString('ETHERSCAN_API_KEY'))
 )
 container.bind(IDS.SERVICE.TrongridApi).to(TronGridApi).inSingletonScope()
+container.bind(IDS.SERVICE.SolScanApi).to(SolScanApi).inSingletonScope()
 
 container.bind(IDS.MODULES.TransactionManager)
     .to(EthTransactionManager).inSingletonScope().whenTargetNamed(ChainId.eth)
@@ -29,7 +32,7 @@ container.bind(IDS.MODULES.TransactionManager)
     .toConstantValue(new UnmarshalTransactionsManager(ChainId.matic))
     .whenTargetNamed(ChainId.matic)
 container.bind(IDS.MODULES.TransactionManager)
-    .toConstantValue(require('./modules/transactions/sol')).whenTargetNamed(ChainId.sol)
+    .to(SolscanTtransactionsManager).inSingletonScope().whenTargetNamed(ChainId.sol)
 container.bind(IDS.MODULES.TransactionManager)
     .to(TronGridApiTransactionsManager).inSingletonScope().whenTargetNamed(ChainId.tron)
 container.bind(IDS.MODULES.TransactionManagerFactory)

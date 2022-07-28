@@ -47,7 +47,7 @@ paths:
           schema:
             type: string
             required: false
-          description: Continue pagination token
+          description: Continue pagination token, `pageSize` should be the same as in previous request
       responses:
         "200":
           description: OK
@@ -58,6 +58,31 @@ paths:
               examples:
                 TronTransactionsExample:
                   $ref: '#/responses/examples/TronTransactionsExample'
+        "400":
+          $ref: '#/responses/PaginationError'
+  /transactions/sol/{address}:
+    get:
+      summary: Get paginated solana transactions from address.
+      tags: [Transactions]
+      parameters:
+        - $ref: '#/parameters/path/address'
+        - $ref: '#/parameters/pagination/pageSize'
+        - in: query
+          name: continue[beforeHash]
+          schema:
+            type: string
+            required: false
+          description: Continue pagination token, `pageSize` should be the same as in previous request
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Transactions'
+              examples:
+                CommonTransactionsExample:
+                  $ref: '#/responses/examples/CommonTransactionsExample'
         "400":
           $ref: '#/responses/PaginationError'
   /transactions/{chain}/{address}:
@@ -71,7 +96,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [bsc, matic, sol]
+            enum: [bsc, matic]
             default: eth
           description: chain name
         - $ref: '#/parameters/path/address'
@@ -110,3 +135,40 @@ paths:
                   $ref: '#/components/schemas/Transaction'
         "400":
           $ref: '#/components/responses/NotFound'
+  /transactions/transfers/{chain}/{address}:
+    get:
+      summary: Get transactions from address.
+      description: Get transactions from address.
+      tags: [Transactions]
+      parameters:
+        - in: path
+          name: chain
+          required: true
+          schema:
+            type: string
+            enum: [eth, bsc, matic, sol, tron]
+            default: eth
+          description: chain name
+        - in: path
+          name: address
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: skip
+          schema:
+            type: number
+        - in: query
+          name: limit
+          schema:
+            type: number
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Transactions'
+        "400":
+          $ref: '#/components/responses/NotFound'
+    
