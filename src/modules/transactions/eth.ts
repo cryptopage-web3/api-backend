@@ -16,8 +16,8 @@ export class EthTransactionManager implements ITransactionManager {
             erc20Transactions:Etherscan.IErc20TransactionData[] = [],
             count = 0;
 
-        const txGlobalOffset = typeof offset?.tx === 'string' ? parseInt(offset.tx) : 0,
-            erc20GlobalOffset = typeof offset?.erc20 === 'string' ? parseInt(offset.erc20) : 0,
+        const txGlobalOffset = offset?.tx || 0,
+            erc20GlobalOffset = offset?.erc20 || 0,
             txPaginator = this.buildFloatPaginator(txGlobalOffset),
             erc20Paginator = this.buildFloatPaginator(erc20GlobalOffset)
 
