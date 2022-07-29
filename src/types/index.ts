@@ -4,13 +4,15 @@ export const IDS = {
         TransactionManagerFactory: Symbol('TransactionManagerFactory'),
         NftsManager: Symbol('NftsManager'),
         NftsManagerFactory: Symbol('NftsManagerFactory'),
-        UnmarshalTransactionManagerFactory: Symbol('UnmarshalTransactionManagerFactory'),
-        UnmarshalNftManagerFactory: Symbol('UnmarshalNftManagerFactory'),
+        TokenManager: Symbol('TokenManager'),
+        TokenManagerFactory: Symbol('TokenManagerFactory'),
     },
     SERVICE:{
         EtherscanApi: Symbol('EtherscanApi'),
         TrongridApi: Symbol('TronGridApi'),
         UnmarshalApiFactory: Symbol('UnmarshalApiFactory'),
         SolScanApi: Symbol('SolScanApi'),
+        CovalentApi: Symbol('CovalentApi'),
+        TronscanApi: Symbol('TronscanApi'),
     }
 }

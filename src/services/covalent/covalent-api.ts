@@ -1,26 +1,24 @@
-// @ts-nocheck
+import { getChainConf } from '../../enums/chains';
+import { toUrlQueryParams } from '../../util/url-util';
+import { ChainId } from '../../modules/transactions/types';
+import { injectable } from 'inversify';
 const axios = require('axios');
-const conf = require('./../../enums/chains');
 const { getCoinPrice } = require('../../cache/coins');
 
-class CovalentApi {
-    /**
-    * @param {Object} data - Info about wallet instance.
-    * @param data.address - The address of the wallet.
-    * @param {Object} data.config - The config of the network.
-    */
-    constructor(data) {
-        const { address, config } = data;
+@injectable()
+export class CovalentApi {
+    chainId: string
+    chainName: string
+    mainCoinId: string
+    explorerUrl: string
+    nativeCoinSymbol: string
+
+    constructor() {
+        const config: any = getChainConf(ChainId.sol);
         this.chainId = config.chainId;
         this.mainCoinId = config.nativeCoinId;
         this.explorerUrl = config.explorerUrl;
         this.nativeCoinSymbol = config.nativeCoinSymbol;
-
-        if (this.chainId !== conf.sol.chainId && !address.match('^0x[a-fA-F0-9]{40}$')) {
-            throw new Error('Address is invalid.');
-        }
-
-        this.address = address;
     }
 
     apiKey = 'ckey_d826382c6f1b430c97ad2521c0d';
@@ -51,8 +49,8 @@ class CovalentApi {
         }
     }
 
-    async getTokensFromApi(skip, limit) {
-        const { data } = await axios.get(`${this.baseUrl}/${this.chainId}/address/${this.address}/balances_v2/?key=${this.apiKey}`);
+    async getTokensFromApi(address) {
+        const { data } = await axios.get(`${this.baseUrl}/${this.chainId}/address/${address}/balances_v2/?key=${this.apiKey}`);
         if (!data?.data?.items?.length) {
             return [];
         }
@@ -60,15 +58,15 @@ class CovalentApi {
         return items;
     }
 
-    async getWalletTokens(skip, limit) {
-        const data = await this.getTokensFromApi(skip, limit);
+    async getWalletTokens(address) {
+        const data = await this.getTokensFromApi(address);
 
         const items = [this.getPageToken];
         for (const item of data) {
             const token = this.getTokenDataFromItem(item);
             items.push(token);
         }
-        const tokens = items.slice(skip * limit, skip * limit + limit).filter(e => (e.balance || e.symbol === 'PAGE'));
+        const tokens = items.filter(e => (e.balance || e.symbol === 'PAGE'));
         return { tokens, count: items.length };
     }
 
@@ -101,39 +99,32 @@ class CovalentApi {
         }
     }
 
-    async getTransactionsFromApi() {
-        const { data } = await axios.get(`${this.baseUrl}/${this.chainId}/address/${this.address}/transactions_v2/?key=${this.apiKey}`);
+    async getTransactionsFromApi(address: string, page: number, pageSize: number) {
+        const queryParams = toUrlQueryParams({'page-number': page, 'page-size': pageSize, key: this.apiKey})
+        const url = `${this.baseUrl}/${this.chainId}/address/${address}/transactions_v2/?${queryParams}`
+        
+        const { data } = await axios.get(url);
         if (!data?.data?.items?.length) {
             return [];
         }
         return data.data.items;
     }
 
-    async getWalletAllTransactions(skip, limit) {
-        try {
-            const data = await this.getTransactionsFromApi();
-            const items = data.slice(skip * limit, skip * limit + limit);
-            const transactions = [];
-            for (const item of items) {
-                const transaction = this.getTransactionDataFromItem(item);
-                transactions.push(transaction);
-            }
-            return { count: data.length, transactions };
-        } catch {
-            return { count: 0, transactions: [] };
-        }
+    async getWalletAllTransactions(address:string, page: number, pageSize: number) {
+        const data = await this.getTransactionsFromApi(address, page, pageSize);
+        
+        const transactions = data.map(i => this.getTransactionDataFromItem(i))
+
+        return { count: data.length, transactions };
     }
 
     async getWalletTokenTransfers(skip, limit) {
-        try {
+       /* try {
             const { transactions, count } = await this.getWalletAllTransactions(0, Number.MAX_VALUE);
             const items = transactions.filter(e => e.title === 'Transfer').slice(skip * limit, skip * limit + limit);
             return { count, transactions: items };
         } catch {
             return { count: 0, transactions: [] };
-        }
+        }*/
     }
 }
-
-module.exports = CovalentApi;
-

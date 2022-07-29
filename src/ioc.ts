@@ -15,6 +15,10 @@ import { TronGridApiTransactionsManager } from './modules/transactions/tron';
 import { SolScanApi } from './services/solscan/solscan-api';
 import { SolscanTtransactionsManager } from './modules/transactions/sol';
 import { UnmarshalApi } from './services/unmarshal/UnmarhalApi';
+import { UnmarshalTokenManager } from './modules/tokens/UnmarshalTokenManager';
+import { CovalentApi } from './services/covalent/covalent-api';
+import { CovalentTokenManager } from './modules/tokens/sol';
+import { TronscanTokenManager } from './modules/tokens/tron';
 
 export const container = new Container();
 
@@ -26,6 +30,8 @@ container.bind(IDS.SERVICE.SolScanApi).to(SolScanApi).inSingletonScope()
 container.bind(IDS.SERVICE.UnmarshalApiFactory).toFactory(context => () => {
     return new UnmarshalApi(context.currentRequest.parentRequest?.target.getNamedTag()?.value as any)
 })
+container.bind(IDS.SERVICE.CovalentApi).to(CovalentApi).inSingletonScope()
+container.bind(IDS.SERVICE.TronscanApi).to(TronscanTokenManager).inSingletonScope()
 
 container.bind(IDS.MODULES.TransactionManager)
     .to(EthTransactionManager).inSingletonScope()
@@ -56,3 +62,21 @@ container.bind(IDS.MODULES.NftsManager)
     .whenTargetNamed(ChainId.eth)
 container.bind(IDS.MODULES.NftsManagerFactory)
     .toAutoNamedFactory(IDS.MODULES.NftsManager)
+
+container.bind(IDS.MODULES.TokenManager)
+    .to(UnmarshalTokenManager).inSingletonScope()
+    .whenTargetNamed(ChainId.eth)
+container.bind(IDS.MODULES.TokenManager)
+    .to(UnmarshalTokenManager).inSingletonScope()
+    .whenTargetNamed(ChainId.bsc)
+container.bind(IDS.MODULES.TokenManager)
+    .to(UnmarshalTokenManager).inSingletonScope()
+    .whenTargetNamed(ChainId.matic)
+container.bind(IDS.MODULES.TokenManager)
+    .to(CovalentTokenManager).inSingletonScope()
+    .whenTargetNamed(ChainId.sol)
+container.bind(IDS.MODULES.TokenManager)
+    .to(TronscanTokenManager).inSingletonScope()
+    .whenTargetNamed(ChainId.tron)
+container.bind(IDS.MODULES.TokenManagerFactory)
+    .toAutoNamedFactory(IDS.MODULES.TokenManager)

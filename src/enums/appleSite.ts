@@ -1,4 +1,4 @@
-module.exports = {
+export const appleSiteJson = {
     'applinks': {
         'apps': [],
         'details': [{

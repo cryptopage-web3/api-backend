@@ -1,16 +1,17 @@
+import { swaggerDefinition } from './swagger';
 const express = require('express');
-const swaggerDefinition = require('../../swagger-docs/swagger');
-const router = express.Router();
 const swaggerJsdoc = require('swagger-jsdoc');
 const { serve, setup } = require('swagger-ui-express');
+
+export const swaggerRouter = express.Router();
 
 const swaggerSpec = swaggerJsdoc({
     swaggerDefinition,
     apis: ['src/swagger-docs/**/*.yml', 'src/routes/**/*.js','src/routes/**/*.ts','src/controller/**/*.ts'],
 });
 
-router.use('/', serve);
-router.get(
+swaggerRouter.use('/', serve);
+swaggerRouter.get(
     '/',
     setup(swaggerSpec, {
         explorer: true,
@@ -20,5 +21,3 @@ router.get(
         }
     })
 );
-
-module.exports = router;

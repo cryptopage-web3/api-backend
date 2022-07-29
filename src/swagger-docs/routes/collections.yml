@@ -31,6 +31,7 @@ paths:
             application/json:
               schema:
                   $ref: '#/components/schemas/NftCollections'
+  
   /collections/{id}:
     get:
       summary: Paginated collection items
@@ -49,32 +50,30 @@ paths:
             application/json:
               schema:
                   $ref: '#/components/schemas/NftItems'
-  /collections/last-updated:
+
+  /collections/marketdashboard:
     get:
       summary: Paginated nft items with last activity
       description: Get Nft items with order by last update DESC
       tags: [Collections]
       parameters:
-      - in: query
-        name: limit
-        schema:
-          type: number
-          default: 10
-      - in: query
-        name: offset
-        schema:
-          type: number
-          default: 0
-      - in: query
-        name: filter[collectionId]
-        schema:
-          type: array
-          items:
-              type: number
+        - $ref: '#/parameters/pagination/page'
+        - $ref: '#/parameters/pagination/pageSize'
+        - in: query
+          name: filter[collectionId]
+          schema:
+            type: array
+            items:
+                type: number
       responses:
-      "200":
-        description: OK
-        content:
-          application/json:
-            schema:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
                 $ref: '#/components/schemas/NftItems'
+              examples:
+                DashboardItemsExample:
+                  $ref: '#/responses/examples/CollectionsMarketExample'
+        "400":
+          $ref: '#/responses/PaginationError'

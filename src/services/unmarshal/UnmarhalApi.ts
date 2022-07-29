@@ -55,7 +55,7 @@ export class UnmarshalApi {
         }
     }
 
-    async getTokensFromApi(address: string, skip, limit) {
+    async getTokensFromApi(address: string) {
         const { data } = await axios.get(`${this.baseUrl}/v1/${this.chainName}/address/${address}/assets?auth_key=${this.apiKey}`);
         if (!data?.length) {
             return [];
@@ -63,15 +63,15 @@ export class UnmarshalApi {
         return data;
     }
 
-    async getWalletTokens(address: string, skip, limit) {
-        const data = await this.getTokensFromApi(address, skip, limit);
+    async getWalletTokens(address: string) {
+        const data = await this.getTokensFromApi(address);
 
         const items = [this.getPageToken];
         for (const item of data) {
             const token = this.getTokenDataFromItem(item);
             items.push(token);
         }
-        const tokens = items.slice(skip * limit, skip * limit + limit).filter(e => (e.balance || e.symbol === 'PAGE'));
+        const tokens = items.filter(e => (e.balance || e.symbol === 'PAGE'));
         return { tokens, count: items.length };
     }
 

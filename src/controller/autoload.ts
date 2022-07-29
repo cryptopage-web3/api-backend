@@ -1,2 +1,5 @@
+import './index-controller'
 import './transactions-controller'
 import './nft-controller'
+import './token-controller'
+import './collections-controller'

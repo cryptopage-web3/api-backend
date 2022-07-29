@@ -18,8 +18,8 @@ export class NftsController implements interfaces.Controller {
     async getAddressNfts(
         @requestParam('chain') chain: ChainId,
         @requestParam('address') address: string,
-        @queryParam('page') page: number,
-        @queryParam('pageSize') pageSize: number,
+        @queryParam('page') page: number = 1,
+        @queryParam('pageSize') pageSize: number = 10,
         @response() res: express.Response
     ){
         const manager = this._nftManagerFactory(chain)
@@ -33,8 +33,8 @@ export class NftsController implements interfaces.Controller {
     async getAddressNftTransactions(
         @requestParam('chain') chain: ChainId,
         @requestParam('address') address: string,
-        @queryParam('page') page: number,
-        @queryParam('pageSize') pageSize: number,
+        @queryParam('page') page: number = 1,
+        @queryParam('pageSize') pageSize: number = 10,
         @response() res: express.Response
     ){
         const manager = this._nftManagerFactory(chain)

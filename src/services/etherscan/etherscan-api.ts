@@ -1,5 +1,5 @@
 import { toUrlQueryParams } from '../../util/url-util';
-// @ts-nocheck
+
 const axios = require('axios');
 
 const API_URL = `https://api.etherscan.io/api`;

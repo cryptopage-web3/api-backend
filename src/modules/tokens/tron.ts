@@ -1,4 +1,6 @@
-// @ts-nocheck
+import { injectable } from "inversify";
+import { ITokenManager } from './types';
+
 const axios = require('axios');
 
 const pageToken = {
@@ -11,32 +13,27 @@ const pageToken = {
     balancePrice: 0
 };
 
-function getTokenData(item) {
-    return {
-        name: item.tokenName,
-        symbol: item.tokenAbbr,
-        logo: item.tokenLogo,
-        balance: Number(item.amount) || 0,
-        percentChange: 0,
-        price: 0,
-        balancePrice: 0
-    };
-}
-
-async function getWalletTokens(address, skip, limit) {
-    const result = await axios.get(`https://apilist.tronscan.org/api/account?address=${address}`);
-    const tokens = [];
-    if (!result.data?.tokens?.length) {
-        return tokens;
+@injectable()
+export class TronscanTokenManager implements ITokenManager {
+    getTokenData(item) {
+        return {
+            name: item.tokenName,
+            symbol: item.tokenAbbr,
+            logo: item.tokenLogo,
+            balance: Number(item.amount) || 0,
+            percentChange: 0,
+            price: 0,
+            balancePrice: 0
+        }
     }
-    const list = result.data.tokens.slice(skip * limit, skip * limit + limit);
-    for(let i = 0; i < list.length; i++) {
-        const token = getTokenData(list[i]);
-        tokens.push(token);
+    
+    async getWalletTokens(address) {
+        const { data } = await axios.get(`https://apilist.tronscan.org/api/account?address=${address}`);
+    
+        if (!data.tokens?.length) {
+            return [];
+        }
+    
+        return data.tokens.map(t => this.getTokenData(t))
     }
-    return tokens;
-}
-
-module.exports = {
-    getWalletTokens
 }
