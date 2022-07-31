@@ -1,5 +1,7 @@
 const axios = require('axios');
+const InputDataDecoder = require('ethereum-input-data-decoder');
 const Web3 = require('web3');
+const abi = require('./erc20.json');
 
 const typeList = ['image', 'audio', 'video'];
 const types = { '.jpg': 'image', '.png': 'image', '.gif': 'image', '.jpeg': 'image', '.webp': 'image', '.mp4': 'video', '.mp3': 'audio' };
@@ -92,9 +94,32 @@ async function getContractName(blockchain, address) {
     }
 }
 
+async function getApproveTarget(blockchain, txHash) {
+    const rpc = {
+        ethereum: 'https://eth.public-rpc.com',
+        binance: 'https://bscrpc.com',
+        polygon: 'https://polygon-rpc.com',
+    }
+    try {
+        const web3 = new Web3(rpc[blockchain]);
+        const transaction = await web3.eth.getTransaction(txHash);
+        const address = decodeEthDataAndGetApproveTarget(transaction.input);
+        return address;
+    } catch (e) {
+        return '';
+    }
+}
+
+function decodeEthDataAndGetApproveTarget(data) {
+    const decoder = new InputDataDecoder(abi);
+    const result = decoder.decodeData(data) || {};
+    return result.inputs[0];
+}
+
 module.exports = {
     getDataFromUrl,
     getFieldFromContract,
     getDateFromBlock,
-    getContractName
+    getContractName,
+    getApproveTarget
 }
