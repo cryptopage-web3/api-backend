@@ -2,7 +2,7 @@ import { ChainId } from '../../modules/transactions/types';
 import { getChainConf } from '../../enums/chains';
 const axios = require('axios');
 const { getCoinPrice } = require('../../cache/coins');
-const { getDataFromUrl, getFieldFromContract, getDateFromBlock, getContractName } = require('./helper');
+const { getDataFromUrl, getFieldFromContract, getDateFromBlock, getContractName, getApproveTarget } = require('./helper');
 
 export class UnmarshalApi {
     chainName: string
@@ -176,6 +176,11 @@ export class UnmarshalApi {
         if (data.type === 'swap') {
             const contractName = await getContractName(this.chainName, data.to);
             action += ` on ${contractName}`;
+        }
+        if (data.type === 'approve') {
+            const contract = await getApproveTarget('ethereum', txHash);
+            const contractName = await getContractName('ethereum', '0x' + contract);
+            action += ` for trade on ${contractName}`;
         }
 
         return {
