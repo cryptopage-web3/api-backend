@@ -6,6 +6,7 @@ paths:
       tags: [Transactions]
       parameters:
         - $ref: '#/parameters/path/address'
+        - $ref: '#/parameters/pagination/pageSize'
         - $ref: '#/parameters/pagination/eth/continueTx'
         - $ref: '#/parameters/pagination/eth/continueErc20'
       responses:
