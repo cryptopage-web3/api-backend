@@ -1,13 +1,14 @@
 import { ITronTransaction } from './types';
 import { toUrlQueryParams } from '../../util/url-util';
 import { injectable } from 'inversify';
+import { chainConfig } from '../../enums/chains';
 const axios = require('axios');
 const TronWeb = require('tronweb');
 
 const tronWeb = new TronWeb({
     fullHost: 'https://api.trongrid.io',
 });
-const config = require('./../../enums/chains');
+
 const { getCoinPrice } = require('../../cache/coins');
 
 @injectable()
@@ -26,10 +27,10 @@ export class TronGridApi {
             ),
             fee: 0,
             value,
-            valueUSD: getCoinPrice(config.tron.nativeCoinId) * value,
+            valueUSD: getCoinPrice(chainConfig.tron.nativeCoinId) * value,
             hash: item.txID,
-            explorerUrl: config.tron.explorerUrl + item.txID,
-            tokenSymbol: config.tron.nativeCoinSymbol,
+            explorerUrl: chainConfig.tron.explorerUrl + item.txID,
+            tokenSymbol: chainConfig.tron.nativeCoinSymbol,
             date: new Date(item.block_timestamp)
         }
     }
