@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify';
-import { Etherscan, ITransactionManager, Paginator, ITransactionsPagination, ChainId } from './types';
+import { Etherscan, ITransactionManager, Paginator, ITransactionsPagination } from './types';
 import { IDS } from '../../types/index';
 import { EtherscanApi } from '../../services/etherscan/etherscan-api';
 import { UnmarshalApi } from '../../services/unmarshal/UnmarhalApi';
@@ -43,11 +43,12 @@ export class EthTransactionManager implements ITransactionManager {
             erc20Transactions, 
             txGlobalOffset,
             erc20GlobalOffset,
-            count
+            count,
+            offset.pageSize
         )
     }
 
-    private buildFloatPaginator(offset: number, pageSize = 100, extendedPageSize = 150): {limit:number, page:number} {
+    private buildFloatPaginator(offset: number, pageSize = 150, extendedPageSize = 200): {limit:number, page:number} {
         const lastPageOffset = (offset - Math.floor(offset / pageSize) * pageSize),
             middle = pageSize / 2;
 
@@ -74,13 +75,21 @@ export class EthTransactionManager implements ITransactionManager {
         return items
     }
     
-    private buildTransactionsPage(address: string, txs: Etherscan.ITransactionData[], erc20txs: Etherscan.IErc20TransactionData[], txOffset: number, erc20Offset: number, totalTxCount: number): Paginator {
-        const result: Etherscan.EthTransaction[] = [],
-            txTotal = txs.length,
-            erc20Total = erc20txs.length
+    private buildTransactionsPage(address: string, txs: Etherscan.ITransactionData[], erc20txs: Etherscan.IErc20TransactionData[], txOffset: number, erc20Offset: number, totalTxCount: number, pageSize:number): Paginator {
+        const result: Etherscan.EthTransaction[] = []
 
         let done = false,
-            tmpTransaction: Etherscan.EthTransaction
+            tmpTransaction: Etherscan.EthTransaction,
+            countTxOnPage = 0,
+            countErc20OnPage = 0
+        
+        function incrementCounnterFroTmpTransaction (){
+            if(tmpTransaction.transactionType == Etherscan.TransactionType.normal){
+                countTxOnPage++
+            } else {
+                countErc20OnPage++
+            }
+        }
             
         while(!done){
             if(txs.length > 0 && erc20txs.length == 0){
@@ -95,29 +104,30 @@ export class EthTransactionManager implements ITransactionManager {
 
             if(result.length == 0){
                 result.push(tmpTransaction)
+                incrementCounnterFroTmpTransaction()
             } else if(tmpTransaction.hash == result[result.length - 1].hash){
                 const prevTx:Etherscan.ITransactionData = result[result.length - 1] as Etherscan.ITransactionData
 
                 if(tmpTransaction.to == address){
                     prevTx.receive = (prevTx.receive || []);
                     prevTx.receive.push(tmpTransaction as Etherscan.IErc20TransactionData)
+                    incrementCounnterFroTmpTransaction()
                 } else {
                     prevTx.send = (prevTx.send || []);
                     prevTx.send.push(tmpTransaction as Etherscan.IErc20TransactionData)
+                    incrementCounnterFroTmpTransaction()
                 }
-            } else if(result.length == 20){
+            } else if(result.length == pageSize){
                 done = true
             } else {
                 result.push(tmpTransaction)
+                incrementCounnterFroTmpTransaction()
             }
 
             if(txs.length == 0 && erc20txs.length == 0){
                 done = true
             }
         }
-
-        const countTxOnPage = txTotal - txs.length,
-            countErc20OnPage = erc20Total - erc20txs.length;
 
         return {
             transactions: result.map(tx => this.mapOperationType(tx, address)),
