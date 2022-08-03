@@ -20,7 +20,7 @@
     "noUnusedParameters": false,
     "noUnusedLocals": false,
     "strictNullChecks": true,
-    "types":["reflect-metadata","node"],
+    "types":["reflect-metadata","node","@types/jest"],
 
     "moduleResolution": "Node",
     "sourceMap": true,

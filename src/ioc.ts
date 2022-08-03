@@ -1,4 +1,4 @@
-import { Container, interfaces } from "inversify"
+import { Container } from "inversify"
 import { IDS } from './types/index';
 import { envToString } from './util/env-util';
 import { EtherscanApi } from './services/etherscan/etherscan-api';
@@ -21,6 +21,7 @@ import { CovalentTokenManager } from './modules/tokens/sol';
 import { TronscanTokenManager } from './modules/tokens/tron';
 import axios from 'axios';
 import { HttpContext, TYPE } from "inversify-express-utils";
+import { ContractDetailsRepo } from './orm/repo/contract-details-repo';
 
 export const container = new Container();
 
@@ -36,9 +37,8 @@ container.bind(IDS.SERVICE.UnmarshalApiFactory).toFactory(context => () => {
     if(!chain){
         throw new Error(`failed to create UnmarshalApiFactory, Invalid chain: ${chain}`)
     }
-    const httpContext:HttpContext = context.container.get(TYPE.HttpContext);
-
-    httpContext.container.bind(IDS.SERVICE.ContextChainId).toConstantValue(chain)
+    context.container.get<HttpContext>(TYPE.HttpContext)
+        .container.bind(IDS.SERVICE.ContextChainId).toConstantValue(chain)
 
     return context.container.get(IDS.SERVICE.UnmarshalApi)
 })
@@ -93,3 +93,5 @@ container.bind(IDS.MODULES.TokenManager)
     .whenTargetNamed(ChainId.tron)
 container.bind(IDS.MODULES.TokenManagerFactory)
     .toAutoNamedFactory(IDS.MODULES.TokenManager)
+
+container.bind(IDS.ORM.REPO.ContractDetailsRepo).to(ContractDetailsRepo)

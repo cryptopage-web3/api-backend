@@ -3,6 +3,7 @@ import { getChainConf } from '../../enums/chains';
 import { inject, injectable } from 'inversify';
 import { IDS } from '../../types/index';
 import { Axios } from 'axios';
+import { ContractDetailsRepo } from '../../orm/repo/contract-details-repo';
 
 const { getCoinPrice } = require('../../cache/coins');
 const { getDataFromUrl, getFieldFromContract, getDateFromBlock, getContractName, getApproveTarget } = require('./helper');
@@ -10,6 +11,9 @@ const { getDataFromUrl, getFieldFromContract, getDateFromBlock, getContractName,
 @injectable()
 export class UnmarshalApi {
     @inject(IDS.NODE_MODULES.axios) _axios:Axios
+    @inject(IDS.ORM.REPO.ContractDetailsRepo) _contractDetailsRepo:ContractDetailsRepo
+
+    _chain: ChainId
 
     chainName: string
     mainCoinId: string
@@ -19,6 +23,8 @@ export class UnmarshalApi {
 
     constructor(@inject(IDS.SERVICE.ContextChainId) chain: ChainId) {
         const config: any = getChainConf(chain);
+
+        this._chain = chain;
 
         this.chainName = config.chainName;
         this.mainCoinId = config.nativeCoinId;
@@ -180,12 +186,12 @@ export class UnmarshalApi {
 
         let action = data.description;
         if (data.type === 'swap') {
-            const contractName = await getContractName(this.chainName, data.to);
+            const contractName = await this._contractDetailsRepo.getContractName(this._chain, data.to);
             action += ` on ${contractName}`;
         }
         if (data.type === 'approve') {
             const contract = await getApproveTarget('ethereum', txHash);
-            const contractName = await getContractName('ethereum', '0x' + contract);
+            const contractName = await this._contractDetailsRepo.getContractName(this._chain, '0x' + contract);
             action += ` for trade on ${contractName}`;
         }
 

@@ -21,5 +21,10 @@ export const IDS = {
     },
     NODE_MODULES:{
         axios: axios
+    },
+    ORM:{
+        REPO:{
+            ContractDetailsRepo: Symbol('ContractDetailsRepo')
+        }
     }
 }
