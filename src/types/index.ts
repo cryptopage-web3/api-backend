@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 export const IDS = {
     MODULES:{
         TransactionManager: Symbol('TransactionManager'),
@@ -11,8 +13,13 @@ export const IDS = {
         EtherscanApi: Symbol('EtherscanApi'),
         TrongridApi: Symbol('TronGridApi'),
         UnmarshalApiFactory: Symbol('UnmarshalApiFactory'),
+        UnmarshalApi: Symbol('UnmarshalApi'),
         SolScanApi: Symbol('SolScanApi'),
         CovalentApi: Symbol('CovalentApi'),
         TronscanApi: Symbol('TronscanApi'),
+        ContextChainId: Symbol('ContextChainId')
+    },
+    NODE_MODULES:{
+        axios: axios
     }
 }

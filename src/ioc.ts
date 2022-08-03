@@ -19,8 +19,12 @@ import { UnmarshalTokenManager } from './modules/tokens/UnmarshalTokenManager';
 import { CovalentApi } from './services/covalent/covalent-api';
 import { CovalentTokenManager } from './modules/tokens/sol';
 import { TronscanTokenManager } from './modules/tokens/tron';
+import axios from 'axios';
+import { HttpContext, TYPE } from "inversify-express-utils";
 
 export const container = new Container();
+
+container.bind(IDS.NODE_MODULES.axios).toConstantValue(axios)
 
 container.bind(IDS.SERVICE.EtherscanApi).toConstantValue(
     new EtherscanApi(envToString('ETHERSCAN_API_KEY'))
@@ -28,8 +32,17 @@ container.bind(IDS.SERVICE.EtherscanApi).toConstantValue(
 container.bind(IDS.SERVICE.TrongridApi).to(TronGridApi).inSingletonScope()
 container.bind(IDS.SERVICE.SolScanApi).to(SolScanApi).inSingletonScope()
 container.bind(IDS.SERVICE.UnmarshalApiFactory).toFactory(context => () => {
-    return new UnmarshalApi(context.currentRequest.parentRequest?.target.getNamedTag()?.value as any)
+    const chain: ChainId = context.currentRequest.parentRequest?.target.getNamedTag()?.value as any;
+    if(!chain){
+        throw new Error(`failed to create UnmarshalApiFactory, Invalid chain: ${chain}`)
+    }
+    const httpContext:HttpContext = context.container.get(TYPE.HttpContext);
+
+    httpContext.container.bind(IDS.SERVICE.ContextChainId).toConstantValue(chain)
+
+    return context.container.get(IDS.SERVICE.UnmarshalApi)
 })
+container.bind(IDS.SERVICE.UnmarshalApi).to(UnmarshalApi).inSingletonScope()
 container.bind(IDS.SERVICE.CovalentApi).to(CovalentApi).inSingletonScope()
 container.bind(IDS.SERVICE.TronscanApi).to(TronscanTokenManager).inSingletonScope()
 

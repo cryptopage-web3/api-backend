@@ -1,17 +1,23 @@
 import { ChainId } from '../../modules/transactions/types';
 import { getChainConf } from '../../enums/chains';
-const axios = require('axios');
+import { inject, injectable } from 'inversify';
+import { IDS } from '../../types/index';
+import { Axios } from 'axios';
+
 const { getCoinPrice } = require('../../cache/coins');
 const { getDataFromUrl, getFieldFromContract, getDateFromBlock, getContractName, getApproveTarget } = require('./helper');
 
+@injectable()
 export class UnmarshalApi {
+    @inject(IDS.NODE_MODULES.axios) _axios:Axios
+
     chainName: string
     mainCoinId: string
     explorerUrl: string
     nativeCoinSymbol: string
     rpc: string
 
-    constructor(chain: ChainId) {
+    constructor(@inject(IDS.SERVICE.ContextChainId) chain: ChainId) {
         const config: any = getChainConf(chain);
 
         this.chainName = config.chainName;
@@ -56,7 +62,7 @@ export class UnmarshalApi {
     }
 
     async getTokensFromApi(address: string) {
-        const { data } = await axios.get(`${this.baseUrl}/v1/${this.chainName}/address/${address}/assets?auth_key=${this.apiKey}`);
+        const { data } = await this._axios.get(`${this.baseUrl}/v1/${this.chainName}/address/${address}/assets?auth_key=${this.apiKey}`);
         if (!data?.length) {
             return [];
         }
@@ -114,7 +120,7 @@ export class UnmarshalApi {
 
     async getTransactionsFromApi(address: string, page, pageSize) {
         const url = `${this.baseUrl}/v2/${this.chainName}/address/${address}/transactions?page=${page}&pageSize=${pageSize}&auth_key=${this.apiKey}`;
-        const { data } = await axios.get(url);
+        const { data } = await this._axios.get(url);
 
         if (data.transactions?.length == 0) {
             return { items: [], count: 0 };
@@ -125,7 +131,7 @@ export class UnmarshalApi {
 
     async getTransactionsCount(address) {
         const url = `${this.baseUrl}/v2/${this.chainName}/address/${address}/transactions?page=1&pageSize=1&auth_key=${this.apiKey}`;
-        const { data: { total_txs } } = await axios.get(url);
+        const { data: { total_txs } } = await this._axios.get(url);
 
         return total_txs;
     }
@@ -155,7 +161,7 @@ export class UnmarshalApi {
     }
 
     async getTransactionDetails(txHash) {
-        const { data } = await axios.get(`${this.baseUrl}/v2/${this.chainName}/transactions/${txHash}?auth_key=${this.apiKey}`);
+        const { data } = await this._axios.get(`${this.baseUrl}/v2/${this.chainName}/transactions/${txHash}?auth_key=${this.apiKey}`);
 
         const transfers = [...(data.sent || []), ...(data.other || []), ...(data.received || [])];
         const tranfersInfo = transfers.map(e => {
@@ -250,7 +256,7 @@ export class UnmarshalApi {
 
     async getNFTDetailsFromApi(address, tokenId) {
         try {
-            const { data } = await axios.get(`${this.baseUrl}/v2/${this.chainName}/address/${address}/details?page=1&pageSize=1&tokenId=${tokenId}&auth_key=${this.apiKey}`);
+            const { data } = await this._axios.get(`${this.baseUrl}/v2/${this.chainName}/address/${address}/details?page=1&pageSize=1&tokenId=${tokenId}&auth_key=${this.apiKey}`);
             const info = data.nft_token_details[0];
             const { url, type } = await getDataFromUrl(info.image_url);
             return {
@@ -274,12 +280,12 @@ export class UnmarshalApi {
     }
 
     async getNFTTransactionsFromApi(address: string, page, pageSize) {
-        const { data } = await axios.get(`${this.baseUrl}/v2/${this.chainName}/address/${address}/nft-transactions?page=${page}&pageSize=${pageSize}&auth_key=${this.apiKey}`);
+        const { data } = await this._axios.get(`${this.baseUrl}/v2/${this.chainName}/address/${address}/nft-transactions?page=${page}&pageSize=${pageSize}&auth_key=${this.apiKey}`);
         return data;
     }
 
     async getNFTAssetsFromApi(address: string, page, pageSize) {
-        const { data } = await axios.get(`${this.baseUrl}/v2/${this.chainName}/address/${address}/nft-assets?page=${page}&pageSize=${pageSize}&auth_key=${this.apiKey}`);
+        const { data } = await this._axios.get(`${this.baseUrl}/v2/${this.chainName}/address/${address}/nft-assets?page=${page}&pageSize=${pageSize}&auth_key=${this.apiKey}`);
         return data;
     }
 
