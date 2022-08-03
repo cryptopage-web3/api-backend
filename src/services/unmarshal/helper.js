@@ -1,5 +1,7 @@
 const axios = require('axios');
+const InputDataDecoder = require('ethereum-input-data-decoder');
 const Web3 = require('web3');
+const abi = require('./erc20.json');
 
 const typeList = ['image', 'audio', 'video'];
 const types = { '.jpg': 'image', '.png': 'image', '.gif': 'image', '.jpeg': 'image', '.webp': 'image', '.mp4': 'video', '.mp3': 'audio' };
@@ -73,8 +75,51 @@ async function getDateFromBlock(rpc, blockNum) {
     }
 }
 
+async function getContractName(blockchain, address) {
+    const urls = {
+        ethereum: 'https://api.etherscan.io',
+        binance: 'https://api.bscscan.com',
+        polygon: 'https://api.polygonscan.com',
+    }
+    const keys = {
+        ethereum: 'VQDBC4GZA5MQT2F6IRW2U6RPH66HJRSF6S',
+        polygon: 'TQDPK4XAU4BZT8WQNN6IETRRXXDI37W64Y',
+        binance: '4DCKF5U2YGR1HNG1KHWP8DSK47AH85W28Z'
+    }
+    try {
+        const { data } = await axios.get(`${urls[blockchain]}/api?module=contract&action=getsourcecode&address=${address}&apikey=${keys[blockchain]}`);
+        return data.result[0].ContractName;
+    } catch (e) {
+        return address;
+    }
+}
+
+async function getApproveTarget(blockchain, txHash) {
+    const rpc = {
+        ethereum: 'https://eth.public-rpc.com',
+        binance: 'https://bscrpc.com',
+        polygon: 'https://polygon-rpc.com',
+    }
+    try {
+        const web3 = new Web3(rpc[blockchain]);
+        const transaction = await web3.eth.getTransaction(txHash);
+        const address = decodeEthDataAndGetApproveTarget(transaction.input);
+        return address;
+    } catch (e) {
+        return '';
+    }
+}
+
+function decodeEthDataAndGetApproveTarget(data) {
+    const decoder = new InputDataDecoder(abi);
+    const result = decoder.decodeData(data) || {};
+    return result.inputs[0];
+}
+
 module.exports = {
     getDataFromUrl,
     getFieldFromContract,
-    getDateFromBlock
+    getDateFromBlock,
+    getContractName,
+    getApproveTarget
 }

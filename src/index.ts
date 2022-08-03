@@ -6,6 +6,7 @@ import { InversifyExpressServer } from 'inversify-express-utils';
 
 import { container } from './ioc'
 import { envToInt, envToString } from './util/env-util';
+import { swaggerRouter } from './swagger-docs/swagger.route';
 
 const express = require('express');
 const app = express();
@@ -20,12 +21,7 @@ require('./cache/coins');
 
 app.use(express.json({ limit: '15mb' }));
 
-app.use('/', require('./routes'));
-app.use('/tokens', require('./routes/tokens'));
-app.use('/nfts', require('./routes/nfts'));
-
-const swaggerRoutes = require('./routes/swagger/swagger.route');
-app.use('/', swaggerRoutes);
+app.use('/', swaggerRouter);
 
 let server = new InversifyExpressServer(container, null, null, app);
 

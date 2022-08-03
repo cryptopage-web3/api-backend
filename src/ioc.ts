@@ -1,24 +1,82 @@
-import { Container } from "inversify"
+import { Container, interfaces } from "inversify"
 import { IDS } from './types/index';
 import { envToString } from './util/env-util';
 import { EtherscanApi } from './services/etherscan/etherscan-api';
 
 //autoload controllers
-import './controller/transactions-controller'
+import './controller/autoload'
 
 import { EthTransactionManager } from './modules/transactions/eth';
 import { ChainId } from './modules/transactions/types';
+import { UnmarshalTransactionsManager } from './modules/transactions/UnmarshalTransactionsManager';
+import { UnmarshalNftsManager } from './modules/nfts/UnmarshalNftsManager';
+import { TronGridApi } from './services/trongrid/trongrid-api';
+import { TronGridApiTransactionsManager } from './modules/transactions/tron';
+import { SolScanApi } from './services/solscan/solscan-api';
+import { SolscanTtransactionsManager } from './modules/transactions/sol';
+import { UnmarshalApi } from './services/unmarshal/UnmarhalApi';
+import { UnmarshalTokenManager } from './modules/tokens/UnmarshalTokenManager';
+import { CovalentApi } from './services/covalent/covalent-api';
+import { CovalentTokenManager } from './modules/tokens/sol';
+import { TronscanTokenManager } from './modules/tokens/tron';
 
 export const container = new Container();
 
 container.bind(IDS.SERVICE.EtherscanApi).toConstantValue(
     new EtherscanApi(envToString('ETHERSCAN_API_KEY'))
 )
+container.bind(IDS.SERVICE.TrongridApi).to(TronGridApi).inSingletonScope()
+container.bind(IDS.SERVICE.SolScanApi).to(SolScanApi).inSingletonScope()
+container.bind(IDS.SERVICE.UnmarshalApiFactory).toFactory(context => () => {
+    return new UnmarshalApi(context.currentRequest.parentRequest?.target.getNamedTag()?.value as any)
+})
+container.bind(IDS.SERVICE.CovalentApi).to(CovalentApi).inSingletonScope()
+container.bind(IDS.SERVICE.TronscanApi).to(TronscanTokenManager).inSingletonScope()
 
-container.bind(IDS.MODULES.TransactionManager).to(EthTransactionManager).inSingletonScope().whenTargetNamed(ChainId.eth)
-container.bind(IDS.MODULES.TransactionManager).toConstantValue(require('./modules/transactions/bsc')).whenTargetNamed(ChainId.bsc)
-container.bind(IDS.MODULES.TransactionManager).toConstantValue(require('./modules/transactions/matic')).whenTargetNamed(ChainId.matic)
-container.bind(IDS.MODULES.TransactionManager).toConstantValue(require('./modules/transactions/sol')).whenTargetNamed(ChainId.sol)
-container.bind(IDS.MODULES.TransactionManager).toConstantValue(require('./modules/transactions/tron')).whenTargetNamed(ChainId.tron)
+container.bind(IDS.MODULES.TransactionManager)
+    .to(EthTransactionManager).inSingletonScope()
+    .whenTargetNamed(ChainId.eth)
+container.bind(IDS.MODULES.TransactionManager)
+    .to(UnmarshalTransactionsManager).inSingletonScope()
+    .whenTargetNamed(ChainId.bsc)
+container.bind(IDS.MODULES.TransactionManager)
+    .to(UnmarshalTransactionsManager).inSingletonScope()
+    .whenTargetNamed(ChainId.matic)
+container.bind(IDS.MODULES.TransactionManager)
+    .to(SolscanTtransactionsManager).inSingletonScope()
+    .whenTargetNamed(ChainId.sol)
+container.bind(IDS.MODULES.TransactionManager)
+    .to(TronGridApiTransactionsManager).inSingletonScope()
+    .whenTargetNamed(ChainId.tron)
+container.bind(IDS.MODULES.TransactionManagerFactory)
+    .toAutoNamedFactory(IDS.MODULES.TransactionManager)
 
-container.bind(IDS.MODULES.TransactionManagerFactory).toAutoNamedFactory(IDS.MODULES.TransactionManager)
+container.bind(IDS.MODULES.NftsManager)
+    .to(UnmarshalNftsManager).inSingletonScope()
+    .whenTargetNamed(ChainId.bsc)
+container.bind(IDS.MODULES.NftsManager)
+    .to(UnmarshalNftsManager).inSingletonScope()
+    .whenTargetNamed(ChainId.matic)
+container.bind(IDS.MODULES.NftsManager)
+    .to(UnmarshalNftsManager).inSingletonScope()
+    .whenTargetNamed(ChainId.eth)
+container.bind(IDS.MODULES.NftsManagerFactory)
+    .toAutoNamedFactory(IDS.MODULES.NftsManager)
+
+container.bind(IDS.MODULES.TokenManager)
+    .to(UnmarshalTokenManager).inSingletonScope()
+    .whenTargetNamed(ChainId.eth)
+container.bind(IDS.MODULES.TokenManager)
+    .to(UnmarshalTokenManager).inSingletonScope()
+    .whenTargetNamed(ChainId.bsc)
+container.bind(IDS.MODULES.TokenManager)
+    .to(UnmarshalTokenManager).inSingletonScope()
+    .whenTargetNamed(ChainId.matic)
+container.bind(IDS.MODULES.TokenManager)
+    .to(CovalentTokenManager).inSingletonScope()
+    .whenTargetNamed(ChainId.sol)
+container.bind(IDS.MODULES.TokenManager)
+    .to(TronscanTokenManager).inSingletonScope()
+    .whenTargetNamed(ChainId.tron)
+container.bind(IDS.MODULES.TokenManagerFactory)
+    .toAutoNamedFactory(IDS.MODULES.TokenManager)

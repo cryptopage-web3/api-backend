@@ -1,0 +1,53 @@
+paths:
+  /nfts/{chain}/{address}:
+    get:
+      summary: Get nfts from address.
+      description: Get nfts from address.
+      tags: [NFT]
+      parameters:
+        - in: path
+          name: chain
+          required: true
+          schema:
+            type: string
+            enum: [eth, bsc, matic]
+            default: eth
+          description: chain name
+        - $ref: '#/parameters/path/address'
+        - $ref: '#/parameters/pagination/page'
+        - $ref: '#/parameters/pagination/pageSize'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/NFTs'
+        "400":
+          $ref: '#/responses/PaginationError'
+  /nfts/transactions/{chain}/{address}:
+    get:
+      summary: Get nft transactions from address.
+      description: Get nft transactions from address.
+      tags: [NFT]
+      parameters:
+        - in: path
+          name: chain
+          required: true
+          schema:
+            type: string
+            enum: [eth, bsc, matic]
+            default: eth
+          description: chain name
+        - $ref: '#/parameters/path/address'
+        - $ref: '#/parameters/pagination/page'
+        - $ref: '#/parameters/pagination/pageSize'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/NFTTransactions'
+        "400":
+          $ref: '#/responses/PaginationError'

@@ -2,22 +2,25 @@ import { inject, injectable } from 'inversify';
 import { Etherscan, ITransactionManager, Paginator, ITransactionsPagination } from './types';
 import { IDS } from '../../types/index';
 import { EtherscanApi } from '../../services/etherscan/etherscan-api';
-
-const UnmarshalApi = require('./../../services/unmarshal');
-
-const config = require('./../../enums/chains');
+import { UnmarshalApi } from '../../services/unmarshal/UnmarhalApi';
 
 @injectable()
 export class EthTransactionManager implements ITransactionManager {
     @inject(IDS.SERVICE.EtherscanApi) private _etherscan: EtherscanApi;
 
+    _unmarshalApi: UnmarshalApi
+
+    constructor(@inject(IDS.SERVICE.UnmarshalApiFactory) _unmarshalApiFactory: ()=> UnmarshalApi){
+        this._unmarshalApi = _unmarshalApiFactory()
+    }
+    
     async getWalletAllTransactions(address:string, offset:ITransactionsPagination) {
         let transactions:Etherscan.ITransactionData[] = [],
             erc20Transactions:Etherscan.IErc20TransactionData[] = [],
             count = 0;
 
-        const txGlobalOffset = typeof offset?.tx === 'string' ? parseInt(offset.tx) : 0,
-            erc20GlobalOffset = typeof offset?.erc20 === 'string' ? parseInt(offset.erc20) : 0,
+        const txGlobalOffset = offset?.tx || 0,
+            erc20GlobalOffset = offset?.erc20 || 0,
             txPaginator = this.buildFloatPaginator(txGlobalOffset),
             erc20Paginator = this.buildFloatPaginator(erc20GlobalOffset)
 
@@ -40,11 +43,12 @@ export class EthTransactionManager implements ITransactionManager {
             erc20Transactions, 
             txGlobalOffset,
             erc20GlobalOffset,
-            count
+            count,
+            offset.pageSize
         )
     }
 
-    private buildFloatPaginator(offset: number, pageSize = 100, extendedPageSize = 150): {limit:number, page:number} {
+    private buildFloatPaginator(offset: number, pageSize = 150, extendedPageSize = 200): {limit:number, page:number} {
         const lastPageOffset = (offset - Math.floor(offset / pageSize) * pageSize),
             middle = pageSize / 2;
 
@@ -71,13 +75,21 @@ export class EthTransactionManager implements ITransactionManager {
         return items
     }
     
-    private buildTransactionsPage(address: string, txs: Etherscan.ITransactionData[], erc20txs: Etherscan.IErc20TransactionData[], txOffset: number, erc20Offset: number, totalTxCount: number): Paginator {
-        const result: Etherscan.EthTransaction[] = [],
-            txTotal = txs.length,
-            erc20Total = erc20txs.length
+    private buildTransactionsPage(address: string, txs: Etherscan.ITransactionData[], erc20txs: Etherscan.IErc20TransactionData[], txOffset: number, erc20Offset: number, totalTxCount: number, pageSize:number): Paginator {
+        const result: Etherscan.EthTransaction[] = []
 
         let done = false,
-            tmpTransaction: Etherscan.EthTransaction
+            tmpTransaction: Etherscan.EthTransaction,
+            countTxOnPage = 0,
+            countErc20OnPage = 0
+        
+        function incrementCounnterFroTmpTransaction (){
+            if(tmpTransaction.transactionType == Etherscan.TransactionType.normal){
+                countTxOnPage++
+            } else {
+                countErc20OnPage++
+            }
+        }
             
         while(!done){
             if(txs.length > 0 && erc20txs.length == 0){
@@ -92,29 +104,30 @@ export class EthTransactionManager implements ITransactionManager {
 
             if(result.length == 0){
                 result.push(tmpTransaction)
+                incrementCounnterFroTmpTransaction()
             } else if(tmpTransaction.hash == result[result.length - 1].hash){
                 const prevTx:Etherscan.ITransactionData = result[result.length - 1] as Etherscan.ITransactionData
 
                 if(tmpTransaction.to == address){
                     prevTx.receive = (prevTx.receive || []);
                     prevTx.receive.push(tmpTransaction as Etherscan.IErc20TransactionData)
+                    incrementCounnterFroTmpTransaction()
                 } else {
                     prevTx.send = (prevTx.send || []);
                     prevTx.send.push(tmpTransaction as Etherscan.IErc20TransactionData)
+                    incrementCounnterFroTmpTransaction()
                 }
-            } else if(result.length == 20){
+            } else if(result.length == pageSize){
                 done = true
             } else {
                 result.push(tmpTransaction)
+                incrementCounnterFroTmpTransaction()
             }
 
             if(txs.length == 0 && erc20txs.length == 0){
                 done = true
             }
         }
-
-        const countTxOnPage = txTotal - txs.length,
-            countErc20OnPage = erc20Total - erc20txs.length;
 
         return {
             transactions: result.map(tx => this.mapOperationType(tx, address)),
@@ -141,17 +154,14 @@ export class EthTransactionManager implements ITransactionManager {
     }
 
     getTransactionsCount(address:string):Promise<number>{
-        const service = new UnmarshalApi({ address, config: config.eth });
-        return service.getTransactionsCount(config.eth.chainName, address)
+        return this._unmarshalApi.getTransactionsCount(address)
     }
 
     getTransactionDetails(txHash) {
-        const service = new UnmarshalApi({ config: config.eth });
-        return service.getTransactionDetails(txHash);
+        return this._unmarshalApi.getTransactionDetails(txHash);
     }
     
-    getWalletTokenTransfers(address, skip, limit) {
-        const service = new UnmarshalApi({ address, config: config.eth });
-        return service.getWalletTokenTransfers(skip, limit);
+    getWalletTokenTransfers(address, {page, pageSize}) {
+        return this._unmarshalApi.getWalletTokenTransfers(address, page, pageSize);
     }
 }

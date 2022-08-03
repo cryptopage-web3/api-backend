@@ -1,0 +1,6 @@
+responses:
+  examples:
+    CommonTransactionsExample:
+      summary: A sample default transactions response
+      value:
+        {count: 742820,transactions: [{title: "Deposit",from: "0x2465176c461afb316ebc773c61faee85a6515daa",to: "0x0000000000000000000000000000000000001000",fee: 0,type: "Deposit",description: "Deposit ",value: 0.05533548432,valueUSD: 13.9605893390928,hash: "0x062efa0c4281ffc8f7bbd74d66ed46db5a80176dda5995c3036e4c45b451468d",explorerUrl: "https://bscscan.com/tx/0x062efa0c4281ffc8f7bbd74d66ed46db5a80176dda5995c3036e4c45b451468d",date: "2022-07-27T09:24:11.000Z"},{title: "Deposit",from: "0x2465176c461afb316ebc773c61faee85a6515daa",to: "0x0000000000000000000000000000000000001000",fee: 0,type: "Deposit",description: "Deposit ",value: 0.09008205898188683,valueUSD: 22.726802660540226,hash: "0x689479e12e7090f61e6cccc1970c2462a7aa6ccb81e3f9592d925952fe77ac03",explorerUrl: "https://bscscan.com/tx/0x689479e12e7090f61e6cccc1970c2462a7aa6ccb81e3f9592d925952fe77ac03",date: "2022-07-27T09:23:08.000Z"}]}

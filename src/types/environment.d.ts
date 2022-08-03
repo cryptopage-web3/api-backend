@@ -14,6 +14,8 @@ export interface Env {
     UPDATE_NFT_COLLECTION_BLOCKCHAIN: Blockchains
 
     ETHERSCAN_API_KEY: string
+
+    SWAGGER_LOCAL_SERVER_FIRST: string | undefined
 }
 
 export type EnvVarName = keyof Env

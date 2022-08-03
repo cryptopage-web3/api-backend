@@ -1,0 +1,30 @@
+paths:
+  /tokens/{chain}/{address}:
+    get:
+      summary: Get tokens from address.
+      description: Get tokens from address.
+      tags: [Tokens]
+      parameters:
+        - in: path
+          name: chain
+          required: true
+          schema:
+            type: string
+            enum: [eth, bsc, matic, sol, tron]
+            default: eth
+          description: chain name
+        - in: path
+          name: address
+          required: true
+          schema:
+            type: string
+          description: wallet address
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Tokens'
+        "400":
+          $ref: '#/components/responses/NotFound'

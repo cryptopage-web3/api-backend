@@ -1,0 +1,6 @@
+responses:
+  examples:
+    PaginationErrorExample:
+      summary: A sample validation error
+      value:
+        {status: "error", message: "Invalid request", validationErrors: {page: {value: "-1", msg: "Minimal value is 1", param: "page", location: "query"}, pageSize: { value: "-2", msg: "Minimal value is 1", param: "pageSize", location: "query" }}}

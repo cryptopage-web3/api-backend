@@ -1,0 +1,79 @@
+paths:
+  /collections:
+    get:
+      summary: Paginated nft collections
+      description: Get nft collections
+      tags: [Collections]
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: number
+            default: 10
+        - in: query
+          name: offset
+          schema:
+            type: number
+            default: 0
+        - in: query
+          name: filter[name]
+          schema:
+            type: string
+        - in: query
+          name: filter[blockchain]
+          schema:
+            type: string
+            enum: [ETHEREUM,POLYGON]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/NftCollections'
+  
+  /collections/{id}:
+    get:
+      summary: Paginated collection items
+      description: Get collection items
+      tags: [Collections]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/NftItems'
+
+  /collections/market-dashboard:
+    get:
+      summary: Paginated nft items with last activity
+      description: Get Nft items with order by last update DESC
+      tags: [Collections]
+      parameters:
+        - $ref: '#/parameters/pagination/page'
+        - $ref: '#/parameters/pagination/pageSize'
+        - in: query
+          name: filter[collectionId]
+          schema:
+            type: array
+            items:
+                type: number
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NftItems'
+              examples:
+                DashboardItemsExample:
+                  $ref: '#/responses/examples/CollectionsMarketExample'
+        "400":
+          $ref: '#/responses/PaginationError'

@@ -1,0 +1,175 @@
+paths:  
+  /transactions/eth/{address}:
+    get:
+      summary: Get transactions from eth address.
+      description: Get paginated transactions from eth address.
+      tags: [Transactions]
+      parameters:
+        - $ref: '#/parameters/path/address'
+        - $ref: '#/parameters/pagination/pageSize'
+        - $ref: '#/parameters/pagination/eth/continueTx'
+        - $ref: '#/parameters/pagination/eth/continueErc20'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transactions:
+                    type: array
+                    items:
+                      anyOf:
+                        - $ref: '#/components/schemas/EthTransaction'
+                        - $ref: '#/components/schemas/Erc20Transaction'
+                  continue:
+                    type: object
+                    properties:
+                      tx:
+                        type: number
+                      erc20:
+                        type: number
+              examples:
+                EthTransactionExample:
+                  $ref: '#/responses/examples/EthTransactionExample'
+        "400":
+          $ref: '#/components/responses/NotFound'
+  /transactions/tron/{address}:
+    get:
+      summary: Get paginated tron transactions from address.
+      description: Get tron transactions from address.
+      tags: [Transactions]
+      parameters:
+        - $ref: '#/parameters/path/address'
+        - $ref: '#/parameters/pagination/pageSize'
+        - in: query
+          name: continue[fingerprint]
+          schema:
+            type: string
+            required: false
+          description: Continue pagination token, `pageSize` should be the same as in previous request
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Transactions'
+              examples:
+                TronTransactionsExample:
+                  $ref: '#/responses/examples/TronTransactionsExample'
+        "400":
+          $ref: '#/responses/PaginationError'
+  /transactions/sol/{address}:
+    get:
+      summary: Get paginated solana transactions from address.
+      tags: [Transactions]
+      parameters:
+        - $ref: '#/parameters/path/address'
+        - $ref: '#/parameters/pagination/pageSize'
+        - in: query
+          name: continue[beforeHash]
+          schema:
+            type: string
+            required: false
+          description: Continue pagination token, `pageSize` should be the same as in previous request
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Transactions'
+              examples:
+                CommonTransactionsExample:
+                  $ref: '#/responses/examples/CommonTransactionsExample'
+        "400":
+          $ref: '#/responses/PaginationError'
+  /transactions/{chain}/{address}:
+    get:
+      summary: Get transactions from address.
+      description: Get transactions from address.
+      tags: [Transactions]
+      parameters:
+        - in: path
+          name: chain
+          required: true
+          schema:
+            type: string
+            enum: [bsc, matic]
+            default: eth
+          description: chain name
+        - $ref: '#/parameters/path/address'
+        - $ref: '#/parameters/pagination/page'
+        - $ref: '#/parameters/pagination/pageSize'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Transactions'
+              examples:
+                CommonTransactionsExample:
+                  $ref: '#/responses/examples/CommonTransactionsExample'
+        "400":
+          $ref: '#/responses/PaginationError'
+  /transactions/detail/{chain}/{txHash}:
+    get:
+      summary: Get transaction.
+      description: Get transactions.
+      tags: [Transactions]
+      parameters:
+        - $ref: '#/parameters/path/chain'
+        - in: path
+          name: txHash
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Transaction'
+        "400":
+          $ref: '#/components/responses/NotFound'
+  /transactions/transfers/{chain}/{address}:
+    get:
+      summary: Get transactions from address.
+      description: Get transactions from address.
+      tags: [Transactions]
+      parameters:
+        - in: path
+          name: chain
+          required: true
+          schema:
+            type: string
+            enum: [eth, bsc, matic, sol, tron]
+            default: eth
+          description: chain name
+        - in: path
+          name: address
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: skip
+          schema:
+            type: number
+        - in: query
+          name: limit
+          schema:
+            type: number
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Transactions'
+        "400":
+          $ref: '#/components/responses/NotFound'
+    

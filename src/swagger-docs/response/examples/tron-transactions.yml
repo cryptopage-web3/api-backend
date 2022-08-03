@@ -1,0 +1,6 @@
+responses:
+  examples:
+    TronTransactionsExample:
+      summary: A sample Tron transactions response - pagination with fingerprint token
+      value:
+        {count: 2,transactions: [{title: "Transfer",from: "TUhP5gihY2637jYCm1evMF7p7z8XF5c4g1",to: "TYZ6QbrPaUjv62CoU7za2nVHJ1ZoEJMXah",fee: 0,value: 0.000006,valueUSD: 3.9627000000000004e-7,hash: "938c4000ed80fc2497c135d7d71c0785d3f862b9169116698638efffb321c508",explorerUrl: "https://tronscan.org/#/transaction/938c4000ed80fc2497c135d7d71c0785d3f862b9169116698638efffb321c508",tokenSymbol: "TRX",date: "2022-07-25T10:11:27.000Z"},{title: "Transfer",from: "TGwfgT3GN6bfEBkENBk3d1EBuShZj6RquQ",to: "TYZ6QbrPaUjv62CoU7za2nVHJ1ZoEJMXah",fee: 0,value: 0.000006,valueUSD: 3.9627000000000004e-7,hash: "24671c14b8c61762fb67f55272e239b169e38f7438eca738acba420f2c666cba",explorerUrl: "https://tronscan.org/#/transaction/24671c14b8c61762fb67f55272e239b169e38f7438eca738acba420f2c666cba",tokenSymbol: "TRX",date: "2022-07-25T10:11:24.000Z"}],continue: {fingerprint: "T6atjwJE3mif8Kyc1USumd2eYJ6cANGRRiukmzVAKJCrhdkwM8hsnwsixyiBfgCztMYTYvHZ1WvHhfcU2Erj1ZkXUTxnH8"}}
