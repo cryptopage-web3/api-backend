@@ -53,6 +53,14 @@ npm run build 2>&1
 
 exit_if_error "build failed"
 
+tg_message "Start interation tests"
+
+echo "Start interation tests"
+
+npm t 2>&1
+
+exit_if_error "integration tests failed"
+
 echo "Start deploy test server"
 
 export NODE_ENV=production

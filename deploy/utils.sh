@@ -28,19 +28,21 @@ tg_message()
          -H 'Content-Type: application/json'
          -d "$data"
          --connect-timeout 4
-         --silent --output /tmp/tg.log --show-error --fail
+         --silent --show-error
          https://api.telegram.org/bot$bot_id/sendMessage
     )
 
-    curl "${args[@]}" #send message
+    curl "${args[@]}" >> /tmp/tg-msg.log #send message
 
     local FILE="$2"
 
     if [ -f "$FILE" ]; then #send file
+        echo "Send file to tg: $FILE"
+        
         curl -F document=@"$FILE" \
         --connect-timeout 4
-        --silent --output /tmp/tg.log --show-error --fail \
-        https://api.telegram.org/bot$bot_id/sendDocument?chat_id=$chat_id
+        --silent --show-error \
+        https://api.telegram.org/bot$bot_id/sendDocument?chat_id=$chat_id >> /tmp/tg-file-send.log
     fi
 }
 
