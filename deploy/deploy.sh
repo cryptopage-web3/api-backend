@@ -8,6 +8,8 @@
 #unclude utils
 . $(dirname "$0")/utils.sh
 
+echo "log file: ${DEPLOY_LOG_FILE}"
+
 deploy_dir=~/deploy
 run_dir=~/crypto.page
 deploy_port=3010
@@ -53,9 +55,9 @@ npm run build 2>&1
 
 exit_if_error "build failed"
 
-tg_message "Start interation tests"
+tg_message "Start integration tests"
 
-echo "Start interation tests"
+echo "Start integration tests"
 
 npm t 2>&1
 
