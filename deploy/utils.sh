@@ -44,7 +44,7 @@ tg_message()
         echo "Send file to tg: $FILE"
         
         curl -F document=@"$FILE" \
-        --connect-timeout 4
+        --connect-timeout 4 \
         --silent --show-error \
         https://api.telegram.org/bot$bot_id/sendDocument?chat_id=$chat_id >> $file_send_log
 
