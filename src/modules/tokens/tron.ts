@@ -28,12 +28,13 @@ export class TronscanTokenManager implements ITokenManager {
     }
     
     async getWalletTokens(address) {
-        const { data } = await axios.get(`https://apilist.tronscan.org/api/account?address=${address}`);
+        const url = `https://apilist.tronscan.org/api/account?address=${address}`
+        const { data } = await axios.get(url);
     
         if (!data.tokens?.length) {
-            return [];
+            return {tokens: []};
         }
     
-        return data.tokens.map(t => this.getTokenData(t))
+        return {tokens: data.tokens.map(t => this.getTokenData(t))}
     }
 }

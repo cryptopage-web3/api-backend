@@ -68,7 +68,8 @@ export class UnmarshalApi {
     }
 
     async getTokensFromApi(address: string) {
-        const { data } = await this._axios.get(`${this.baseUrl}/v1/${this.chainName}/address/${address}/assets?auth_key=${this.apiKey}`);
+        const url = `${this.baseUrl}/v1/${this.chainName}/address/${address}/assets?auth_key=${this.apiKey}`
+        const { data } = await this._axios.get(url);
         if (!data?.length) {
             return [];
         }

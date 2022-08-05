@@ -50,7 +50,8 @@ export class CovalentApi {
     }
 
     async getTokensFromApi(address) {
-        const { data } = await axios.get(`${this.baseUrl}/${this.chainId}/address/${address}/balances_v2/?key=${this.apiKey}`);
+        const url = `${this.baseUrl}/${this.chainId}/address/${address}/balances_v2/?key=${this.apiKey}`
+        const { data } = await axios.get(url);
         if (!data?.data?.items?.length) {
             return [];
         }
