@@ -21,7 +21,7 @@ export class UnmarshalApi {
     nativeCoinSymbol: string
     rpc: string
 
-    constructor(@inject(IDS.SERVICE.ContextChainId) chain: ChainId) {
+    initConfig(chain: ChainId){
         const config: any = getChainConf(chain);
 
         this._chain = chain;

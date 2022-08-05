@@ -20,7 +20,6 @@ import { CovalentApi } from './services/covalent/covalent-api';
 import { CovalentTokenManager } from './modules/tokens/sol';
 import { TronscanTokenManager } from './modules/tokens/tron';
 import axios from 'axios';
-import { HttpContext, TYPE } from "inversify-express-utils";
 import { ContractDetailsRepo } from './orm/repo/contract-details-repo';
 
 export const container = new Container();
@@ -32,19 +31,17 @@ container.bind(IDS.SERVICE.EtherscanApi).toConstantValue(
 )
 container.bind(IDS.SERVICE.TrongridApi).to(TronGridApi).inSingletonScope()
 container.bind(IDS.SERVICE.SolScanApi).to(SolScanApi).inSingletonScope()
-container.bind(IDS.SERVICE.UnmarshalApiFactory).toFactory(context => () => {
-    const chain: ChainId = context.currentRequest.parentRequest?.target.getNamedTag()?.value as any;
+container.bind(IDS.SERVICE.UnmarshalApi).to(UnmarshalApi).onActivation((context, instance:UnmarshalApi) =>{
+    const chain: ChainId = context.plan.rootRequest?.target.getNamedTag()?.value as any;
     if(!chain){
-        throw new Error(`failed to create UnmarshalApiFactory, Invalid chain: ${chain}`)
+        throw new Error(`failed to init UnmarshalApi, Invalid chain: ${chain}`)
     }
-    context.container.get<HttpContext>(TYPE.HttpContext)
-        .container.bind(IDS.SERVICE.ContextChainId).toConstantValue(chain)
 
-    return context.container.get(IDS.SERVICE.UnmarshalApi)
+    instance.initConfig(chain)
+    return instance
 })
-container.bind(IDS.SERVICE.UnmarshalApi).to(UnmarshalApi).inSingletonScope()
-container.bind(IDS.SERVICE.CovalentApi).to(CovalentApi).inSingletonScope()
-container.bind(IDS.SERVICE.TronscanApi).to(TronscanTokenManager).inSingletonScope()
+container.bind(IDS.SERVICE.CovalentApi).to(CovalentApi)
+container.bind(IDS.SERVICE.TronscanApi).to(TronscanTokenManager)
 
 container.bind(IDS.MODULES.TransactionManager)
     .to(EthTransactionManager).inSingletonScope()

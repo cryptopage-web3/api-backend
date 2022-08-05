@@ -7,8 +7,8 @@ import { IDS } from '../../types/index';
 export class UnmarshalNftsManager implements INftsManager {
     _unmarshalApi: UnmarshalApi
 
-    constructor(@inject(IDS.SERVICE.UnmarshalApiFactory) _unmarshalApiFactory: () => UnmarshalApi){
-        this._unmarshalApi = _unmarshalApiFactory()
+    constructor(@inject(IDS.SERVICE.UnmarshalApi) unmarshalApi: UnmarshalApi){
+        this._unmarshalApi = unmarshalApi
     }
 
     getWalletAllNFTs(address, page, pageSize) {

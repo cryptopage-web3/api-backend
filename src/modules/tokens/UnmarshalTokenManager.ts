@@ -6,8 +6,8 @@ import { IDS } from '../../types/index';
 @injectable()
 export class UnmarshalTokenManager implements ITokenManager {
     _unmarshalApi:UnmarshalApi
-    constructor(@inject(IDS.SERVICE.UnmarshalApiFactory) _unmarshalApiFactory: () => UnmarshalApi){
-        this._unmarshalApi = _unmarshalApiFactory()
+    constructor(@inject(IDS.SERVICE.UnmarshalApi) unmarshalApi: UnmarshalApi){
+        this._unmarshalApi = unmarshalApi
     }
 
     getWalletTokens(address: string) {
