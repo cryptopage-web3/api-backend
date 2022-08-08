@@ -44,7 +44,7 @@ container.bind(IDS.SERVICE.UnmarshalApi).to(UnmarshalApi).onActivation((context,
     instance.initConfig(chain)
     return instance
 })
-container.bind(IDS.SERVICE.UnmarshalApiHelper).toConstantValue(UnmarshalApiHelper)
+container.bind(IDS.SERVICE.UnmarshalApiHelper).to(UnmarshalApiHelper)
 container.bind(IDS.SERVICE.CovalentApi).to(CovalentApi)
 container.bind(IDS.SERVICE.TronscanApi).to(TronscanTokenManager)
 

@@ -13,7 +13,7 @@ const types = { '.jpg': 'image', '.png': 'image', '.gif': 'image', '.jpeg': 'ima
 export class UnmarshalApiHelper {
     @inject(IDS.NODE_MODULES.axios) _axios: Axios
 
-    parseUrl(url) {
+    normalizeUrl(url) {
         if (!url) return;
         if (url.startsWith('ipfs://ipfs/')) {
             return url.replace('ipfs://', 'https://ipfs.io/')
@@ -47,7 +47,7 @@ export class UnmarshalApiHelper {
     }
     
     async getDataFromUrl(link) {
-        const url = this.parseUrl(link);
+        const url = this.normalizeUrl(link);
         const type = await this.getType(url);
         return { url, type }
     }
