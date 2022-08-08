@@ -1,18 +1,22 @@
 import { ITronTransaction } from './types';
 import { toUrlQueryParams } from '../../util/url-util';
-import { injectable } from 'inversify';
+import { inject, injectable } from 'inversify';
 import { chainConfig } from '../../enums/chains';
-const axios = require('axios');
+import { IDS } from '../../types/index';
+import { Axios } from 'axios';
+import { PriceCache } from '../../cache/coins';
+
 const TronWeb = require('tronweb');
 
 const tronWeb = new TronWeb({
     fullHost: 'https://api.trongrid.io',
 });
 
-const { getCoinPrice } = require('../../cache/coins');
-
 @injectable()
 export class TronGridApi {
+    @inject(IDS.NODE_MODULES.axios) _axios: Axios
+    @inject(IDS.CACHE.PriceCache) _priceCache: PriceCache
+
     baseUrl = 'https://api.trongrid.io/v1/'
 
     getTransactionDataFromItem(item): ITronTransaction {
@@ -27,7 +31,7 @@ export class TronGridApi {
             ),
             fee: 0,
             value,
-            valueUSD: getCoinPrice(chainConfig.tron.nativeCoinId) * value,
+            valueUSD: this._priceCache.getCoinPrice(chainConfig.tron.nativeCoinId) * value,
             hash: item.txID,
             explorerUrl: chainConfig.tron.explorerUrl + item.txID,
             tokenSymbol: chainConfig.tron.nativeCoinSymbol,
@@ -39,7 +43,7 @@ export class TronGridApi {
         const queryParamss = toUrlQueryParams({limit: pageSize, fingerprint}),
             url = `${this.baseUrl}accounts/${address}/transactions?${queryParamss}`
 
-        const { data } = await axios.get(url);
+        const { data } = await this._axios.get(url);
         if (!data?.data?.length) {
             return {items:[], nextPageToken: null};
         }

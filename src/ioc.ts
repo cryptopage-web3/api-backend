@@ -21,10 +21,14 @@ import { CovalentTokenManager } from './modules/tokens/sol';
 import { TronscanTokenManager } from './modules/tokens/tron';
 import axios from 'axios';
 import { ContractDetailsRepo } from './orm/repo/contract-details-repo';
+import { PriceCache } from './cache/coins';
+import { UnmarshalApiHelper } from './services/unmarshal/helper';
 
 export const container = new Container();
 
 container.bind(IDS.NODE_MODULES.axios).toConstantValue(axios)
+
+container.bind(IDS.CACHE.PriceCache).to(PriceCache)
 
 container.bind(IDS.SERVICE.EtherscanApi).toConstantValue(
     new EtherscanApi(envToString('ETHERSCAN_API_KEY'))
@@ -40,6 +44,7 @@ container.bind(IDS.SERVICE.UnmarshalApi).to(UnmarshalApi).onActivation((context,
     instance.initConfig(chain)
     return instance
 })
+container.bind(IDS.SERVICE.UnmarshalApiHelper).toConstantValue(UnmarshalApiHelper)
 container.bind(IDS.SERVICE.CovalentApi).to(CovalentApi)
 container.bind(IDS.SERVICE.TronscanApi).to(TronscanTokenManager)
 

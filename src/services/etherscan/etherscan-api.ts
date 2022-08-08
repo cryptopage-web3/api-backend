@@ -1,10 +1,14 @@
+import { inject, injectable } from 'inversify';
 import { toUrlQueryParams } from '../../util/url-util';
-
-const axios = require('axios');
+import { IDS } from '../../types/index';
+import { Axios } from 'axios';
 
 const API_URL = `https://api.etherscan.io/api`;
 
+@injectable()
 export class EtherscanApi {
+    @inject(IDS.NODE_MODULES.axios) _axios: Axios
+
     private apiKey: string;
     private numberFields = ['blockNumber','timeStamp','nonce','tokenDecimal','transactionIndex','gas','gasPrice','gasUsed','cumulativeGasUsed','confirmations','value'];
 
@@ -15,7 +19,7 @@ export class EtherscanApi {
 
     async getTxCount(address: string) {
         try {
-            const { data } = await axios.get(`${API_URL}module=account&action=txlist&address=${address}&startblock=0&endblock=999999999999&sort=asc&apikey=${this.apiKey}`, {timeout: 10000});
+            const { data } = await this._axios.get(`${API_URL}module=account&action=txlist&address=${address}&startblock=0&endblock=999999999999&sort=asc&apikey=${this.apiKey}`, {timeout: 10000});
             return data.result.length;
         } catch {
             return 0;
@@ -57,7 +61,7 @@ export class EtherscanApi {
     private async apiCall(params: Object){
         const url = this.buildUrl(params)
 
-        const {data} = await axios.get(url);
+        const {data} = await this._axios.get(url);
 
         return data.result;
     }

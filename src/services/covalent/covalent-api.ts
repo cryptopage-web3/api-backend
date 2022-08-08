@@ -1,12 +1,16 @@
 import { getChainConf } from '../../enums/chains';
 import { toUrlQueryParams } from '../../util/url-util';
 import { ChainId } from '../../modules/transactions/types';
-import { injectable } from 'inversify';
-const axios = require('axios');
-const { getCoinPrice } = require('../../cache/coins');
+import { inject, injectable } from 'inversify';
+import { IDS } from '../../types/index';
+import { Axios } from 'axios';
+import { PriceCache } from '../../cache/coins';
 
 @injectable()
 export class CovalentApi {
+    @inject(IDS.NODE_MODULES.axios) _axios:Axios
+    @inject(IDS.CACHE.PriceCache) _priceCache: PriceCache
+
     chainId: string
     chainName: string
     mainCoinId: string
@@ -51,7 +55,7 @@ export class CovalentApi {
 
     async getTokensFromApi(address) {
         const url = `${this.baseUrl}/${this.chainId}/address/${address}/balances_v2/?key=${this.apiKey}`
-        const { data } = await axios.get(url);
+        const { data } = await this._axios.get(url);
         if (!data?.data?.items?.length) {
             return [];
         }
@@ -90,7 +94,7 @@ export class CovalentApi {
             to: item.to_address,
             fee: (item.gas_spent * item.gas_price) / 10 ** 18,
             value,
-            valueUSD: getCoinPrice(this.mainCoinId) * value,
+            valueUSD: this._priceCache.getCoinPrice(this.mainCoinId) * value,
             tokenSymbol,
             tokenAmount,
             tokenAddress,
@@ -104,7 +108,7 @@ export class CovalentApi {
         const queryParams = toUrlQueryParams({'page-number': page, 'page-size': pageSize, key: this.apiKey})
         const url = `${this.baseUrl}/${this.chainId}/address/${address}/transactions_v2/?${queryParams}`
         
-        const { data } = await axios.get(url);
+        const { data } = await this._axios.get(url);
         if (!data?.data?.items?.length) {
             return [];
         }

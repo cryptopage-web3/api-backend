@@ -1,12 +1,16 @@
-import { injectable } from 'inversify';
+import { inject, injectable } from 'inversify';
 import { toUrlQueryParams } from '../../util/url-util';
 import { chainConfig } from '../../enums/chains';
-const axios = require('axios');
+import { IDS } from '../../types/index';
+import { Axios } from 'axios';
+import { PriceCache } from '../../cache/coins';
 
-const { getCoinPrice } = require('../../cache/coins');
 
 @injectable()
 export class SolScanApi {
+    @inject(IDS.NODE_MODULES.axios) _axios: Axios
+    @inject(IDS.CACHE.PriceCache) _priceCache: PriceCache
+
     baseUrl = 'https://public-api.solscan.io/account/';
     mainCoinId = chainConfig.sol.nativeCoinId;
     explorerUrl = chainConfig.sol.explorerUrl;
@@ -19,7 +23,7 @@ export class SolScanApi {
             to: item.signer[1] || item.signer[0],
             fee: item.fee / 10 ** 9,
             value,
-            valueUSD: getCoinPrice(this.mainCoinId) * value,
+            valueUSD: this._priceCache.getCoinPrice(this.mainCoinId) * value,
             hash: item.txHash,
             explorerUrl: this.explorerUrl + item.txHash,
             tokenSymbol: chainConfig.sol.nativeCoinSymbol,
@@ -30,7 +34,7 @@ export class SolScanApi {
     async getTransactionsFromApi(address: string, pageSize: number, beforeHash?: string) {
         const queryParams = toUrlQueryParams({account: address, limit: pageSize, beforeHash})
         const url = `${this.baseUrl}transactions?${queryParams}`
-        const { data } = await axios.get(url);
+        const { data } = await this._axios.get(url);
 
         if (!data?.length) {
             return [];

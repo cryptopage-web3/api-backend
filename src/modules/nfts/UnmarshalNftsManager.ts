@@ -1,4 +1,4 @@
-import { INftsManager } from './types';
+import { INftsManager, INftsList } from './types';
 import { UnmarshalApi } from '../../services/unmarshal/UnmarhalApi';
 import { inject, injectable } from 'inversify';
 import { IDS } from '../../types/index';
@@ -11,7 +11,7 @@ export class UnmarshalNftsManager implements INftsManager {
         this._unmarshalApi = unmarshalApi
     }
 
-    getWalletAllNFTs(address, page, pageSize) {
+    getWalletAllNFTs(address, page, pageSize):Promise<INftsList> {
         return this._unmarshalApi.getWalletAllNFTs(address, page, pageSize);
     }
     

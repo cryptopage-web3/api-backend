@@ -1,7 +1,7 @@
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import { ITokenManager } from './types';
-
-const axios = require('axios');
+import { IDS } from '../../types/index';
+import { Axios } from 'axios';
 
 const pageToken = {
     name: 'Page',
@@ -15,6 +15,8 @@ const pageToken = {
 
 @injectable()
 export class TronscanTokenManager implements ITokenManager {
+    @inject(IDS.NODE_MODULES.axios) _axios:Axios
+
     getTokenData(item) {
         return {
             name: item.tokenName,
@@ -29,7 +31,7 @@ export class TronscanTokenManager implements ITokenManager {
     
     async getWalletTokens(address) {
         const url = `https://apilist.tronscan.org/api/account?address=${address}`
-        const { data } = await axios.get(url);
+        const { data } = await this._axios.get(url);
     
         if (!data.tokens?.length) {
             return {tokens: []};

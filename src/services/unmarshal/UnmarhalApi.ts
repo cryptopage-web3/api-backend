@@ -4,14 +4,17 @@ import { inject, injectable } from 'inversify';
 import { IDS } from '../../types/index';
 import { Axios } from 'axios';
 import { ContractDetailsRepo } from '../../orm/repo/contract-details-repo';
-
-const { getCoinPrice } = require('../../cache/coins');
-const { getDataFromUrl, getFieldFromContract, getDateFromBlock, getContractName, getApproveTarget } = require('./helper');
+import { INftItem, INftsList } from '../../modules/nfts/types';
+import { IUnmarshanNftItem, IUnmarshalNftResponse } from './types';
+import { UnmarshalApiHelper } from './helper';
+import { PriceCache } from '../../cache/coins';
 
 @injectable()
 export class UnmarshalApi {
     @inject(IDS.NODE_MODULES.axios) _axios:Axios
     @inject(IDS.ORM.REPO.ContractDetailsRepo) _contractDetailsRepo:ContractDetailsRepo
+    @inject(IDS.SERVICE.UnmarshalApiHelper) _helper: UnmarshalApiHelper
+    @inject(IDS.CACHE.PriceCache) _priceCache: PriceCache
 
     _chain: ChainId
 
@@ -115,7 +118,7 @@ export class UnmarshalApi {
             type: item.type,
             description: item.description,
             value,
-            valueUSD: getCoinPrice(this.mainCoinId) * value,
+            valueUSD: this._priceCache.getCoinPrice(this.mainCoinId) * value,
             tokenSymbol,
             tokenAmount,
             tokenAddress,
@@ -191,7 +194,7 @@ export class UnmarshalApi {
             action += ` on ${contractName}`;
         }
         if (data.type === 'approve') {
-            const contract = await getApproveTarget('ethereum', txHash);
+            const contract = await this._helper.getApproveTarget('ethereum', txHash);
             const contractName = await this._contractDetailsRepo.getContractName(this._chain, '0x' + contract);
             action += ` for trade on ${contractName}`;
         }
@@ -204,16 +207,16 @@ export class UnmarshalApi {
             status: this.txStatus[data.status],
             value,
             fee,
-            valueUSD: getCoinPrice(this.mainCoinId) * value,
-            feeUSD: getCoinPrice(this.mainCoinId) * value,
+            valueUSD: this._priceCache.getCoinPrice(this.mainCoinId) * value,
+            feeUSD: this._priceCache. getCoinPrice(this.mainCoinId) * value,
             transfers: tranfersInfo,
             action,
             logs: data.logDetails
         }
     }
 
-    async getNFTDataFromItem(item) {
-        const { url, type, name, price, description, attributes } = await this.getNFTDetailsFromApi(item.asset_contract, item.token_id);
+    getNFTDataFromItem(item:IUnmarshanNftItem):INftItem {
+        //const { url, type, name, price, description, attributes } = await this.getNFTDetailsFromApi(item.asset_contract, item.token_id);
 
         return {
             from: item.creator,
@@ -222,16 +225,16 @@ export class UnmarshalApi {
             dislikes: 0,
             comments: 0,
             date: new Date(),
-            name: name || '',
-            collectionName: name || '',
-            description: description || '',
-            type,
-            usdPrice: Number(price),
-            url,
-            image: url,
-            contract_address: item.contract_address || '',
+            name: item.issuer_specific_data.name,
+            collectionName: item.issuer_specific_data.name,
+            description: item.description,
+            type: item.type,
+            usdPrice: Number(item.price),
+            url: item.external_link,
+            image: item.issuer_specific_data.image_url,
+            contract_address: item.asset_contract,
             tokenId: item.token_id,
-            attributes
+            attributes: item.nft_metadata
         }
     }
 
@@ -265,7 +268,7 @@ export class UnmarshalApi {
         try {
             const { data } = await this._axios.get(`${this.baseUrl}/v2/${this.chainName}/address/${address}/details?page=1&pageSize=1&tokenId=${tokenId}&auth_key=${this.apiKey}`);
             const info = data.nft_token_details[0];
-            const { url, type } = await getDataFromUrl(info.image_url);
+            const { url, type } = await this._helper.getDataFromUrl(info.image_url);
             return {
                 url,
                 type,
@@ -280,9 +283,9 @@ export class UnmarshalApi {
     }
 
     async getNFTDetailsFromBlockchain(address, blockNumber) {
-        const name = await getFieldFromContract(this.rpc, address, 'name');
-        const symbol = await getFieldFromContract(this.rpc, address, 'symbol');
-        const date = await getDateFromBlock(this.rpc, blockNumber);
+        const name = await this._helper.getFieldFromContract(this.rpc, address, 'name');
+        const symbol = await this._helper.getFieldFromContract(this.rpc, address, 'symbol');
+        const date = await this._helper.getDateFromBlock(this.rpc, blockNumber);
         return { symbol, name, date };
     }
 
@@ -291,21 +294,17 @@ export class UnmarshalApi {
         return data;
     }
 
-    async getNFTAssetsFromApi(address: string, page, pageSize) {
+    async getNFTAssetsFromApi(address: string, page, pageSize):Promise<IUnmarshalNftResponse> {
         const url = `${this.baseUrl}/v2/${this.chainName}/address/${address}/nft-assets?page=${page}&pageSize=${pageSize}&auth_key=${this.apiKey}`
         const { data } = await this._axios.get(url);
         return data;
     }
 
-    async getWalletAllNFTs(address: string, page, pageSize) {
+    async getWalletAllNFTs(address: string, page, pageSize):Promise<INftsList> {
         const data = await this.getNFTAssetsFromApi(address, page, pageSize);
 
-        const promises: Promise<any>[] = [];
-        for (const item of data.nft_assets) {
-            const promise = this.getNFTDataFromItem(item);
-            promises.push(promise);
-        }
-        const list = await Promise.all(promises);
+        const list = data.nft_assets.map(i => this.getNFTDataFromItem(i));
+        
         return { list, count: data.total_assets };
     }
 
