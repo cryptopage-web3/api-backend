@@ -78,7 +78,7 @@ export class EthTransactionManager implements ITransactionManager {
     private buildTransactionsPage(address: string, txs: Etherscan.ITransactionData[], erc20txs: Etherscan.IErc20TransactionData[], txOffset: number, erc20Offset: number, totalTxCount: number, pageSize:number): Paginator {
         const result: Etherscan.EthTransaction[] = []
 
-        let done = false,
+        let done = txs.length === 0,
             tmpTransaction: Etherscan.EthTransaction,
             countTxOnPage = 0,
             countErc20OnPage = 0

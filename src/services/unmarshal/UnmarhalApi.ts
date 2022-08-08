@@ -292,7 +292,8 @@ export class UnmarshalApi {
     }
 
     async getNFTAssetsFromApi(address: string, page, pageSize) {
-        const { data } = await this._axios.get(`${this.baseUrl}/v2/${this.chainName}/address/${address}/nft-assets?page=${page}&pageSize=${pageSize}&auth_key=${this.apiKey}`);
+        const url = `${this.baseUrl}/v2/${this.chainName}/address/${address}/nft-assets?page=${page}&pageSize=${pageSize}&auth_key=${this.apiKey}`
+        const { data } = await this._axios.get(url);
         return data;
     }
 
