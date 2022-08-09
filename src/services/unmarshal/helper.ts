@@ -4,7 +4,7 @@ import { Axios } from 'axios';
 
 const InputDataDecoder = require('ethereum-input-data-decoder');
 const Web3 = require('web3');
-const abi = require('./erc20.json');
+import * as abi from './erc20.json';
 
 const typeList = ['image', 'audio', 'video'];
 const types = { '.jpg': 'image', '.png': 'image', '.gif': 'image', '.jpeg': 'image', '.webp': 'image', '.mp4': 'video', '.mp3': 'audio' };
