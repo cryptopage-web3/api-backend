@@ -37,7 +37,7 @@ describe('test tokens api endpoints', ()=>{
             expect(response.body.tokens[1].balance).toBe(250870.248787)
     })
 
-    it.only('should return bsc tokens', async ()=>{
+    it('should return bsc tokens', async ()=>{
         (axios.get as jest.Mock)
             .mockResolvedValueOnce({data: unmarshalBscTokensResponse})
 

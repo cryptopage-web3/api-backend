@@ -8,14 +8,10 @@ const API_URL = `https://api.etherscan.io/api`;
 @injectable()
 export class EtherscanApi {
     @inject(IDS.NODE_MODULES.axios) _axios: Axios
+    @inject(IDS.CONFIG.EtherscanApiKey) private apiKey: string;
 
-    private apiKey: string;
     private numberFields = ['blockNumber','timeStamp','nonce','tokenDecimal','transactionIndex','gas','gasPrice','gasUsed','cumulativeGasUsed','confirmations','value'];
 
-
-    constructor(apiKey: string) {
-        this.apiKey = apiKey;
-    }
 
     async getTxCount(address: string) {
         try {

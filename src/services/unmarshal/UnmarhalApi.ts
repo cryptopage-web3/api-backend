@@ -147,17 +147,13 @@ export class UnmarshalApi {
     }
 
     async getWalletAllTransactions(address: string, page, pageSize) {
-        try {
-            const { items, count } = await this.getTransactionsFromApi(address, page, pageSize);
-            const transactions: any[] = [];
-            for (const item of items) {
-                const transaction = this.getTransactionDataFromItem(item);
-                transactions.push(transaction);
-            }
-            return { count, transactions };
-        } catch (e) {
-            return { count: 0, transactions: [] };
+        const { items, count } = await this.getTransactionsFromApi(address, page, pageSize);
+        const transactions: any[] = [];
+        for (const item of items) {
+            const transaction = this.getTransactionDataFromItem(item);
+            transactions.push(transaction);
         }
+        return { count, transactions };
     }
 
     async getWalletTokenTransfers(address: string, page, pageSize) {

@@ -18,7 +18,7 @@ export class PriceCache {
     }
 
     getCoinPrice(id) {
-        return this.coins[id]?.usd || 0;
+        return this.coins?.[id].usd || 0;
     }
 }
 

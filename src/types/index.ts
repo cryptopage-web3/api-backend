@@ -1,4 +1,7 @@
 export const IDS = {
+    CONFIG:{
+        EtherscanApiKey:Symbol('EtherscanApiKey')
+    },
     CACHE:{
         PriceCache: Symbol('PriceCache')
     },

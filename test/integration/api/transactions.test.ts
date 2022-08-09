@@ -17,13 +17,15 @@ jest.mock('axios')
 
 const axios:Axios = container.get(IDS.NODE_MODULES.axios)
 
+const axiosGetMock: jest.Mock = axios.get as any
+
 describe('test get transactions list', ()=>{
     beforeEach(()=>{
         jest.resetAllMocks()
     })
     
     it('should return eth transactions list', async ()=>{
-        (axios.get as jest.Mock)
+        axiosGetMock
             .mockResolvedValueOnce({data: etherscanTransactionsResponse})
             .mockResolvedValueOnce({data: etherscanErc20TransactionsResponse})
             .mockResolvedValueOnce({data: {total_txs: 1074}})
@@ -37,22 +39,26 @@ describe('test get transactions list', ()=>{
         expect(response.body.count).toBe(1074)
         expect(Array.isArray(response.body.transactions)).toBe(true)
         expect(response.body.transactions.length).toBe(10)
+
+        expect(axiosGetMock.mock.calls.length).toBe(3)
     })
 
     it('should return polygon transactions list', async () => {
-        (axios.get as jest.Mock)
+        axiosGetMock
             .mockResolvedValueOnce({data: unmarshalPolygonTransactionResponse})
 
         const response = await testAgent
             .get('/transactions/matic/0xBA7089b207205c1B2282A18c1C80E856Fd424de0')
             .expect('Content-Type',/json/)
-        
+
             expect(response.body.count).toBe(15)
             expect(Array.isArray(response.body.transactions)).toBe(true)
             expect(response.body.transactions.length).toBe(10)
             expect(response.body.transactions[0].to).toBe('0xdcc74f011a80943b2e6d26ab4f9d897c5a73d960')
             expect(response.body.transactions[0].from).toBe('0xba7089b207205c1b2282a18c1c80e856fd424de0')
             expect(response.body.transactions[0].type).toBe('send')
+
+            expect(axiosGetMock.mock.calls.length).toBe(1)
     })
 
     it('should return bsc transactions', async () =>{
@@ -69,6 +75,8 @@ describe('test get transactions list', ()=>{
             expect(response.body.transactions[0].to).toBe('0x0000000000000000000000000000000000001000')
             expect(response.body.transactions[0].from).toBe('0x2465176c461afb316ebc773c61faee85a6515daa')
             expect(response.body.transactions[0].type).toBe('Deposit')
+
+            expect(axiosGetMock.mock.calls.length).toBe(1)
     })
 
     it('should return solana transactions', async () =>{
@@ -84,6 +92,8 @@ describe('test get transactions list', ()=>{
             expect(response.body.transactions.length).toBe(5)
             expect(response.body.transactions[0].to).toBe('G9tHWDcDLUbaGm2mREhbGeqe9SUPznM2quM8gu7XGrsP')
             expect(response.body.transactions[0].from).toBe('G9tHWDcDLUbaGm2mREhbGeqe9SUPznM2quM8gu7XGrsP')
+
+            expect(axiosGetMock.mock.calls.length).toBe(1)
     })
 
     it('should return tron transactions', async () =>{
@@ -99,6 +109,8 @@ describe('test get transactions list', ()=>{
             expect(response.body.transactions.length).toBe(10)
             expect(response.body.transactions[0].to).toBe('TYZ6QbrPaUjv62CoU7za2nVHJ1ZoEJMXah')
             expect(response.body.transactions[0].from).toBe('TJiAfxZthfS9NdHjieAtda2f8eAwRbJppp')
+
+            expect(axiosGetMock.mock.calls.length).toBe(1)
     })
 
     it('should not return error when no eth transactions', async ()=>{
@@ -116,6 +128,8 @@ describe('test get transactions list', ()=>{
         expect(response.body.count).toBe(0)
         expect(Array.isArray(response.body.transactions)).toBe(true)
         expect(response.body.transactions.length).toBe(0)
+
+        expect(axiosGetMock.mock.calls.length).toBe(3)
     })
 
     it('should not return error when no polygon transactions list', async () => {
@@ -129,6 +143,8 @@ describe('test get transactions list', ()=>{
             expect(response.body.count).toBe(0)
             expect(Array.isArray(response.body.transactions)).toBe(true)
             expect(response.body.transactions.length).toBe(0)
+
+            expect(axiosGetMock.mock.calls.length).toBe(1)
     })
 
     it('should not return error when no bsc transactions', async () =>{
@@ -142,6 +158,8 @@ describe('test get transactions list', ()=>{
             expect(response.body.count).toBe(0)
             expect(Array.isArray(response.body.transactions)).toBe(true)
             expect(response.body.transactions.length).toBe(0)
+
+            expect(axiosGetMock.mock.calls.length).toBe(1)
     })
 
     it('should not return error when no solana transactions', async () =>{
@@ -155,6 +173,8 @@ describe('test get transactions list', ()=>{
             expect(response.body.count).toBe(0)
             expect(Array.isArray(response.body.transactions)).toBe(true)
             expect(response.body.transactions.length).toBe(0)
+
+            expect(axiosGetMock.mock.calls.length).toBe(1)
     })
 
     it('should not return error when no tron transactions', async () =>{
@@ -168,5 +188,7 @@ describe('test get transactions list', ()=>{
             expect(response.body.count).toBe(0)
             expect(Array.isArray(response.body.transactions)).toBe(true)
             expect(response.body.transactions.length).toBe(0)
+
+            expect(axiosGetMock.mock.calls.length).toBe(1)
     })
 })

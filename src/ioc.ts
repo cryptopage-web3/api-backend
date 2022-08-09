@@ -28,11 +28,11 @@ export const container = new Container();
 
 container.bind(IDS.NODE_MODULES.axios).toConstantValue(axios)
 
+container.bind(IDS.CONFIG.EtherscanApiKey).toConstantValue(envToString('ETHERSCAN_API_KEY'))
+
 container.bind(IDS.CACHE.PriceCache).to(PriceCache)
 
-container.bind(IDS.SERVICE.EtherscanApi).toConstantValue(
-    new EtherscanApi(envToString('ETHERSCAN_API_KEY'))
-)
+container.bind(IDS.SERVICE.EtherscanApi).to(EtherscanApi).inSingletonScope()
 container.bind(IDS.SERVICE.TrongridApi).to(TronGridApi).inSingletonScope()
 container.bind(IDS.SERVICE.SolScanApi).to(SolScanApi).inSingletonScope()
 container.bind(IDS.SERVICE.UnmarshalApi).to(UnmarshalApi).onActivation((context, instance:UnmarshalApi) =>{
