@@ -7,7 +7,7 @@ import { agent } from "supertest";
 import { container } from '../../../src/ioc';
 import { Axios } from 'axios';
 import { IDS } from '../../../src/types/index';
-import { unmarshalEthNftsResponse } from './nfts-response';
+import { unmarshalEthNftsResponse, unmarshalNftTransactionsEmptyResponse } from './nfts-response';
 
 const app = new InversifyExpressServer(container).build()
 const testAgent = agent(app)
@@ -21,7 +21,7 @@ describe('test nfts api endpoints', ()=>{
         jest.resetAllMocks()
     })
 
-    it.only('should return eth nfts', async ()=>{
+    it('should return eth nfts', async ()=>{
         (axios.get as jest.Mock)
             .mockResolvedValueOnce({data: unmarshalEthNftsResponse})
 
@@ -42,4 +42,19 @@ describe('test nfts api endpoints', ()=>{
             expect((axios.get as jest.Mock).mock.calls.length).toBe(1)
     })
 
+
+    it('should not return error eth nfts transactions', async ()=>{
+        (axios.get as jest.Mock)
+            .mockResolvedValueOnce({data: unmarshalNftTransactionsEmptyResponse})
+
+        const response = await testAgent
+            .get('/nfts/transactions/eth/0x2aDe7E7ed11a4E35C2dDCCB6189d4fE710A165f5')
+            .expect('Content-Type',/json/)
+
+            expect(Array.isArray(response.body.list)).toBe(true)
+            expect(response.body.count).toBe(0)
+            expect(response.body.list.length).toBe(0)
+
+            expect((axios.get as jest.Mock).mock.calls.length).toBe(1)
+    })
 })

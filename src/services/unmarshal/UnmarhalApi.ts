@@ -290,7 +290,8 @@ export class UnmarshalApi {
     }
 
     async getNFTTransactionsFromApi(address: string, page, pageSize) {
-        const { data } = await this._axios.get(`${this.baseUrl}/v2/${this.chainName}/address/${address}/nft-transactions?page=${page}&pageSize=${pageSize}&auth_key=${this.apiKey}`);
+        const url = `${this.baseUrl}/v2/${this.chainName}/address/${address}/nft-transactions?page=${page}&pageSize=${pageSize}&auth_key=${this.apiKey}`
+        const { data } = await this._axios.get(url);
         return data;
     }
 
@@ -310,9 +311,10 @@ export class UnmarshalApi {
 
     async getWalletNFTTransactions(address: string, page, pageSize) {
         const data = await this.getNFTTransactionsFromApi(address, page, pageSize);
+        const transactions = data.transactions || [] 
 
         const promises: Promise<any>[] = [];
-        for (const item of data.transactions) {
+        for (const item of transactions) {
             const promise = this.getNFTTransactionDataFromItem(item);
             promises.push(promise);
         }
