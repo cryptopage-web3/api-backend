@@ -1,6 +1,6 @@
 const Web3 = require('web3');
 
-const rpcURL = 'https://goerli.infura.io/v3/b09e910a12ad4770aee90cb3bcfcf65e';
+const rpcURL = 'https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161';
 
 async function getEthBalance(walletAddress) {
     const web3 = new Web3(rpcURL);
