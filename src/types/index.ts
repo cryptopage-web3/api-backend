@@ -21,6 +21,7 @@ export const IDS = {
         SolScanApi: Symbol('SolScanApi'),
         CovalentApi: Symbol('CovalentApi'),
         TronscanApi: Symbol('TronscanApi'),
+        GoerliScanApi: Symbol('GoerliScanApi'),
     },
     NODE_MODULES:{
         axios: Symbol('axios')

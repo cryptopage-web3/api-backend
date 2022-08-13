@@ -49,6 +49,18 @@ export const chainConfig = {
         explorerUrl: 'https://tronscan.org/#/transaction/',
         nativeCoinSymbol: 'TRX',
         nativeCoinId: 'tron'
+    },
+    [ChainId.goerli]: {
+        evm: true,
+        chainId: 5,
+        chain: 'goerli',
+        chainName: 'goerli',
+        explorerUrl: 'https://goerli.etherscan.io/tx/',
+        nativeCoinSymbol: 'Goerli ETH',
+        apiUrl: 'https://api.goerli.etherscan.io/api?',
+        apiKey: 'VQDBC4GZA5MQT2F6IRW2U6RPH66HJRSF6S',
+        rpc: 'https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
+        nativeCoinId: 'ethereum'
     }
 }
 

@@ -16,6 +16,7 @@ import { SolScanApi } from './services/solscan/solscan-api';
 import { SolscanTtransactionsManager } from './modules/transactions/sol';
 import { UnmarshalApi } from './services/unmarshal/UnmarhalApi';
 import { UnmarshalTokenManager } from './modules/tokens/UnmarshalTokenManager';
+import { GoerliScanTokenManager } from './modules/tokens/goerli';
 import { CovalentApi } from './services/covalent/covalent-api';
 import { CovalentTokenManager } from './modules/tokens/sol';
 import { TronscanTokenManager } from './modules/tokens/tron';
@@ -47,6 +48,7 @@ container.bind(IDS.SERVICE.UnmarshalApi).to(UnmarshalApi).onActivation((context,
 container.bind(IDS.SERVICE.UnmarshalApiHelper).to(UnmarshalApiHelper)
 container.bind(IDS.SERVICE.CovalentApi).to(CovalentApi)
 container.bind(IDS.SERVICE.TronscanApi).to(TronscanTokenManager)
+container.bind(IDS.SERVICE.GoerliScanApi).to(GoerliScanTokenManager)
 
 container.bind(IDS.MODULES.TransactionManager)
     .to(EthTransactionManager).inSingletonScope()
@@ -95,5 +97,7 @@ container.bind(IDS.MODULES.TokenManager)
     .whenTargetNamed(ChainId.tron)
 container.bind(IDS.MODULES.TokenManagerFactory)
     .toAutoNamedFactory(IDS.MODULES.TokenManager)
-
 container.bind(IDS.ORM.REPO.ContractDetailsRepo).to(ContractDetailsRepo)
+container.bind(IDS.MODULES.TokenManager)
+    .to(GoerliScanTokenManager).inSingletonScope()
+    .whenTargetNamed(ChainId.goerli)
