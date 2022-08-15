@@ -44,8 +44,9 @@ container.bind(IDS.SERVICE.WEB3.Web3Manager)
     .to(EthWeb3Manager).whenParentNamed(ChainId.eth)
 container.bind(IDS.SERVICE.WEB3.Web3Manager)
     .to(DefaultWebManager).when((request)=> {
-        const name = request.target.getNamedTag()?.value as any
+        const name = request.parentRequest?.target.getNamedTag()?.value as any
         const implementedChains = [ChainId.eth]
+        
         return implementedChains.indexOf(name) === -1
     })
 
