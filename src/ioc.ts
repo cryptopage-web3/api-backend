@@ -43,7 +43,11 @@ container.bind(IDS.NODE_MODULES.web3).toFactory(context => () =>{
 container.bind(IDS.SERVICE.WEB3.Web3Manager)
     .to(EthWeb3Manager).whenParentNamed(ChainId.eth)
 container.bind(IDS.SERVICE.WEB3.Web3Manager)
-    .to(DefaultWebManager)
+    .to(DefaultWebManager).when((request)=> {
+        const name = request.target.getNamedTag()?.value as any
+        const implementedChains = [ChainId.eth]
+        return implementedChains.indexOf(name) === -1
+    })
 
 
 container.bind(IDS.CONFIG.EtherscanApiKey).toConstantValue(envToString('ETHERSCAN_API_KEY'))
