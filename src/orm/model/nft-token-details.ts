@@ -19,7 +19,7 @@ NftTokenDetails.init({
     chain: DataTypes.ENUM(ChainId.eth, ChainId.bsc, ChainId.matic, ChainId.sol, ChainId.tron),
     name: DataTypes.STRING(255),
     type: DataTypes.STRING(100),
-    description: DataTypes.STRING(400),
+    description: DataTypes.STRING(2000),
     url: DataTypes.STRING(600),
     attributes: DataTypes.JSON
 },{

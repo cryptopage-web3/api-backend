@@ -5,7 +5,7 @@ import { IDS } from '../../types/index';
 import { Axios } from 'axios';
 import { ContractDetailsRepo } from '../../orm/repo/contract-details-repo';
 import { INftItem, INftsList } from '../../modules/nfts/types';
-import { IUnmarshanNftItem, IUnmarshalNftResponse, UnmarshalNftDetails } from './types';
+import { IUnmarshanNftItem, IUnmarshalNftResponse, UnmarshalNftDetails, IUnmarshalNtfTxsResponse } from './types';
 import { UnmarshalApiHelper } from './helper';
 import { PriceCache } from '../../cache/coins';
 
@@ -287,7 +287,7 @@ export class UnmarshalApi {
         return { symbol, name, date };*/
     }
 
-    async getNFTTransactionsFromApi(address: string, page, pageSize) {
+    async getNFTTransactionsFromApi(address: string, page, pageSize):Promise<IUnmarshalNtfTxsResponse> {
         const url = `${this.baseUrl}/v2/${this.chainName}/address/${address}/nft-transactions?page=${page}&pageSize=${pageSize}&auth_key=${this.apiKey}`
         const { data } = await this._axios.get(url);
         return data;
