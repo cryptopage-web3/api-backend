@@ -41,11 +41,16 @@ container.bind(IDS.NODE_MODULES.web3).toFactory(context => () =>{
 })
 
 container.bind(IDS.SERVICE.WEB3.Web3Manager)
-    .to(EthWeb3Manager).whenParentNamed(ChainId.eth)
+    .to(EthWeb3Manager).when(request =>{
+        const name = request.parentRequest?.target.getNamedTag()?.value as any
+        const compatibleChains = [ChainId.eth, ChainId.bsc, ChainId.matic]
+
+        return compatibleChains.indexOf(name) !== -1
+    })
 container.bind(IDS.SERVICE.WEB3.Web3Manager)
     .to(DefaultWebManager).when((request)=> {
         const name = request.parentRequest?.target.getNamedTag()?.value as any
-        const implementedChains = [ChainId.eth]
+        const implementedChains = [ChainId.eth, ChainId.bsc, ChainId.matic]
         
         return implementedChains.indexOf(name) === -1
     })
