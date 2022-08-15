@@ -1,6 +1,7 @@
 export const IDS = {
     CONFIG:{
-        EtherscanApiKey:Symbol('EtherscanApiKey')
+        EtherscanApiKey:Symbol('EtherscanApiKey'),
+        Web3RpcFactory: Symbol('Web3RpcFactory')
     },
     CACHE:{
         PriceCache: Symbol('PriceCache')
@@ -21,13 +22,20 @@ export const IDS = {
         SolScanApi: Symbol('SolScanApi'),
         CovalentApi: Symbol('CovalentApi'),
         TronscanApi: Symbol('TronscanApi'),
+        WEB3:{
+            Web3Manager: Symbol('Web3Manager'),
+        }
     },
     NODE_MODULES:{
-        axios: Symbol('axios')
+        axios: Symbol('axios'),
+        web3: Symbol('web3')
     },
     ORM:{
         REPO:{
-            ContractDetailsRepo: Symbol('ContractDetailsRepo')
+            ContractDetailsRepo: Symbol('ContractDetailsRepo'),
+            NftTokenDetailsRepo: Symbol('NftTokenDetailsRepo'),
         }
     }
 }
+
+export class ApiError extends Error {}

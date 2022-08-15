@@ -24,3 +24,12 @@ export interface IUnmarshalNftResponse {
     total_assets: number
     nft_assets: IUnmarshanNftItem[]
 }
+
+export interface UnmarshalNftDetails {
+    url: string
+    type: string
+    name: string
+    price: string
+    description: string
+    attributes: any[]
+}

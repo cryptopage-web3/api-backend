@@ -5,7 +5,7 @@ import { IDS } from '../../types/index';
 import { Axios } from 'axios';
 import { ContractDetailsRepo } from '../../orm/repo/contract-details-repo';
 import { INftItem, INftsList } from '../../modules/nfts/types';
-import { IUnmarshanNftItem, IUnmarshalNftResponse } from './types';
+import { IUnmarshanNftItem, IUnmarshalNftResponse, UnmarshalNftDetails } from './types';
 import { UnmarshalApiHelper } from './helper';
 import { PriceCache } from '../../cache/coins';
 
@@ -235,7 +235,7 @@ export class UnmarshalApi {
     }
 
     async getNFTTransactionDataFromItem(item) {
-        const { name, symbol, date } = await this.getNFTDetailsFromBlockchain(item.contract_address, item.block_number);
+        /*const { name, symbol, date } = await this.getNFTDetailsFromBlockchain(item.contract_address, item.block_number);
         const { url, type, price, description, attributes } = await this.getNFTDetailsFromApi(item.contract_address, item.token_id);
 
         return {
@@ -256,33 +256,35 @@ export class UnmarshalApi {
             likes: 0,
             dislikes: 0,
             comments: 0
-        }
+        }*/
     }
 
+    async getNFTDetailsFromApi(contractAddress, tokenId): Promise<UnmarshalNftDetails> {
+        const apiUrl = `${this.baseUrl}/v2/${this.chainName}/address/${contractAddress}/details?page=1&pageSize=1&tokenId=${tokenId}&auth_key=${this.apiKey}`
+        const { data } = await this._axios.get(apiUrl);
+        const info = data.nft_token_details[0];
 
-    async getNFTDetailsFromApi(address, tokenId) {
-        try {
-            const { data } = await this._axios.get(`${this.baseUrl}/v2/${this.chainName}/address/${address}/details?page=1&pageSize=1&tokenId=${tokenId}&auth_key=${this.apiKey}`);
-            const info = data.nft_token_details[0];
-            const { url, type } = await this._helper.getDataFromUrl(info.image_url);
-            return {
-                url,
-                type,
-                name: info.name,
-                price: info.price,
-                description: info.description,
-                attributes: info.properties
-            }
-        } catch (err) {
-            return {}
+        const url = this._helper.normalizeUrl(info.image_url)
+
+        const type = await this._helper.getType(url).catch(err =>{
+            console.error(`failed to get nft content type:, ${url}`, err)
+        })
+
+        return {
+            url,
+            type,
+            name: info.name,
+            price: info.price,
+            description: info.description,
+            attributes: info.properties
         }
     }
 
     async getNFTDetailsFromBlockchain(address, blockNumber) {
-        const name = await this._helper.getFieldFromContract(this.rpc, address, 'name');
+        /*const name = await this._helper.getFieldFromContract(this.rpc, address, 'name');
         const symbol = await this._helper.getFieldFromContract(this.rpc, address, 'symbol');
         const date = await this._helper.getDateFromBlock(this.rpc, blockNumber);
-        return { symbol, name, date };
+        return { symbol, name, date };*/
     }
 
     async getNFTTransactionsFromApi(address: string, page, pageSize) {
@@ -309,12 +311,12 @@ export class UnmarshalApi {
         const data = await this.getNFTTransactionsFromApi(address, page, pageSize);
         const transactions = data.transactions || [] 
 
-        const promises: Promise<any>[] = [];
-        for (const item of transactions) {
+        //const promises: Promise<any>[] = [];
+       /* for (const item of transactions) {
             const promise = this.getNFTTransactionDataFromItem(item);
             promises.push(promise);
-        }
-        const list = await Promise.all(promises);
-        return { list, count: data.total_txs };
+        }*/
+        //const list = await Promise.all(promises);
+        return { list: transactions, count: data.total_txs };
     }
 }

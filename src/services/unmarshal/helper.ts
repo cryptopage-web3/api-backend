@@ -3,7 +3,7 @@ import { IDS } from '../../types/index';
 import { Axios } from 'axios';
 
 const InputDataDecoder = require('ethereum-input-data-decoder');
-const Web3 = require('web3');
+import Web3 from 'web3';
 import * as abi from './erc20.json';
 
 const typeList = ['image', 'audio', 'video'];
@@ -50,36 +50,6 @@ export class UnmarshalApiHelper {
         const url = this.normalizeUrl(link);
         const type = await this.getType(url);
         return { url, type }
-    }
-    
-    async getFieldFromContract(rpc, address, key) {
-        try {
-            const web3 = new Web3(rpc);
-            const minABI = [
-                {
-                    "constant": true,
-                    "inputs": [],
-                    "name": key,
-                    "outputs": [{ "name": key, "type": "string" }],
-                    "type": "function"
-                }
-            ];
-            const contract = new web3.eth.Contract(minABI, address);
-            const info = await contract.methods[key]().call();
-            return info;
-        } catch {
-            return '';
-        }
-    }
-    
-    async getDateFromBlock(rpc, blockNum) {
-        try {
-            const web3 = new Web3(rpc);
-            const block = await web3.eth.getBlock(blockNum);
-            return new Date(block.timestamp * 1000);
-        } catch {
-            return new Date();
-        }
     }
     
     async getContractName(blockchain, address) {

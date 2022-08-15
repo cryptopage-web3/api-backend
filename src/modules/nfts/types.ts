@@ -1,6 +1,11 @@
+import { ChainId } from '../transactions/types';
+
 export interface INftsManager {
+    _chain: ChainId
+    
     getWalletAllNFTs(address: string, page: number, pageSize: number): Promise<INftsList>
     getWalletNFTTransactions(address: string, page: number, pageSize: number)
+    getNftTransactionDetails(contractAddress: string, tokenId: string, blockNumber:number)
 }
 
 export interface INftItem {
