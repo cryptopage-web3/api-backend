@@ -7,7 +7,7 @@ import { agent } from "supertest";
 import { container } from '../../../src/ioc';
 import { Axios } from 'axios';
 import { IDS } from '../../../src/types/index';
-import { unmarshalEthNftsResponse, unmarshalNftTransactionsEmptyResponse, unmarshalEthNftTransactionsResponse, unmarshalMaticNftsResponse, unmarshalBscNtsResponse } from './nfts-response';
+import { unmarshalEthNftsResponse, unmarshalNftTransactionsEmptyResponse, unmarshalEthNftTransactionsResponse, unmarshalMaticNftsResponse, unmarshalBscNtsResponse, unmarshalNtsEmptyResponse, unmarshalMaticNftTransactionsResponse, unmarshalBscNfttransactionsResponse } from './nfts-response';
 
 const app = new InversifyExpressServer(container).build()
 const testAgent = agent(app)
@@ -85,13 +85,12 @@ describe('test nfts api endpoints', ()=>{
             expect(axiosGetMock.mock.calls.length).toBe(1)
     })
 
-
-    it('should not return error eth nfts transactions', async ()=>{
+    it('should not return error eth nfts', async ()=>{
         axiosGetMock
-            .mockResolvedValueOnce({data: unmarshalNftTransactionsEmptyResponse})
+            .mockResolvedValueOnce({data: unmarshalNtsEmptyResponse})
 
         const response = await testAgent
-            .get('/nfts/transactions/eth/0x2aDe7E7ed11a4E35C2dDCCB6189d4fE710A165f5')
+            .get('/nfts/eth/0xb29c388e3fd63e1050ac5e4ca1d046dca36f004c')
             .expect('Content-Type',/json/)
 
             expect(Array.isArray(response.body.list)).toBe(true)
@@ -99,6 +98,36 @@ describe('test nfts api endpoints', ()=>{
             expect(response.body.list.length).toBe(0)
 
             expect((axios.get as jest.Mock).mock.calls.length).toBe(1)
+    })
+
+    it('should not return error polygon nfts', async () => {
+        axiosGetMock
+            .mockResolvedValueOnce({data: unmarshalNtsEmptyResponse})
+
+        const response = await testAgent
+            .get('/nfts/matic/0xBA7089b207205c1B2282A18c1C80E856Fd424de0')
+            .expect('Content-Type',/json/)
+
+            expect(Array.isArray(response.body.list)).toBe(true)
+            expect(response.body.count).toBe(0)
+            expect(response.body.list.length).toBe(0)
+
+            expect(axiosGetMock.mock.calls.length).toBe(1)
+    })
+
+    it('should not return error bsc nfts', async () => {
+        axiosGetMock
+            .mockResolvedValueOnce({data: unmarshalNtsEmptyResponse})
+
+        const response = await testAgent
+            .get('/nfts/bsc/0x2465176C461AfB316ebc773C61fAEe85A6515DAA')
+            .expect('Content-Type',/json/)
+
+            expect(Array.isArray(response.body.list)).toBe(true)
+            expect(response.body.count).toBe(0)
+            expect(response.body.list.length).toBe(0)
+
+            expect(axiosGetMock.mock.calls.length).toBe(1)
     })
 
     it('should return eth nft transactions', async ()=>{
@@ -120,4 +149,90 @@ describe('test nfts api endpoints', ()=>{
 
         expect(axiosGetMock.mock.calls.length).toBe(1)
     })
+
+    it('should return matic nft transactions', async ()=>{
+        axiosGetMock.mockResolvedValue({data: unmarshalMaticNftTransactionsResponse})
+
+        const response = await testAgent
+            .get('/nfts/transactions/matic/0xBA7089b207205c1B2282A18c1C80E856Fd424de0')
+            .expect('Content-Type',/json/)
+
+        expect(Array.isArray(response.body.list)).toBe(true)
+        expect(response.body.count).toBe(116)
+        expect(response.body.list.length).toBe(4)
+        expect(response.body.list[0]).toEqual(expect.objectContaining({
+            type: 'base_info',
+            from: '0xae94ccf82b3c8044b31a4fcff2455480763ae226',
+            to: '0xba7089b207205c1b2282a18c1c80e856fd424de0',
+            blockNumber: 31467970,
+            tokenId: '78965343665950388415519985342127408390054350375949077399659463369044632110752'
+        }))
+
+        expect(axiosGetMock.mock.calls.length).toBe(1)
+    })
+
+    it('should return bsc nft transactions', async ()=>{
+        axiosGetMock.mockResolvedValue({data: unmarshalBscNfttransactionsResponse})
+
+        const response = await testAgent
+            .get('/nfts/transactions/bsc/0x2465176C461AfB316ebc773C61fAEe85A6515DAA')
+            .expect('Content-Type',/json/)
+
+        expect(Array.isArray(response.body.list)).toBe(true)
+        expect(response.body.count).toBe(2)
+        expect(response.body.list.length).toBe(2)
+        expect(response.body.list[0]).toEqual(expect.objectContaining({
+            type: 'base_info',
+            from: '0x7bf3fde4fe3d031caf369bfd15855b31b4512a9d',
+            to: '0x2465176c461afb316ebc773c61faee85a6515daa',
+            blockNumber: 16196556,
+            tokenId: '340282366920938463463374607431768211749'
+        }))
+
+        expect(axiosGetMock.mock.calls.length).toBe(1)
+    })
+
+    it('should not return error eth nfts transactions', async ()=>{
+        axiosGetMock
+            .mockResolvedValueOnce({data: unmarshalNftTransactionsEmptyResponse})
+
+        const response = await testAgent
+            .get('/nfts/transactions/eth/0x2aDe7E7ed11a4E35C2dDCCB6189d4fE710A165f5')
+            .expect('Content-Type',/json/)
+
+            expect(Array.isArray(response.body.list)).toBe(true)
+            expect(response.body.count).toBe(0)
+            expect(response.body.list.length).toBe(0)
+
+            expect((axios.get as jest.Mock).mock.calls.length).toBe(1)
+    })
+
+    it('should not return error matic nft transactions', async ()=>{
+        axiosGetMock.mockResolvedValue({data: unmarshalNftTransactionsEmptyResponse})
+
+        const response = await testAgent
+            .get('/nfts/transactions/matic/0xBA7089b207205c1B2282A18c1C80E856Fd424de0')
+            .expect('Content-Type',/json/)
+
+        expect(Array.isArray(response.body.list)).toBe(true)
+        expect(response.body.count).toBe(0)
+        expect(response.body.list.length).toBe(0)
+
+        expect(axiosGetMock.mock.calls.length).toBe(1)
+    })
+
+    it('should return bsc nft transactions', async ()=>{
+        axiosGetMock.mockResolvedValue({data: unmarshalNftTransactionsEmptyResponse})
+
+        const response = await testAgent
+            .get('/nfts/transactions/bsc/0x2465176C461AfB316ebc773C61fAEe85A6515DAA')
+            .expect('Content-Type',/json/)
+
+        expect(Array.isArray(response.body.list)).toBe(true)
+        expect(response.body.count).toBe(0)
+        expect(response.body.list.length).toBe(0)
+
+        expect(axiosGetMock.mock.calls.length).toBe(1)
+    })
+
 })

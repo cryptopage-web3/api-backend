@@ -302,7 +302,7 @@ export class UnmarshalApi {
     async getWalletAllNFTs(address: string, page, pageSize):Promise<INftsList> {
         const data = await this.getNFTAssetsFromApi(address, page, pageSize);
 
-        const list = data.nft_assets.map(i => this.getNFTDataFromItem(i));
+        const list = data.nft_assets?.map(i => this.getNFTDataFromItem(i)) || [];
         
         return { list, count: data.total_assets };
     }
