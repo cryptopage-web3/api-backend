@@ -20,14 +20,13 @@
     "noUnusedParameters": false,
     "noUnusedLocals": false,
     "strictNullChecks": true,
-    "types":["reflect-metadata","node","@types/jest"],
+    "typeRoots": ["node_modules"],
+    "types":["reflect-metadata","node","@types/mocha", "@types/chai"],
 
     "moduleResolution": "Node",
     "sourceMap": true,
     "outDir": "dist",
     "baseUrl": "./src",
-
-
   },
   "include": ["src"],
 }
