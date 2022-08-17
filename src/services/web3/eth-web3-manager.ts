@@ -5,11 +5,7 @@ import Web3 from 'web3';
 
 @injectable()
 export class EthWeb3Manager implements IWeb3Manager {
-    _web3: Web3
-
-    constructor(@inject(IDS.NODE_MODULES.web3) web3Factory:()=> Web3){
-        this._web3 = web3Factory()
-    }
+    @inject(IDS.NODE_MODULES.web3) _web3: Web3
 
     async getDateFromBlock(blocknum: number): Promise<Date> {
         const block = await this._web3.eth.getBlock(blocknum);

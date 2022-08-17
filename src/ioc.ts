@@ -33,7 +33,7 @@ import { DefaultWebManager } from './services/web3/default-web3-manager';
 export const container = new Container();
 
 container.bind(IDS.NODE_MODULES.axios).toConstantValue(axios)
-container.bind(IDS.NODE_MODULES.web3).toFactory(context => () =>{
+container.bind(IDS.NODE_MODULES.web3).toDynamicValue(context => {
     const chain:ChainId = context.plan.rootRequest?.target.getNamedTag()?.value as any
     const rpc = getChainRpc(chain)
     
@@ -41,12 +41,15 @@ container.bind(IDS.NODE_MODULES.web3).toFactory(context => () =>{
 })
 
 container.bind(IDS.SERVICE.WEB3.Web3Manager)
-    .to(EthWeb3Manager).when(request =>{
-        const name = request.parentRequest?.target.getNamedTag()?.value as any
-        const compatibleChains = [ChainId.eth, ChainId.bsc, ChainId.matic]
-
-        return compatibleChains.indexOf(name) !== -1
-    })
+    .to(EthWeb3Manager)
+    .inSingletonScope().whenParentNamed(ChainId.eth)
+container.bind(IDS.SERVICE.WEB3.Web3Manager)
+    .to(EthWeb3Manager)
+    .inSingletonScope().whenParentNamed(ChainId.matic)
+container.bind(IDS.SERVICE.WEB3.Web3Manager)
+    .to(EthWeb3Manager)
+    .inSingletonScope().whenParentNamed(ChainId.bsc)
+    
 container.bind(IDS.SERVICE.WEB3.Web3Manager)
     .to(DefaultWebManager).when((request)=> {
         const name = request.parentRequest?.target.getNamedTag()?.value as any
