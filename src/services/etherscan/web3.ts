@@ -25,4 +25,9 @@ async function getBalanceOfToken(walletAddress, tokenAddress, decimals = 18) {
     return balance / 10 ** decimals;
 }
 
-export { getEthBalance, getBalanceOfToken };
+function getTransactionCount(walletAddress) {
+    const web3 = new Web3(rpcURL);
+    return web3.eth.getTransactionCount(walletAddress)
+}
+
+export { getEthBalance, getBalanceOfToken, getTransactionCount };

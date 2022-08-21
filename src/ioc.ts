@@ -13,7 +13,9 @@ import { UnmarshalNftsManager } from './modules/nfts/UnmarshalNftsManager';
 import { TronGridApi } from './services/trongrid/trongrid-api';
 import { TronGridApiTransactionsManager } from './modules/transactions/tron';
 import { SolScanApi } from './services/solscan/solscan-api';
+import { GoerliScanApi } from './services/etherscan/goerliscan-api';
 import { SolscanTtransactionsManager } from './modules/transactions/sol';
+import { GoerliscanTtransactionsManager } from './modules/transactions/goerli';
 import { UnmarshalApi } from './services/unmarshal/UnmarhalApi';
 import { UnmarshalTokenManager } from './modules/tokens/UnmarshalTokenManager';
 import { GoerliScanTokenManager } from './modules/tokens/goerli';
@@ -36,6 +38,7 @@ container.bind(IDS.CACHE.PriceCache).to(PriceCache)
 container.bind(IDS.SERVICE.EtherscanApi).to(EtherscanApi).inSingletonScope()
 container.bind(IDS.SERVICE.TrongridApi).to(TronGridApi).inSingletonScope()
 container.bind(IDS.SERVICE.SolScanApi).to(SolScanApi).inSingletonScope()
+container.bind(IDS.SERVICE.GoerliScanApi).to(GoerliScanApi).inSingletonScope()
 container.bind(IDS.SERVICE.UnmarshalApi).to(UnmarshalApi).onActivation((context, instance:UnmarshalApi) =>{
     const chain: ChainId = context.plan.rootRequest?.target.getNamedTag()?.value as any;
     if(!chain){
@@ -48,7 +51,6 @@ container.bind(IDS.SERVICE.UnmarshalApi).to(UnmarshalApi).onActivation((context,
 container.bind(IDS.SERVICE.UnmarshalApiHelper).to(UnmarshalApiHelper)
 container.bind(IDS.SERVICE.CovalentApi).to(CovalentApi)
 container.bind(IDS.SERVICE.TronscanApi).to(TronscanTokenManager)
-container.bind(IDS.SERVICE.GoerliScanApi).to(GoerliScanTokenManager)
 
 container.bind(IDS.MODULES.TransactionManager)
     .to(EthTransactionManager).inSingletonScope()
@@ -65,6 +67,9 @@ container.bind(IDS.MODULES.TransactionManager)
 container.bind(IDS.MODULES.TransactionManager)
     .to(TronGridApiTransactionsManager).inSingletonScope()
     .whenTargetNamed(ChainId.tron)
+container.bind(IDS.MODULES.TransactionManager)
+    .to(GoerliscanTtransactionsManager).inSingletonScope()
+    .whenTargetNamed(ChainId.goerli)
 container.bind(IDS.MODULES.TransactionManagerFactory)
     .toAutoNamedFactory(IDS.MODULES.TransactionManager)
 

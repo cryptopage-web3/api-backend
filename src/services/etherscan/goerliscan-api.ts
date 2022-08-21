@@ -1,8 +1,10 @@
+import { injectable } from 'inversify';
 import axios  from 'axios';
-import { getEthBalance, getBalanceOfToken }  from './web3';
+import { getEthBalance, getBalanceOfToken, getTransactionCount }  from './web3';
 
 const API_URL = `https://api-goerli.etherscan.io/api`;
 
+@injectable()
 export class GoerliScanApi {
 
     async setBalanceToToken(token, address, tokenAddress, decimals) {
@@ -47,6 +49,16 @@ export class GoerliScanApi {
             };
         }
         return Object.values(addresses);
+    }
+
+    async getWalletAllTransactions(address: string, pageSize: number, beforeHash?: string) {
+        const { data: { result } } = await axios.get(`${API_URL}?module=account&action=txlist&address=${address}&page=1&offset=${pageSize || 10}&startblock=0&endblock=999999999999999999999&sort=asc&apikey=YourApiKeyToken`);
+        const txCount = await getTransactionCount(address);
+        return {
+            count: txCount,
+            transactions: result,
+            beforeHash
+        };
     }
 
 }
