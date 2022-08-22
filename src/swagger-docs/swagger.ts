@@ -18,12 +18,12 @@ export const swaggerDefinition = {
     servers: [
         {
             url: 'https://api-m.crypto.page/',
-            description: 'Dev server'
+            description: 'Prod server'
         },
         {
-            url: `https://crypto-page-app.herokuapp.com/`,
-            description: 'Heroku server'
-        },
+            url: 'https://stage-api.crypto.page/',
+            description: 'Staging server'
+        }
         
     ],
 };

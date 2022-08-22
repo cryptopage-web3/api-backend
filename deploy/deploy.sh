@@ -10,10 +10,10 @@
 
 echo "log file: ${DEPLOY_LOG_FILE}, ${TG_BOT_ID}|${TG_TEXT_PREFIX}|${TG_CHAT_ID}|${DEPLOY_DIR}|${DEPLOY_PORT}|${RUN_DIR}|${RUN_PORT}|${PM2_NAME}"
 
-deploy_dir=${DEPLOY_DIR:-\~/deploy}
-run_dir=${RUN_DIR:-\~/crypto.page}
-deploy_port=${DEPLOY_PORT:-3010}
-run_port=${RUN_PORT:-3000}
+deploy_dir=${DEPLOY_DIR}
+run_dir=${RUN_DIR}
+deploy_port=${DEPLOY_PORT}
+run_port=${RUN_PORT}
 
 pm2_run_name="${PM2_NAME}"
 pm2_deploy_name="${PM2_NAME}_deploy"
@@ -25,7 +25,7 @@ echo "Stop server"
 pm2 stop $pm2_deploy_name
 pm2 delete $pm2_deploy_name
 
-cd $deploy_dir
+cd $deploy_dir 2>&1
 
 echo "deploy dir: $deploy_dir; run dir $run_dir"
 
