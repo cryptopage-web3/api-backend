@@ -51,3 +51,32 @@ paths:
                   $ref: '#/components/schemas/NFTTransactions'
         "400":
           $ref: '#/responses/PaginationError'
+    
+  /nfts/transaction/{chain}/details/{contractAddress}/{tokenId}/{blockNumber}:
+    get:
+      summary: Get nft transaction details.
+      tags: [NFT]
+      parameters:
+        - in: path
+          name: chain
+          required: true
+          schema:
+            type: string
+            enum: [eth, bsc, matic]
+            default: eth
+          description: chain name
+        - in: path
+          name: contractAddress
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: tokenId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: blockNumber
+          required: true
+          schema:
+            type: number

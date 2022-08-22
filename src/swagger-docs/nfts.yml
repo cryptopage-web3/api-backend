@@ -59,44 +59,33 @@ components:
           items:
             type: object
             properties:
-              url:
-                type: string
               type:
-                type: string
-              price:
-                type: string
-              description:
-                type: string
-              attributes:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    trait_type:
-                      type: string
-                    value:
-                      type: string
-              name:
-                type: string
-              symbol:
-                type: string
-              date:
-                type: string
-              from:
-                type: string
-              to:
                 type: string
               txHash:
                 type: string
+              blockNumber:
+                type: number              
               contract_address:
                 type: string
               tokenId:
                 type: string
-              likes:
-                type: number
-              dislikes:
-                type: number
-              comments:
-                type: number
+              to:
+                type: string
+              from:
+                type: string
         count:
           type: number
+    
+    NftTransactionDetails:
+      type: object
+      properties:
+        tokenId:
+          type: string
+        url:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        date:
+          type: string
