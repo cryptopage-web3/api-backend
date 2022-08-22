@@ -10,10 +10,10 @@
 
 echo "log file: ${DEPLOY_LOG_FILE}"
 
-deploy_dir=~/deploy
-run_dir=~/crypto.page
-deploy_port=3010
-run_port=3000
+deploy_dir=${DEPLOY_DIR:-\~/deploy}
+run_dir=${RUN_DIR:-\~/crypto.page}
+deploy_port=${DEPLOY_PORT:-3010}
+run_port=${RUN_PORT:-3000}
 
 pm2_run_name="${PM2_NAME}"
 pm2_deploy_name="${PM2_NAME}_deploy"
