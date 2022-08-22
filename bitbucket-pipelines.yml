@@ -44,4 +44,5 @@ pipelines:
                 export RUN_DIR=$RUN_DIR && 
                 export DEPLOY_PORT=$DEPLOY_PORT && 
                 export RUN_PORT=$RUN_PORT && 
+                mkdir /tmp/staging-deploy -p &&
                 /bin/bash /tmp/staging-deploy/deploy.sh > $DEPLOY_LOG_FILE"
