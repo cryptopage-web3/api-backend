@@ -32,7 +32,7 @@ pipelines:
                   SERVER: $DEV_SSH_SERVER
                   REMOTE_PATH: '/tmp/staging-deploy/'
                   LOCAL_PATH: './deploy/*'
-                  EXTRA_ARGS: ['-r']
+                  EXTRA_ARGS: ['-r', '-v']
              - >- 
                 ssh $DEV_SSH_USER@$DEV_SSH_SERVER 
                 "export TG_BOT_ID=$TG_BOT_ID && 
