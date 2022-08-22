@@ -3,7 +3,8 @@ export enum ChainId {
     bsc='bsc',
     matic='matic',
     sol='sol',
-    tron='tron'
+    tron='tron',
+    goerli='goerli'
 }
 
 export interface ITransactionManager {

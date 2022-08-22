@@ -13,9 +13,12 @@ import { UnmarshalNftsManager } from './modules/nfts/UnmarshalNftsManager';
 import { TronGridApi } from './services/trongrid/trongrid-api';
 import { TronGridApiTransactionsManager } from './modules/transactions/tron';
 import { SolScanApi } from './services/solscan/solscan-api';
+import { GoerliScanApi } from './services/etherscan/goerliscan-api';
 import { SolscanTtransactionsManager } from './modules/transactions/sol';
+import { GoerliscanTtransactionsManager } from './modules/transactions/goerli';
 import { UnmarshalApi } from './services/unmarshal/UnmarhalApi';
 import { UnmarshalTokenManager } from './modules/tokens/UnmarshalTokenManager';
+import { GoerliScanTokenManager } from './modules/tokens/goerli';
 import { CovalentApi } from './services/covalent/covalent-api';
 import { CovalentTokenManager } from './modules/tokens/sol';
 import { TronscanTokenManager } from './modules/tokens/tron';
@@ -66,6 +69,7 @@ container.bind(IDS.CACHE.PriceCache).to(PriceCache)
 container.bind(IDS.SERVICE.EtherscanApi).to(EtherscanApi).inSingletonScope()
 container.bind(IDS.SERVICE.TrongridApi).to(TronGridApi).inSingletonScope()
 container.bind(IDS.SERVICE.SolScanApi).to(SolScanApi).inSingletonScope()
+container.bind(IDS.SERVICE.GoerliScanApi).to(GoerliScanApi).inSingletonScope()
 container.bind(IDS.SERVICE.UnmarshalApi).to(UnmarshalApi).onActivation((context, instance:UnmarshalApi) =>{
     const chain: ChainId = context.plan.rootRequest?.target.getNamedTag()?.value as any;
     if(!chain){
@@ -94,6 +98,9 @@ container.bind(IDS.MODULES.TransactionManager)
 container.bind(IDS.MODULES.TransactionManager)
     .to(TronGridApiTransactionsManager).inSingletonScope()
     .whenTargetNamed(ChainId.tron)
+container.bind(IDS.MODULES.TransactionManager)
+    .to(GoerliscanTtransactionsManager).inSingletonScope()
+    .whenTargetNamed(ChainId.goerli)
 container.bind(IDS.MODULES.TransactionManagerFactory)
     .toAutoNamedFactory(IDS.MODULES.TransactionManager)
 
@@ -140,5 +147,7 @@ container.bind(IDS.MODULES.TokenManager)
 container.bind(IDS.MODULES.TokenManagerFactory)
     .toAutoNamedFactory(IDS.MODULES.TokenManager)
 
-container.bind(IDS.ORM.REPO.ContractDetailsRepo).to(ContractDetailsRepo)
+container.bind(IDS.MODULES.TokenManager)
+    .to(GoerliScanTokenManager).inSingletonScope()
+    .whenTargetNamed(ChainId.goerli)container.bind(IDS.ORM.REPO.ContractDetailsRepo).to(ContractDetailsRepo)
 container.bind(IDS.ORM.REPO.NftTokenDetailsRepo).to(NftTokenDetailsRepo)

@@ -22,6 +22,7 @@ export const IDS = {
         SolScanApi: Symbol('SolScanApi'),
         CovalentApi: Symbol('CovalentApi'),
         TronscanApi: Symbol('TronscanApi'),
+        GoerliScanApi: Symbol('GoerliScanApi'),
         WEB3:{
             Web3Manager: Symbol('Web3Manager'),
         }
