@@ -147,7 +147,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [eth, bsc, matic, sol, tron]
+            enum: [eth, bsc, matic, sol, tron, goerli]
             default: eth
           description: chain name
         - in: path

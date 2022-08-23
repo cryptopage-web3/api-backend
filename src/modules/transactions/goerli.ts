@@ -12,7 +12,7 @@ export class GoerliscanTtransactionsManager implements ITransactionManager {
     }
 
     getWalletTokenTransfers(address: string, opts: ITransactionsPagination) {
-        throw new Error('Method not implemented')
+        return this._goerliScanApi.getTokenTransfers(address, opts.pageSize, opts.beforeHash)
     }
 
     getTransactionDetails(txHash: string) {

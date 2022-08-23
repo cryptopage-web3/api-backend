@@ -7,7 +7,7 @@ import * as express from 'express';
 import { inject } from "inversify";
 import { IDS } from '../types/index';
 
-const chainValidator = [ChainId.bsc,ChainId.eth,ChainId.matic].join('|')
+const chainValidator = [ChainId.bsc,ChainId.eth,ChainId.matic, ChainId.goerli].join('|')
 
 @controller('/nfts')
 export class NftsController implements interfaces.Controller {
