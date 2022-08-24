@@ -63,7 +63,7 @@ npm t 2>&1
 
 exit_if_error "integration tests failed"
 
-echo "Start deploy test server"
+echo "Start deploy test server, port $deploy_port"
 
 export NODE_ENV=production
 export PORT=$deploy_port
@@ -110,10 +110,15 @@ sleep 5
 echo sleep 5 sec
 
 http_response=$(curl -s -w "%{http_code}" -o /dev/null  --connect-timeout 1  "http://127.0.0.1:$run_port")
+
+echo "port $run_port response: $http_response"
+
 if [ "$http_response" != "200" ]; then
     tg_message "Server start failed"
     exit 1
 fi
+
+echo "Server started on port: $run_port"
 
 tg_message "deploy completed"
 
