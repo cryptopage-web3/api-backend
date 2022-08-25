@@ -63,6 +63,10 @@ npm t 2>&1
 
 exit_if_error "integration tests failed"
 
+npm run db:sync 2&>1
+
+exit_if_error "database update failed"
+
 echo "Start deploy test server, port $deploy_port"
 
 export NODE_ENV=production
