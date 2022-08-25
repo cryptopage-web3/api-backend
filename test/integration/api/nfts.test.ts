@@ -261,7 +261,7 @@ describe('test nfts api endpoints', ()=>{
             blockNumber = 15300497
 
         const response = await testAgent
-            .get(`/nfts/token/eth/details/${contractAddress}/${tokenId}/${blockNumber}`)
+            .get(`/nfts/transaction/eth/details/${contractAddress}/${tokenId}/${blockNumber}`)
             .expect('Content-Type',/json/)
 
         expect(response.body).contain({
@@ -299,7 +299,7 @@ describe('test nfts api endpoints', ()=>{
             blockNumber = 31467970
 
         const response = await testAgent
-            .get(`/nfts/token/matic/details/${contractAddress}/${tokenId}/${blockNumber}`)
+            .get(`/nfts/transaction/matic/details/${contractAddress}/${tokenId}/${blockNumber}`)
             .expect('Content-Type',/json/)
 
         expect(response.body).contain({
@@ -337,7 +337,7 @@ describe('test nfts api endpoints', ()=>{
             blockNumber = 16196556
 
         const response = await testAgent
-            .get(`/nfts/token/bsc/details/${contractAddress}/${tokenId}/${blockNumber}`)
+            .get(`/nfts/transaction/bsc/details/${contractAddress}/${tokenId}/${blockNumber}`)
             .expect('Content-Type',/json/)
 
         expect(response.body).contain({

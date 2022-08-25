@@ -43,7 +43,7 @@ export class NftsController implements interfaces.Controller {
         res.json(result)
     }
 
-    @httpGet(`/token/:chain(${chainValidator})/details/:contractAddress/:tokenId/:block(\\d+)`)
+    @httpGet(`/transaction/:chain(${chainValidator})/details/:contractAddress/:tokenId/:block(\\d+)`)
     @errorHandler()
     async getTransactionDetails(
         @requestParam('chain') chain: ChainId,
