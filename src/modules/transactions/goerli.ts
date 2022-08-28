@@ -16,6 +16,6 @@ export class GoerliscanTtransactionsManager implements ITransactionManager {
     }
 
     getTransactionDetails(txHash: string) {
-        throw new Error('Method not implemented')
+        return this._goerliScanApi.getTransactionDetails(txHash);
     }
 }

@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 import axios from 'axios';
-import { getEthBalance, getBalanceOfToken, getTransactionCount, getTokenMetadata } from './web3';
+import { getEthBalance, getBalanceOfToken, getTransactionCount, getTokenMetadata, getTransactionData } from './web3';
 
 const API_URL = `https://api-goerli.etherscan.io/api`;
 
@@ -124,6 +124,10 @@ export class GoerliScanApi {
         return {
             transactions: list, count: list.length
         }
+    }
+
+    getTransactionDetails(txHash) {
+        return getTransactionData(txHash);
     }
 
 }

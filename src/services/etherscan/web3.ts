@@ -65,4 +65,28 @@ async function getTokenMetadata(tokenAddress, tokenId) {
     }
 }
 
-export { getEthBalance, getBalanceOfToken, getTransactionCount, getTokenMetadata };
+async function getTransactionData(txHash) {
+    const web3 = new Web3(rpcURL);
+    const receipt = await web3.eth.getTransactionReceipt(txHash);
+    const transaction = await web3.eth.getTransaction(txHash);
+    const data = { ...receipt, ...transaction };
+    const block = await web3.eth.getBlock(data.blockNumber);
+    const { timestamp } = block;
+    const info = {
+        txHash,
+        block: data.blockNumber,
+        nonce: data.nonce,
+        status: "Success",
+        value: Number(data.value),
+        fee: data.gasUsed * data.gasPrice / 10 ** 18,
+        valueUSD: 0,
+        feeUSD: 0,
+        transfers: [],
+        action: data.input ? "Smart Contract Executed" : "Transfer",
+        date: new Date(timestamp * 1000),
+        logs: data.logs
+    }
+    return info;
+}
+
+export { getEthBalance, getBalanceOfToken, getTransactionCount, getTokenMetadata, getTransactionData };
