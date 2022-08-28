@@ -1,9 +1,14 @@
 import { injectable } from "inversify";
 import { INftsManager, INftsList } from './types';
 import { GoerliScanApi } from './../../services/etherscan/goerliscan-api';
+import { ChainId } from "modules/transactions/types";
 
 @injectable()
 export class GoerliScanNFTsManager implements INftsManager {
+    _chain: ChainId;
+    getNftTransactionDetails(contractAddress: string, tokenId: string, blockNumber: number) {
+        throw new Error("Method not implemented.");
+    }
 
     async getWalletAllNFTs(address, page, pageSize):Promise<INftsList> {
         const goerliScanInstance = new GoerliScanApi();
