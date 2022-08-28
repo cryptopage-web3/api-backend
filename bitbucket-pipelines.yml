@@ -20,6 +20,10 @@ pipelines:
                 export TG_TEXT_PREFIX=$TG_TEXT_PREFIX && 
                 export PM2_NAME=$PM2_NAME && 
                 export DEPLOY_LOG_FILE=$DEPLOY_LOG_FILE && 
+                export DEPLOY_DIR=$DEPLOY_DIR && 
+                export RUN_DIR=$RUN_DIR && 
+                export DEPLOY_PORT=$DEPLOY_PORT && 
+                export RUN_PORT=$RUN_PORT &&
                 /bin/bash /tmp/deploy.sh > $DEPLOY_LOG_FILE"
     staging:
      - step:
