@@ -47,7 +47,7 @@ function normalizeData(protocolsData: DefiLamaContract[]): InferAttributes<Contr
                 contractAddress: contract.address,
                 name: contract.name,
                 symbol: contract.symbol,
-                descr: contract.description,
+                description: contract.description,
                 url: contract.url,
                 chain: chainId
             })

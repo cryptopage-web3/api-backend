@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 import { ChainId } from '../../modules/transactions/types';
-import { ContractDetails } from '../model/contract-detail';
+import { ContractDetails, ContractDetailsInferAttr } from '../model/contract-detail';
 
 @injectable()
 export class ContractDetailsRepo {
@@ -8,5 +8,13 @@ export class ContractDetailsRepo {
         const c = await ContractDetails.findOne({where:{contractAddress: contract, chain}})
 
         return c?.name || contract
+    }
+
+    getContract(chain:ChainId, contractAddress:string){
+        return ContractDetails.findOne({where:{contractAddress, chain}})
+    }
+
+    createContract(contract:ContractDetailsInferAttr){
+        return ContractDetails.create(contract)
     }
 }

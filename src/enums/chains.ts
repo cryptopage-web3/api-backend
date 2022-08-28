@@ -71,3 +71,13 @@ export function getChainConf(chain: ChainId){
 
     return chainConfig[chain]
 }
+
+export function getChainRpc(chain: ChainId){
+    const rpc = (getChainConf(chain) as any)?.rpc
+
+    if(!rpc){
+        throw new Error(`rpc is not configured for chain: ${chain}`)
+    }
+
+    return rpc
+}

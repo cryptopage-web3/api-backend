@@ -8,12 +8,12 @@
 #unclude utils
 . $(dirname "$0")/utils.sh
 
-echo "log file: ${DEPLOY_LOG_FILE}"
+echo "log file: ${DEPLOY_LOG_FILE}, ${TG_BOT_ID}|${TG_TEXT_PREFIX}|${TG_CHAT_ID}|${DEPLOY_DIR}|${DEPLOY_PORT}|${RUN_DIR}|${RUN_PORT}|${PM2_NAME}"
 
-deploy_dir=~/deploy
-run_dir=~/crypto.page
-deploy_port=3010
-run_port=3000
+deploy_dir=${DEPLOY_DIR}
+run_dir=${RUN_DIR}
+deploy_port=${DEPLOY_PORT}
+run_port=${RUN_PORT}
 
 pm2_run_name="${PM2_NAME}"
 pm2_deploy_name="${PM2_NAME}_deploy"
@@ -25,7 +25,7 @@ echo "Stop server"
 pm2 stop $pm2_deploy_name
 pm2 delete $pm2_deploy_name
 
-cd $deploy_dir
+cd $deploy_dir 2>&1
 
 echo "deploy dir: $deploy_dir; run dir $run_dir"
 
@@ -63,7 +63,11 @@ npm t 2>&1
 
 exit_if_error "integration tests failed"
 
-echo "Start deploy test server"
+npm run db:sync 2&>1
+
+exit_if_error "database update failed"
+
+echo "Start deploy test server, port $deploy_port"
 
 export NODE_ENV=production
 export PORT=$deploy_port
@@ -110,10 +114,15 @@ sleep 5
 echo sleep 5 sec
 
 http_response=$(curl -s -w "%{http_code}" -o /dev/null  --connect-timeout 1  "http://127.0.0.1:$run_port")
+
+echo "port $run_port response: $http_response"
+
 if [ "$http_response" != "200" ]; then
     tg_message "Server start failed"
     exit 1
 fi
+
+echo "Server started on port: $run_port"
 
 tg_message "deploy completed"
 

@@ -4,7 +4,7 @@ import { IDS } from '../types/index';
 import { ITransactionManager, ITransactionsPagination, ChainId } from '../modules/transactions/types';
 import * as express from "express";
 import { errorHandler } from "./decorator/error-handler";
-import { getTransactionsValidator } from './validator/get-transactionsv-validator';
+import { getTransactionsValidator } from './validator/get-transactions-validator';
 import { paginationValidator } from './validator/pagination-validator';
 
 const chainValidator = [ChainId.bsc,ChainId.eth,ChainId.matic,ChainId.sol,ChainId.tron, ChainId.goerli].join('|')
