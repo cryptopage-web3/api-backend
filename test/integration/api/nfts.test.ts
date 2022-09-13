@@ -134,7 +134,7 @@ describe('test nfts api endpoints', ()=>{
             expect(axiosGetStub.calledOnce).to.eq(true)
     })
 
-    it.only('should not fall when api key limit reached, goerli nfts', async () => {
+    it('should not fall when api key limit reached, goerli nfts', async () => {
         axiosGetStub
             .resolves({data: goerlyErrorResponse})
 
