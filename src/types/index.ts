@@ -1,6 +1,7 @@
 export const IDS = {
     CONFIG:{
         EtherscanApiKey:Symbol('EtherscanApiKey'),
+        GoerliApiKey:Symbol('GoerliApiKey'),
         Web3RpcFactory: Symbol('Web3RpcFactory')
     },
     CACHE:{

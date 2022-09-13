@@ -1,6 +1,7 @@
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import { ITokenManager } from './types';
 import { GoerliScanApi } from './../../services/etherscan/goerliscan-api';
+import { IDS } from '../../types/index';
 
 const ethLogo = 'https://assets.unmarshal.io/tokens/ethereum_0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE.png';
 
@@ -16,6 +17,8 @@ const pageToken = {
 
 @injectable()
 export class GoerliScanTokenManager implements ITokenManager {
+    @inject(IDS.SERVICE.GoerliScanApi) _goerli:GoerliScanApi
+
     getTokenData(item) {
         return {
             name: item.name,
@@ -30,8 +33,7 @@ export class GoerliScanTokenManager implements ITokenManager {
     }
     
     async getWalletTokens(address) {
-        const goerliScanInstance = new GoerliScanApi();
-        const balances = await goerliScanInstance.getWalletTokens(address);
+        const balances = await this._goerli.getWalletTokens(address);
         const tokens = balances.map(token => this.getTokenData(token));
         tokens.unshift(pageToken);
         return { tokens, count: tokens.length };

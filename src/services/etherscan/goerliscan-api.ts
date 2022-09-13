@@ -1,11 +1,14 @@
-import { injectable } from 'inversify';
-import axios from 'axios';
+import { inject, injectable } from 'inversify';
 import { getEthBalance, getBalanceOfToken, getTransactionCount, getTokenMetadata, getTransactionData } from './web3';
+import { IDS } from '../../types/index';
+import { Axios, AxiosResponse } from 'axios';
 
 const API_URL = `https://api-goerli.etherscan.io/api`;
 
 @injectable()
 export class GoerliScanApi {
+    @inject(IDS.NODE_MODULES.axios) _axios:Axios
+    @inject(IDS.CONFIG.GoerliApiKey) _apiKey:string
 
     async setBalanceToToken(token, address, tokenAddress, decimals) {
         try {
@@ -38,9 +41,13 @@ export class GoerliScanApi {
     }
 
     async getTokensUsedByAddress(address) {
-        const { data: { result } } = await axios.get(`${API_URL}?module=account&action=tokentx&address=${address}&page=1&offset=100&startblock=0&endblock=999999999999999999999&sort=asc&apikey=YourApiKeyToken`);
+        const response = await this._axios.get(`${API_URL}?module=account&action=tokentx&address=${address}&page=1&offset=100&startblock=0&endblock=999999999999999999999&sort=asc&apikey=${this._apiKey}`);
+        
+        this._validateResponse(response)
+
         const addresses = {};
-        for (const item of result) {
+
+        for (const item of response.data.result) {
             addresses[item.contractAddress] = {
                 address: item.contractAddress,
                 name: item.tokenName,
@@ -51,19 +58,31 @@ export class GoerliScanApi {
         return Object.values(addresses);
     }
 
-    async getWalletAllTransactions(address: string, pageSize: number, beforeHash?: string) {
-        const { data: { result } } = await axios.get(`${API_URL}?module=account&action=txlist&address=${address}&page=1&offset=${pageSize || 10}&startblock=0&endblock=999999999999999999999&sort=asc&apikey=YourApiKeyToken`);
+    async getWalletAllTransactions(address: string, page: number, pageSize: number) {
+        const response = await this._axios.get(`${API_URL}?module=account&action=txlist&address=${address}&page=${page}&offset=${pageSize}&startblock=0&endblock=999999999999999999999&sort=asc&apikey=${this._apiKey}`);
+        
+        this._validateResponse(response)
+
         const txCount = await getTransactionCount(address);
         return {
             count: txCount,
-            transactions: result,
-            beforeHash
+            transactions: response.data.result
         };
     }
 
     async getNftTransactionsByAddress(address) {
-        const { data: { result } } = await axios.get(`${API_URL}?module=account&action=tokennfttx&address=${address}&page=1&offset=100&startblock=0&endblock=99999999&sort=desc&apikey=YourApiKeyToken`);
-        return result;
+        const url = `${API_URL}?module=account&action=tokennfttx&address=${address}&page=1&offset=100&startblock=0&endblock=99999999&sort=desc&apikey=${this._apiKey}`
+        const response = await this._axios.get(url);
+        
+        this._validateResponse(response)
+
+        return response.data.result;
+    }
+
+    _validateResponse(response:AxiosResponse<any,any>){
+        if(response.data.status == '0' && response.data.message === 'NOTOK'){
+            throw new Error('Failed to call goerli api: ' + response.data.result)
+        }
     }
 
     async nftAsyncResolver(data: any) {
@@ -102,10 +121,13 @@ export class GoerliScanApi {
     }
 
     async getTokenTransfers(address: string, pageSize: number, beforeHash?: string) {
-        const { data: { result } } = await axios.get(`${API_URL}?module=account&action=tokentx&address=${address}&page=1&offset=${pageSize || 10}&startblock=0&endblock=99999999&sort=desc&apikey=YourApiKeyToken`);
+        const response = await this._axios.get(`${API_URL}?module=account&action=tokentx&address=${address}&page=1&offset=${pageSize || 10}&startblock=0&endblock=99999999&sort=desc&apikey=${this._apiKey}`);
+
+        this._validateResponse(response)
+
         const list: any = [];
-        for (let i = 0; i < result.length; i++) {
-            const data = result[i];
+        for (let i = 0; i < response.data.result.length; i++) {
+            const data = response.data.result[i];
             const item: any = {
                 name: data.tokenName,
                 from: data.from,

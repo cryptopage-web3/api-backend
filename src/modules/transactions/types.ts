@@ -16,7 +16,7 @@ export interface ITransactionManager {
 export interface ITransactionsPagination {
     tx?: number,
     erc20?: number,
-    page?:number,
+    page:number,
     pageSize: number,
     fingerprint?: string,
     beforeHash?: string

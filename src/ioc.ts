@@ -64,6 +64,7 @@ container.bind(IDS.SERVICE.WEB3.Web3Manager)
 
 
 container.bind(IDS.CONFIG.EtherscanApiKey).toConstantValue(envToString('ETHERSCAN_API_KEY'))
+container.bind(IDS.CONFIG.GoerliApiKey).toConstantValue(envToString('GOERLI_API_KEY'))
 
 container.bind(IDS.CACHE.PriceCache).to(PriceCache)
 

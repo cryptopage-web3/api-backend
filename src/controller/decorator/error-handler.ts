@@ -9,7 +9,10 @@ export function errorHandler(){
             try {
                 return await originalMethod.apply(this, args)
             } catch (error) {
-                console.error('Failed to call controller:', error)
+                if(process.env.NODE_ENV !== 'test'){
+                    console.error('Failed to call controller:', error)
+                }
+                
                 const message = error instanceof ApiError ? error.message : 'Unexpected error'
                 args[args.length - 2].status(500).json({message})
             }

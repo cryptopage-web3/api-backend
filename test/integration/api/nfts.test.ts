@@ -3,7 +3,7 @@ import { agent } from "supertest";
 import { container } from '../../../src/ioc';
 import { Axios } from 'axios';
 import { IDS } from '../../../src/types/index';
-import { unmarshalEthNftsResponse, unmarshalNftTransactionsEmptyResponse, unmarshalEthNftTransactionsResponse, unmarshalMaticNftsResponse, unmarshalBscNtsResponse, unmarshalNtsEmptyResponse, unmarshalMaticNftTransactionsResponse, unmarshalBscNfttransactionsResponse, unmarshalEthNftDetailsResponse, unmarshalMaticNftDetailsResponse, unmarshalBscNftDetailsResponse } from './nfts-response';
+import { unmarshalEthNftsResponse, unmarshalNftTransactionsEmptyResponse, unmarshalEthNftTransactionsResponse, unmarshalMaticNftsResponse, unmarshalBscNtsResponse, unmarshalNtsEmptyResponse, unmarshalMaticNftTransactionsResponse, unmarshalBscNfttransactionsResponse, unmarshalEthNftDetailsResponse, unmarshalMaticNftDetailsResponse, unmarshalBscNftDetailsResponse, goerlyErrorResponse } from './nfts-response';
 import Sinon, { SinonStub } from 'sinon';
 import { expect } from 'chai';
 import { NftTokenDetails } from '../../../src/orm/model/nft-token-details';
@@ -130,6 +130,19 @@ describe('test nfts api endpoints', ()=>{
             expect(Array.isArray(response.body.list)).to.eq(true)
             expect(response.body.count).to.eq(0)
             expect(response.body.list.length).to.eq(0)
+
+            expect(axiosGetStub.calledOnce).to.eq(true)
+    })
+
+    it.only('should not fall when api key limit reached, goerli nfts', async () => {
+        axiosGetStub
+            .resolves({data: goerlyErrorResponse})
+
+        const response = await testAgent
+            .get('/nfts/goerli/0x2465176C461AfB316ebc773C61fAEe85A6515DAA')
+            .expect('Content-Type',/json/)
+
+            expect(response.body.message).to.be.eq('Unexpected error')
 
             expect(axiosGetStub.calledOnce).to.eq(true)
     })
