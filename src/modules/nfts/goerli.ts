@@ -4,16 +4,16 @@ import { GoerliScanApi } from './../../services/etherscan/goerliscan-api';
 import { ChainId } from "modules/transactions/types";
 import { IDS } from '../../types/index';
 import { IGoerliNftTransaction } from '../../services/etherscan/types';
+import { IWeb3Manager } from '../../services/web3/types';
+import { NftCache } from './NftCache';
 
 @injectable()
 export class GoerliScanNFTsManager implements INftsManager {
     @inject(IDS.SERVICE.GoerliScanApi) _goerli:GoerliScanApi
+    @inject(IDS.SERVICE.WEB3.Web3Manager) private _web3Manager: IWeb3Manager
+    @inject(IDS.MODULES.NftCache) _nftCache: NftCache
 
     _chain: ChainId;
-
-    getNftTransactionDetails(contractAddress: string, tokenId: string, blockNumber: number) {
-        throw new Error("Method not implemented.");
-    }
 
     async getWalletAllNFTs(address, page, pageSize):Promise<INftsList> {
         const list = await this._goerli.getNftTransfers(address);
@@ -39,5 +39,16 @@ export class GoerliScanNFTsManager implements INftsManager {
             to: data.to,
             from: data.from
         }
+    }
+
+    getNftTransactionDetails(contractAddress: string, tokenId: string, blockNumber: number) {
+        return this._nftCache.getNftTransactionDetails(
+            this._web3Manager,
+            this._chain,
+            contractAddress,
+            tokenId,
+            blockNumber,
+            ()=> this._web3Manager.getTokenData(contractAddress, tokenId)
+        )
     }
 }

@@ -7,6 +7,7 @@ export type NftTokenDetailsInferAttr = InferAttributes<NftTokenDetails>
 export class NftTokenDetails extends Model<NftTokenDetailsInferAttr, InferCreationAttributes<NftTokenDetails>> {
     declare tokenId: string
     declare chain: string
+    declare contractAddress: string
     declare name: string
     declare type: string
     declare description: string
@@ -16,7 +17,8 @@ export class NftTokenDetails extends Model<NftTokenDetailsInferAttr, InferCreati
 
 NftTokenDetails.init({
     tokenId: DataTypes.STRING(255),
-    chain: DataTypes.ENUM(ChainId.eth, ChainId.bsc, ChainId.matic, ChainId.sol, ChainId.tron),
+    chain: DataTypes.ENUM(ChainId.eth, ChainId.bsc, ChainId.matic, ChainId.sol, ChainId.tron, ChainId.goerli),
+    contractAddress: DataTypes.STRING(255),
     name: DataTypes.STRING(255),
     type: DataTypes.STRING(100),
     description: DataTypes.STRING(2000),

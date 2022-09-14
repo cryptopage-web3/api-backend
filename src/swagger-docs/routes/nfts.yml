@@ -62,7 +62,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [eth, bsc, matic]
+            enum: [eth, bsc, matic,goerli]
             default: eth
           description: chain name
         - in: path

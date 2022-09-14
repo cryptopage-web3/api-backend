@@ -12,6 +12,7 @@ export const IDS = {
         TransactionManagerFactory: Symbol('TransactionManagerFactory'),
         NftsManager: Symbol('NftsManager'),
         NftsManagerFactory: Symbol('NftsManagerFactory'),
+        NftCache: Symbol('NftsCache'),
         TokenManager: Symbol('TokenManager'),
         TokenManagerFactory: Symbol('TokenManagerFactory'),
     },

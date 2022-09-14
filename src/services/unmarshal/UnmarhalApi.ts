@@ -8,6 +8,7 @@ import { INftItem, INftsList } from '../../modules/nfts/types';
 import { IUnmarshanNftItem, IUnmarshalNftResponse, UnmarshalNftDetails, IUnmarshalNtfTxsResponse } from './types';
 import { UnmarshalApiHelper } from './helper';
 import { PriceCache } from '../../cache/coins';
+import { normalizeUrl } from '../../util/url-util';
 
 @injectable()
 export class UnmarshalApi {
@@ -226,8 +227,8 @@ export class UnmarshalApi {
             description: item.description,
             type: item.type,
             usdPrice: Number(item.price),
-            url: this._helper.normalizeUrl(item.external_link),
-            image: this._helper.normalizeUrl(item.issuer_specific_data.image_url),
+            url: normalizeUrl(item.external_link),
+            image: normalizeUrl(item.issuer_specific_data.image_url),
             contract_address: item.asset_contract,
             tokenId: item.token_id,
             attributes: item.nft_metadata
@@ -264,7 +265,7 @@ export class UnmarshalApi {
         const { data } = await this._axios.get(apiUrl);
         const info = data.nft_token_details[0];
 
-        const url = this._helper.normalizeUrl(info.image_url)
+        const url = normalizeUrl(info.image_url)
 
         const type = await this._helper.getType(url).catch(err =>{
             console.error(`failed to get nft content type:, ${url}`, err)

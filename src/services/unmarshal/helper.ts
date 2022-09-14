@@ -5,6 +5,7 @@ import { Axios } from 'axios';
 const InputDataDecoder = require('ethereum-input-data-decoder');
 import Web3 from 'web3';
 import * as abi from './erc20.json';
+import { normalizeUrl } from '../../util/url-util';
 
 const typeList = ['image', 'audio', 'video'];
 const types = { '.jpg': 'image', '.png': 'image', '.gif': 'image', '.jpeg': 'image', '.webp': 'image', '.mp4': 'video', '.mp3': 'audio' };
@@ -12,17 +13,6 @@ const types = { '.jpg': 'image', '.png': 'image', '.gif': 'image', '.jpeg': 'ima
 @injectable()
 export class UnmarshalApiHelper {
     @inject(IDS.NODE_MODULES.axios) _axios: Axios
-
-    normalizeUrl(url) {
-        if (!url) return;
-        if (url.startsWith('ipfs://ipfs/')) {
-            return url.replace('ipfs://', 'https://ipfs.io/')
-        } else if (url.startsWith('ipfs://')) {
-            return url.replace('ipfs://', 'https://ipfs.io/ipfs/')
-        } else {
-            return url;
-        }
-    }
     
     async getType(link) {
         if (!link) return;
@@ -47,7 +37,7 @@ export class UnmarshalApiHelper {
     }
     
     async getDataFromUrl(link) {
-        const url = this.normalizeUrl(link);
+        const url = normalizeUrl(link);
         const type = await this.getType(url);
         return { url, type }
     }

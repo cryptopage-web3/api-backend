@@ -33,6 +33,7 @@ import Web3 from 'web3';
 import { getChainRpc } from './enums/chains';
 import { EthWeb3Manager } from './services/web3/eth-web3-manager';
 import { DefaultWebManager } from './services/web3/default-web3-manager';
+import { NftCache } from './modules/nfts/NftCache';
 
 export const container = new Container();
 
@@ -49,6 +50,9 @@ container.bind(IDS.SERVICE.WEB3.Web3Manager)
     .inSingletonScope().whenParentNamed(ChainId.eth)
 container.bind(IDS.SERVICE.WEB3.Web3Manager)
     .to(EthWeb3Manager)
+    .inSingletonScope().whenParentNamed(ChainId.goerli)
+container.bind(IDS.SERVICE.WEB3.Web3Manager)
+    .to(EthWeb3Manager)
     .inSingletonScope().whenParentNamed(ChainId.matic)
 container.bind(IDS.SERVICE.WEB3.Web3Manager)
     .to(EthWeb3Manager)
@@ -57,7 +61,7 @@ container.bind(IDS.SERVICE.WEB3.Web3Manager)
 container.bind(IDS.SERVICE.WEB3.Web3Manager)
     .to(DefaultWebManager).when((request)=> {
         const name = request.parentRequest?.target.getNamedTag()?.value as any
-        const implementedChains = [ChainId.eth, ChainId.bsc, ChainId.matic]
+        const implementedChains = [ChainId.eth, ChainId.bsc, ChainId.matic,ChainId.goerli]
         
         return implementedChains.indexOf(name) === -1
     })
@@ -84,6 +88,8 @@ container.bind(IDS.SERVICE.UnmarshalApi).to(UnmarshalApi).onActivation((context,
 container.bind(IDS.SERVICE.UnmarshalApiHelper).to(UnmarshalApiHelper)
 container.bind(IDS.SERVICE.CovalentApi).to(CovalentApi)
 container.bind(IDS.SERVICE.TronscanApi).to(TronscanTokenManager)
+
+container.bind(IDS.MODULES.NftCache).to(NftCache)
 
 container.bind(IDS.MODULES.TransactionManager)
     .to(EthTransactionManager).inSingletonScope()
@@ -117,7 +123,7 @@ function nftManagerDecorator(context: interfaces.Context, instance:INftsManager)
 }
 
 
-    container.bind(IDS.MODULES.NftsManager)
+container.bind(IDS.MODULES.NftsManager)
     .to(UnmarshalNftsManager).inSingletonScope()
     .whenTargetNamed(ChainId.bsc)
     .onActivation(nftManagerDecorator)
@@ -132,6 +138,7 @@ container.bind(IDS.MODULES.NftsManager)
 container.bind(IDS.MODULES.NftsManager)
     .to(GoerliScanNFTsManager).inSingletonScope()
     .whenTargetNamed(ChainId.goerli)
+    .onActivation(nftManagerDecorator)
 container.bind(IDS.MODULES.NftsManagerFactory)
     .toAutoNamedFactory(IDS.MODULES.NftsManager)
 

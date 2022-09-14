@@ -64,3 +64,14 @@ export interface INftTxList {
     list: INftTransaction[]
     count: number
 }
+
+export interface NftTokenData {
+    url: string,
+    type: string,
+    name: string,
+    price: string,
+    description: string,
+    attributes: any[]
+}
+
+export type GetTokenFromApiCallback = () => Promise<NftTokenData>
