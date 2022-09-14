@@ -2,6 +2,7 @@ import { inject, injectable } from 'inversify';
 import { getEthBalance, getBalanceOfToken, getTransactionCount, getTokenMetadata, getTransactionData } from './web3';
 import { IDS } from '../../types/index';
 import { Axios, AxiosResponse } from 'axios';
+import { IGoerliNftTransaction } from './types';
 
 const API_URL = `https://api-goerli.etherscan.io/api`;
 
@@ -70,8 +71,8 @@ export class GoerliScanApi {
         };
     }
 
-    async getNftTransactionsByAddress(address) {
-        const url = `${API_URL}?module=account&action=tokennfttx&address=${address}&page=1&offset=100&startblock=0&endblock=99999999&sort=desc&apikey=${this._apiKey}`
+    async getNftTransactionsByAddress(address: string, page: number, pageSize: number):Promise<IGoerliNftTransaction[]> {
+        const url = `${API_URL}?module=account&action=tokennfttx&address=${address}&page=${page}&offset=${pageSize}&startblock=0&endblock=99999999&sort=desc&apikey=${this._apiKey}`
         const response = await this._axios.get(url);
         
         this._validateResponse(response)
@@ -111,7 +112,7 @@ export class GoerliScanApi {
     }
 
     async getNftTransfers(address: string) {
-        const nfts = await this.getNftTransactionsByAddress(address);
+        const nfts = await this.getNftTransactionsByAddress(address,1,100)
         const promises: any = [];
         for (let i = 0; i < nfts.length; i++) {
             promises.push(this.nftAsyncResolver(nfts[i]));
