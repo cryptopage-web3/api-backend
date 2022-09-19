@@ -2,7 +2,7 @@ import { InversifyExpressServer } from 'inversify-express-utils';
 import { agent } from "supertest";
 import { container } from '../../../src/ioc';
 import { Axios } from 'axios';
-import { etherscanTransactionsResponse, etherscanErc20TransactionsResponse, unmarshalBscTransactionsResponse, solscanTransactionsResponse, trongridTransactionsResponse, unmarshalEmptyResponse } from './transactions-response';
+import { etherscanTransactionsResponse, etherscanErc20TransactionsResponse, unmarshalBscTransactionsResponse, solscanTransactionsResponse, trongridTransactionsResponse, unmarshalEmptyResponse, goerliTransactionsResponse } from './transactions-response';
 import { IDS } from '../../../src/types/index';
 import { unmarshalPolygonTransactionResponse } from './transactions-response';
 import Sinon, { SinonStub } from 'sinon';
@@ -33,6 +33,21 @@ describe('test get transactions list', ()=>{
         expect(response.body.transactions.length).to.eq(10)
 
         expect(axiosGetStub.callCount).to.eq(3)
+    })
+
+    it('should return goerli transactions list', async ()=>{
+        axiosGetStub
+            .onCall(0).resolves({data: goerliTransactionsResponse})
+            
+        const response = await testAgent
+            .get('/transactions/goerli/0x222b03f14db34e6c5ab5653fb7b12ac01326e648?pageSize=10')
+            .expect('Content-Type',/json/)
+
+        expect(response.body.count).to.be.undefined
+        expect(response.body.transactions).to.be.an('array')
+        expect(response.body.transactions.length).to.eq(1)
+
+        expect(axiosGetStub.callCount).to.eq(1)
     })
 
     it('should return polygon transactions list', async () => {

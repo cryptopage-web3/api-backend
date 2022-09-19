@@ -60,13 +60,12 @@ export class GoerliScanApi {
     }
 
     async getWalletAllTransactions(address: string, page: number, pageSize: number) {
-        const response = await this._axios.get(`${API_URL}?module=account&action=txlist&address=${address}&page=${page}&offset=${pageSize}&startblock=0&endblock=999999999999999999999&sort=asc&apikey=${this._apiKey}`);
+        const url = `${API_URL}?module=account&action=txlist&address=${address}&page=${page}&offset=${pageSize}&startblock=0&endblock=999999999999999999999&sort=asc&apikey=${this._apiKey}`
+        const response = await this._axios.get(url);
         
         this._validateResponse(response)
 
-        const txCount = await getTransactionCount(address);
         return {
-            count: txCount,
             transactions: response.data.result
         };
     }

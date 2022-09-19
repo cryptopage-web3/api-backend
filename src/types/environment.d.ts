@@ -17,6 +17,8 @@ export interface Env {
     GOERLI_API_KEY: string
 
     SWAGGER_LOCAL_SERVER_FIRST: string | undefined
+
+    PREVENT_LOG_CONTROLLER_ERRORS: 'yes' | undefined
 }
 
 export type EnvVarName = keyof Env

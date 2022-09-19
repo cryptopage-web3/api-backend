@@ -138,16 +138,40 @@ describe('test nfts api endpoints', ()=>{
         axiosGetStub
             .resolves({data: goerlyErrorResponse})
 
+        process.env.PREVENT_LOG_CONTROLLER_ERRORS = 'yes'
+
         const response = await testAgent
             .get('/nfts/goerli/0x2465176C461AfB316ebc773C61fAEe85A6515DAA')
             .expect('Content-Type',/json/)
 
-            expect(response.body.message).to.be.eq('Unexpected error')
+        process.env.PREVENT_LOG_CONTROLLER_ERRORS = undefined
 
-            expect(axiosGetStub.calledOnce).to.eq(true)
+        expect(response.body.message).to.be.eq('Unexpected error')
+
+        expect(axiosGetStub.calledOnce).to.eq(true)
     })
 
     it('should return eth nft transactions', async ()=>{
+        axiosGetStub.resolves({data: unmarshalEthNftTransactionsResponse})
+
+        const response = await testAgent
+            .get('/nfts/transactions/eth/0x2aDe7E7ed11a4E35C2dDCCB6189d4fE710A165f5')
+            .expect('Content-Type',/json/)
+
+        expect(Array.isArray(response.body.list)).to.eq(true)
+        expect(response.body.count).to.eq(24)
+        expect(response.body.list.length).to.eq(10)
+        expect(response.body.list[0]).to.contain(({
+            from: '0xb000953624c10427ad028510cf3249388ffdf310',
+            to: '0xb29c388e3fd63e1050ac5e4ca1d046dca36f004c',
+            blockNumber: 15300497,
+            tokenId: '86322540947695616051707333350443506684962566151002367173878109827558281315304'
+        }))
+
+        expect(axiosGetStub.calledOnce).to.eq(true)
+    })
+
+    it('should return goerli nft transactions', async ()=>{
         axiosGetStub.resolves({data: unmarshalEthNftTransactionsResponse})
 
         const response = await testAgent
