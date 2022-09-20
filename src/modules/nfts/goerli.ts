@@ -24,8 +24,7 @@ export class GoerliScanNFTsManager implements INftsManager {
     async getWalletNFTTransactions(address: string, page: number, pageSize: number) {
         const list = await this._goerli.getNftTransactionsByAddress(address, page, pageSize);
         return { 
-            list:list.map(t => this._normalizeNftTransaction(t)),
-            count: list.length 
+            list:list.map(t => this._normalizeNftTransaction(t))
         };
     }
 

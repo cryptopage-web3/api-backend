@@ -3,7 +3,7 @@ import { agent } from "supertest";
 import { container } from '../../../src/ioc';
 import { Axios } from 'axios';
 import { IDS } from '../../../src/types/index';
-import { unmarshalEthNftsResponse, unmarshalNftTransactionsEmptyResponse, unmarshalEthNftTransactionsResponse, unmarshalMaticNftsResponse, unmarshalBscNtsResponse, unmarshalNtsEmptyResponse, unmarshalMaticNftTransactionsResponse, unmarshalBscNfttransactionsResponse, unmarshalEthNftDetailsResponse, unmarshalMaticNftDetailsResponse, unmarshalBscNftDetailsResponse, goerlyErrorResponse } from './nfts-response';
+import { unmarshalEthNftsResponse, unmarshalNftTransactionsEmptyResponse, unmarshalEthNftTransactionsResponse, unmarshalMaticNftsResponse, unmarshalBscNtsResponse, unmarshalNtsEmptyResponse, unmarshalMaticNftTransactionsResponse, unmarshalBscNfttransactionsResponse, unmarshalEthNftDetailsResponse, unmarshalMaticNftDetailsResponse, unmarshalBscNftDetailsResponse, goerlyErrorResponse, goerliNftTransactionsResponse } from './nfts-response';
 import Sinon, { SinonStub } from 'sinon';
 import { expect } from 'chai';
 import { NftTokenDetails } from '../../../src/orm/model/nft-token-details';
@@ -172,20 +172,20 @@ describe('test nfts api endpoints', ()=>{
     })
 
     it('should return goerli nft transactions', async ()=>{
-        axiosGetStub.resolves({data: unmarshalEthNftTransactionsResponse})
+        axiosGetStub.resolves({data: goerliNftTransactionsResponse})
 
         const response = await testAgent
-            .get('/nfts/transactions/eth/0x2aDe7E7ed11a4E35C2dDCCB6189d4fE710A165f5')
+            .get('/nfts/transactions/goerli/0x2aDe7E7ed11a4E35C2dDCCB6189d4fE710A165f5')
             .expect('Content-Type',/json/)
 
-        expect(Array.isArray(response.body.list)).to.eq(true)
-        expect(response.body.count).to.eq(24)
-        expect(response.body.list.length).to.eq(10)
+        expect(response.body.list).to.be.an('array')
+        expect(response.body.count).to.be.undefined
+        expect(response.body.list.length).to.eq(5)
         expect(response.body.list[0]).to.contain(({
-            from: '0xb000953624c10427ad028510cf3249388ffdf310',
-            to: '0xb29c388e3fd63e1050ac5e4ca1d046dca36f004c',
-            blockNumber: 15300497,
-            tokenId: '86322540947695616051707333350443506684962566151002367173878109827558281315304'
+            from: '0x0000000000000000000000000000000000000000',
+            to: '0x7ee2bbc5d5004683ed84035591582be1fc4953f5',
+            blockNumber: 7626116,
+            tokenId: '37'
         }))
 
         expect(axiosGetStub.calledOnce).to.eq(true)
