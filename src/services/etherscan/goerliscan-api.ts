@@ -60,7 +60,7 @@ export class GoerliScanApi {
     }
 
     async getWalletAllTransactions(address: string, page: number, pageSize: number) {
-        const url = `${API_URL}?module=account&action=txlist&address=${address}&page=${page}&offset=${pageSize}&startblock=0&endblock=999999999999999999999&sort=asc&apikey=${this._apiKey}`
+        const url = `${API_URL}?module=account&action=txlist&address=${address}&page=${page}&offset=${pageSize}&startblock=0&endblock=999999999999999999999&sort=desc&apikey=${this._apiKey}`
         const response = await this._axios.get(url);
         
         this._validateResponse(response)
