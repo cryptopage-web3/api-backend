@@ -31,6 +31,9 @@ describe('test get transactions list', ()=>{
         expect(response.body.count).to.eq(1074)
         expect(Array.isArray(response.body.transactions)).to.eq(true)
         expect(response.body.transactions.length).to.eq(10)
+        expect(response.body.transactions[0]).to.contain({
+            date: "2022-08-02T00:18:27.000Z"
+        })
 
         expect(axiosGetStub.callCount).to.eq(3)
     })
@@ -46,6 +49,9 @@ describe('test get transactions list', ()=>{
         expect(response.body.count).to.be.undefined
         expect(response.body.transactions).to.be.an('array')
         expect(response.body.transactions.length).to.eq(1)
+        expect(response.body.transactions[0]).to.contain({
+            date: "2022-09-19T05:50:24.000Z"
+        })
 
         expect(axiosGetStub.callCount).to.eq(1)
     })
