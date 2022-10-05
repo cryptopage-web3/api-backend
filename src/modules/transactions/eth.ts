@@ -26,9 +26,9 @@ export class EthTransactionManager implements ITransactionManager {
 
         await Promise.all([
             this._etherscan.getTransactions(address, txPaginator.page, txPaginator.limit)
-                .then(txs => {transactions = txs.map(r => this.mapTransactionType(r,Etherscan.TransactionType.normal))}),
+                .then(txs => {transactions = txs.map(r => this.normalizeTransaction(r,Etherscan.TransactionType.normal))}),
             this._etherscan.getErc20Trnsactions(address, erc20Paginator.page, erc20Paginator.limit)
-                .then(txs => {erc20Transactions = txs.map(r => this.mapTransactionType(r, Etherscan.TransactionType.erc20))}),
+                .then(txs => {erc20Transactions = txs.map(r => this.normalizeTransaction(r, Etherscan.TransactionType.erc20))}),
             this.getTransactionsCount(address)
                 .then(cnt => { count = cnt })
                 .catch(err => { console.error('Failed to get transactions count', address, err.message)})
@@ -61,8 +61,8 @@ export class EthTransactionManager implements ITransactionManager {
         }
     }
 
-    private mapTransactionType(txData, transactionType:Etherscan.TransactionType){
-        return Object.assign({}, txData, {transactionType})
+    private normalizeTransaction(txData, transactionType:Etherscan.TransactionType){
+        return Object.assign({}, txData, {transactionType, date: new Date(txData.timeStamp * 1000)})
     }
 
     private continuePaginate<T>(items: T[], pageSize:number, globalOffset: number): T[]{
