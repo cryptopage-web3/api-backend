@@ -35,6 +35,25 @@ paths:
                   $ref: '#/responses/examples/EthTransactionExample'
         "400":
           $ref: '#/components/responses/NotFound'
+  /transactions/goerli/{address}:
+    get:
+      summary: Get paginated goerli transactions from address.
+      description: Get goerli transactions from address.
+      tags: [Transactions]
+      parameters:
+        - $ref: '#/parameters/path/address'
+        - $ref: '#/parameters/pagination/page'
+        - $ref: '#/parameters/pagination/pageSize'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                GoerliTransactionsExample:
+                  $ref: '#/responses/examples/GoerliTransactionExample'
+        "400":
+          $ref: '#/responses/PaginationError'
   /transactions/tron/{address}:
     get:
       summary: Get paginated tron transactions from address.
@@ -97,7 +116,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [bsc, matic, goerli]
+            enum: [bsc, matic]
             default: eth
           description: chain name
         - $ref: '#/parameters/path/address'

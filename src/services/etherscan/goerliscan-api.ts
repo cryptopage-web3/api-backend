@@ -2,7 +2,7 @@ import { inject, injectable } from 'inversify';
 import { getEthBalance, getBalanceOfToken, getTransactionCount, getTokenMetadata, getTransactionData } from './web3';
 import { IDS } from '../../types/index';
 import { Axios, AxiosResponse } from 'axios';
-import { IGoerliNftTransaction } from './types';
+import { IGoerliNftTransaction, IGoerliTransaction } from './types';
 
 const API_URL = `https://api-goerli.etherscan.io/api`;
 
@@ -59,15 +59,13 @@ export class GoerliScanApi {
         return Object.values(addresses);
     }
 
-    async getWalletAllTransactions(address: string, page: number, pageSize: number) {
+    async getWalletAllTransactions(address: string, page: number, pageSize: number):Promise<IGoerliTransaction[]> {
         const url = `${API_URL}?module=account&action=txlist&address=${address}&page=${page}&offset=${pageSize}&startblock=0&endblock=999999999999999999999&sort=desc&apikey=${this._apiKey}`
         const response = await this._axios.get(url);
         
         this._validateResponse(response)
 
-        return {
-            transactions: response.data.result
-        };
+        return response.data.result
     }
 
     async getNftTransactionsByAddress(address: string, page: number, pageSize: number):Promise<IGoerliNftTransaction[]> {
