@@ -4,6 +4,7 @@ import { IDS } from '../../types/index';
 import { Axios, AxiosResponse } from 'axios';
 import { IGoerliNftTransaction, IGoerliTransaction } from './types';
 import { IWeb3Manager } from '../web3/types';
+import { ISocialSmartContract } from '../social-smart-contract/types';
 
 const API_URL = `https://api-goerli.etherscan.io/api`;
 
@@ -12,6 +13,7 @@ export class GoerliScanApi {
     @inject(IDS.NODE_MODULES.axios) _axios:Axios
     @inject(IDS.CONFIG.GoerliApiKey) _apiKey:string
     @inject(IDS.SERVICE.WEB3.Web3Manager) private _web3Manager: IWeb3Manager
+    @inject(IDS.SERVICE.SocialSmartContract) private _socialSmartContract: ISocialSmartContract
 
     async setBalanceToToken(token, address, tokenAddress, decimals) {
         try {
@@ -85,26 +87,27 @@ export class GoerliScanApi {
         }
     }
 
-    async nftAsyncResolver(data: any) {
+    async nftAsyncResolver(data: IGoerliNftTransaction) {
         const metadata = await this._web3Manager.getTokenData(data.contractAddress, data.tokenID)
+        const comments = await this._socialSmartContract.getCommentCount(data.tokenID)
         const item = {
             from: data.from,
             to: data.to,
             likes: 0,
             dislikes: 0,
-            comments: 0,
-            date: new Date(data.timeStamp * 1000),
+            comments,
+            date: new Date( parseInt(data.timeStamp) * 1000),
             name: data.tokenName,
             collectionName: data.tokenName,
             symbol: data.tokenSymbol,
-            type: data.type || '721',
+            type: metadata?.type || '721',
             usdPrice: 0,
             txHash: data.hash,
             contract_address: data.contractAddress,
             tokenId: data.tokenID,
             description: metadata.description,
             url: metadata.url,
-            image: metadata.url,
+            //image: metadata.url,
             attributes: metadata.attributes
         }
         return item;
