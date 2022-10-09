@@ -1,26 +1,27 @@
 import { inject, injectable } from "inversify";
 import { IDS } from '../../types/index';
 import { NftTokenDetailsRepo } from '../../orm/repo/nft-token-details-repo';
-import { ContractDetailsRepo } from '../../orm/repo/contract-details-repo';
 import { IWeb3Manager } from '../../services/web3/types';
 import { ChainId } from '../transactions/types';
-import { ContractDetailsInferAttr } from '../../orm/model/contract-detail';
+
 import { GetTokenFromApiCallback } from './types';
+import { ISocialSmartContract } from '../../services/social-smart-contract/types';
 
 @injectable()
 export class NftCache {
     @inject(IDS.ORM.REPO.NftTokenDetailsRepo) private _nftTokenRepo: NftTokenDetailsRepo
-    @inject(IDS.ORM.REPO.ContractDetailsRepo) private _contractsRepo: ContractDetailsRepo
+    @inject(IDS.SERVICE.SocialSmartContract) private _socialSmartContract: ISocialSmartContract
 
     async getNftTransactionDetails(web3Manager:IWeb3Manager,chain:ChainId, contractAddress: string, tokenId: string, blockNumber:number,getTokenFromApi: GetTokenFromApiCallback) {
-        const [tokenDetails, blockDate] = await Promise.all([
+        const [tokenDetails, blockDate, comments] = await Promise.all([
             this._getTokenDetails(chain, contractAddress, tokenId, getTokenFromApi),
-            web3Manager.getDateFromBlock(blockNumber)
+            web3Manager.getDateFromBlock(blockNumber),
+            this._socialSmartContract.getCommentCount(tokenId)
         ])
 
         return Object.assign({},
             tokenDetails,
-            {date: blockDate}
+            {date: blockDate, comments}
         )
     }
 

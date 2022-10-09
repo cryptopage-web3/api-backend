@@ -3,6 +3,7 @@ import { getEthBalance, getBalanceOfToken, getTransactionCount, getTokenMetadata
 import { IDS } from '../../types/index';
 import { Axios, AxiosResponse } from 'axios';
 import { IGoerliNftTransaction, IGoerliTransaction } from './types';
+import { IWeb3Manager } from '../web3/types';
 
 const API_URL = `https://api-goerli.etherscan.io/api`;
 
@@ -10,6 +11,7 @@ const API_URL = `https://api-goerli.etherscan.io/api`;
 export class GoerliScanApi {
     @inject(IDS.NODE_MODULES.axios) _axios:Axios
     @inject(IDS.CONFIG.GoerliApiKey) _apiKey:string
+    @inject(IDS.SERVICE.WEB3.Web3Manager) private _web3Manager: IWeb3Manager
 
     async setBalanceToToken(token, address, tokenAddress, decimals) {
         try {
@@ -84,7 +86,7 @@ export class GoerliScanApi {
     }
 
     async nftAsyncResolver(data: any) {
-        const metadata = await getTokenMetadata(data.contractAddress, data.tokenID)
+        const metadata = await this._web3Manager.getTokenData(data.contractAddress, data.tokenID)
         const item = {
             from: data.from,
             to: data.to,
@@ -101,8 +103,8 @@ export class GoerliScanApi {
             contract_address: data.contractAddress,
             tokenId: data.tokenID,
             description: metadata.description,
-            url: metadata.image,
-            image: metadata.image,
+            url: metadata.url,
+            image: metadata.url,
             attributes: metadata.attributes
         }
         return item;

@@ -34,6 +34,8 @@ import { getChainRpc } from './enums/chains';
 import { EthWeb3Manager } from './services/web3/eth-web3-manager';
 import { DefaultWebManager } from './services/web3/default-web3-manager';
 import { NftCache } from './modules/nfts/NftCache';
+import { GoerliSocialSmartContract } from './services/social-smart-contract/goerli-social-smart-contract';
+import { DefaultSocialSmartContract } from './services/social-smart-contract/default-social-smart-contract';
 
 export const container = new Container();
 
@@ -47,24 +49,24 @@ container.bind(IDS.NODE_MODULES.web3).toDynamicValue(context => {
 
 container.bind(IDS.SERVICE.WEB3.Web3Manager)
     .to(EthWeb3Manager)
-    .inSingletonScope().whenParentNamed(ChainId.eth)
+    .inSingletonScope().whenAnyAncestorNamed(ChainId.eth)
 container.bind(IDS.SERVICE.WEB3.Web3Manager)
     .to(EthWeb3Manager)
-    .inSingletonScope().whenParentNamed(ChainId.goerli)
+    .inSingletonScope().whenAnyAncestorNamed(ChainId.goerli)
 container.bind(IDS.SERVICE.WEB3.Web3Manager)
     .to(EthWeb3Manager)
-    .inSingletonScope().whenParentNamed(ChainId.matic)
+    .inSingletonScope().whenAnyAncestorNamed(ChainId.matic)
 container.bind(IDS.SERVICE.WEB3.Web3Manager)
     .to(EthWeb3Manager)
-    .inSingletonScope().whenParentNamed(ChainId.bsc)
-    
+    .inSingletonScope().whenAnyAncestorNamed(ChainId.bsc)
+    /*
 container.bind(IDS.SERVICE.WEB3.Web3Manager)
     .to(DefaultWebManager).when((request)=> {
         const name = request.parentRequest?.target.getNamedTag()?.value as any
         const implementedChains = [ChainId.eth, ChainId.bsc, ChainId.matic,ChainId.goerli]
         
         return implementedChains.indexOf(name) === -1
-    })
+    })*/
 
 
 container.bind(IDS.CONFIG.EtherscanApiKey).toConstantValue(envToString('ETHERSCAN_API_KEY'))
@@ -88,6 +90,14 @@ container.bind(IDS.SERVICE.UnmarshalApi).to(UnmarshalApi).onActivation((context,
 container.bind(IDS.SERVICE.UnmarshalApiHelper).to(UnmarshalApiHelper)
 container.bind(IDS.SERVICE.CovalentApi).to(CovalentApi)
 container.bind(IDS.SERVICE.TronscanApi).to(TronscanTokenManager)
+
+container.bind(IDS.SERVICE.SocialSmartContract)
+    .to(GoerliSocialSmartContract)
+    .inSingletonScope()
+    .whenAnyAncestorNamed(ChainId.goerli)
+container.bind(IDS.SERVICE.SocialSmartContract)
+    .to(DefaultSocialSmartContract)
+    .whenNoAncestorNamed(ChainId.goerli)
 
 container.bind(IDS.MODULES.NftCache).to(NftCache)
 

@@ -27,7 +27,9 @@ export const IDS = {
         GoerliScanApi: Symbol('GoerliScanApi'),
         WEB3:{
             Web3Manager: Symbol('Web3Manager'),
-        }
+        },
+        SocialSmartContract: Symbol('SocialSmartContract')
+
     },
     NODE_MODULES:{
         axios: Symbol('axios'),

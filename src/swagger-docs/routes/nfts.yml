@@ -80,3 +80,6 @@ paths:
           required: true
           schema:
             type: number
+      responses:
+        "400":
+          $ref: '#/responses/PaginationError'

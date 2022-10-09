@@ -10,7 +10,7 @@ export function errorHandler(){
                 return await originalMethod.apply(this, args)
             } catch (error) {
                 if(process.env.PREVENT_LOG_CONTROLLER_ERRORS !== 'yes'){
-                    console.error('Failed to call controller:', error)
+                    console.error('Failed to call controller:', args[args.length - 3].originalUrl, error)
                 }
                 
                 const message = error instanceof ApiError ? error.message : 'Unexpected error'
