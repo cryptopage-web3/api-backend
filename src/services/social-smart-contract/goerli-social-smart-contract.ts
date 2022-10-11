@@ -1,9 +1,11 @@
 import { inject, injectable } from "inversify";
-import { ISocialSmartContract } from './types';
+import { ISocialComment, ISocialSmartContract } from './types';
 import { IDS } from '../../types/index';
 import Web3 from 'web3';
+import { goerliSocialAbi } from './goerli-social-abi';
 
 const goerliSocialContractAddress = '0x2d722a9853ac048ce220fadbf3cab45146d76af6';
+
 
 @injectable()
 export class GoerliSocialSmartContract implements ISocialSmartContract{
@@ -18,5 +20,28 @@ export class GoerliSocialSmartContract implements ISocialSmartContract{
         const count = await contract.methods.getCommentCount(tokenId).call();
 
         return parseInt(count)
+    }
+
+    async getComments(tokenId: string): Promise<ISocialComment[]> {
+        const count = await this.getCommentCount(tokenId)
+
+        if(count === 0){
+            return []
+        }
+
+        const comments:ISocialComment[] = [];
+        for(let i = 1; i <= count; i++){
+            comments.push(await this.getCommentFromBlockchain(tokenId, i))
+        }
+
+        return comments
+    }
+
+    async getCommentFromBlockchain(tokenId: string, commentId: number):Promise<ISocialComment>{
+        this._web3.eth.handleRevert = true
+        const contract = new this._web3.eth.Contract(goerliSocialAbi as any[], goerliSocialContractAddress);
+        const comment = await contract.methods.readComment(tokenId, commentId).call();
+
+        return (({ipfsHash, creator, _owner, price, isUp, isDown,isView}) => ({ipfsHash, creator, _owner, price, isUp, isDown,isView}))(comment)
     }
 }

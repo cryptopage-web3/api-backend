@@ -3,8 +3,6 @@ import { getEthBalance, getBalanceOfToken, getTransactionCount, getTokenMetadata
 import { IDS } from '../../types/index';
 import { Axios, AxiosResponse } from 'axios';
 import { IGoerliNftTransaction, IGoerliTransaction } from './types';
-import { IWeb3Manager } from '../web3/types';
-import { ISocialSmartContract } from '../social-smart-contract/types';
 
 const API_URL = `https://api-goerli.etherscan.io/api`;
 
@@ -12,9 +10,7 @@ const API_URL = `https://api-goerli.etherscan.io/api`;
 export class GoerliScanApi {
     @inject(IDS.NODE_MODULES.axios) _axios:Axios
     @inject(IDS.CONFIG.GoerliApiKey) _apiKey:string
-    @inject(IDS.SERVICE.WEB3.Web3Manager) private _web3Manager: IWeb3Manager
-    @inject(IDS.SERVICE.SocialSmartContract) private _socialSmartContract: ISocialSmartContract
-
+    
     async setBalanceToToken(token, address, tokenAddress, decimals) {
         try {
             const balance = await getBalanceOfToken(address, tokenAddress, decimals);
@@ -87,43 +83,7 @@ export class GoerliScanApi {
         }
     }
 
-    async nftAsyncResolver(data: IGoerliNftTransaction) {
-        const metadata = await this._web3Manager.getTokenData(data.contractAddress, data.tokenID)
-        const comments = await this._socialSmartContract.getCommentCount(data.tokenID)
-        const item = {
-            from: data.from,
-            to: data.to,
-            likes: 0,
-            dislikes: 0,
-            comments,
-            date: new Date( parseInt(data.timeStamp) * 1000),
-            name: data.tokenName,
-            collectionName: data.tokenName,
-            symbol: data.tokenSymbol,
-            type: metadata?.type || '721',
-            usdPrice: 0,
-            txHash: data.hash,
-            contract_address: data.contractAddress,
-            tokenId: data.tokenID,
-            description: metadata.description,
-            url: metadata.url,
-            //image: metadata.url,
-            attributes: metadata.attributes
-        }
-        return item;
-    }
-
-    async getNftTransfers(address: string) {
-        const nfts = await this.getNftTransactionsByAddress(address,1,100)
-        const promises: any = [];
-        for (let i = 0; i < nfts.length; i++) {
-            promises.push(this.nftAsyncResolver(nfts[i]));
-        }
-        const list = await Promise.all(promises);
-        return list;
-    }
-
-    async getTokenTransfers(address: string, pageSize: number, beforeHash?: string) {
+    async getTokenTransfers(address: string, pageSize: number) {
         const response = await this._axios.get(`${API_URL}?module=account&action=tokentx&address=${address}&page=1&offset=${pageSize || 10}&startblock=0&endblock=99999999&sort=desc&apikey=${this._apiKey}`);
 
         this._validateResponse(response)

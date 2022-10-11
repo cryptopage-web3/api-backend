@@ -24,7 +24,7 @@ export class GoerliscanTtransactionsManager implements ITransactionManager {
     }
 
     getWalletTokenTransfers(address: string, opts: ITransactionsPagination) {
-        return this._goerliScanApi.getTokenTransfers(address, opts.pageSize, opts.beforeHash)
+        return this._goerliScanApi.getTokenTransfers(address, opts.pageSize)
     }
 
     getTransactionDetails(txHash: string) {

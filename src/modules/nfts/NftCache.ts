@@ -16,7 +16,7 @@ export class NftCache {
         const [tokenDetails, blockDate, comments] = await Promise.all([
             this._getTokenDetails(chain, contractAddress, tokenId, getTokenFromApi),
             web3Manager.getDateFromBlock(blockNumber),
-            this._socialSmartContract.getCommentCount(tokenId)
+            this._socialSmartContract.getComments(tokenId)
         ])
 
         return Object.assign({},
