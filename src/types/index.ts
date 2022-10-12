@@ -1,3 +1,4 @@
+import Web3 from 'web3';
 export const IDS = {
     CONFIG:{
         EtherscanApiKey:Symbol('EtherscanApiKey'),
@@ -27,13 +28,16 @@ export const IDS = {
         GoerliScanApi: Symbol('GoerliScanApi'),
         WEB3:{
             Web3Manager: Symbol('Web3Manager'),
+            EthContract: Symbol('EthContract'),
+            EthContractFactory: Symbol('EthContractFactory'),
         },
         SocialSmartContract: Symbol('SocialSmartContract')
 
     },
     NODE_MODULES:{
         axios: Symbol('axios'),
-        web3: Symbol('web3')
+        web3Factory: Symbol('web3Factory'),
+        web3: Symbol('web3'),
     },
     ORM:{
         REPO:{
