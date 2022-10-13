@@ -1,6 +1,5 @@
 import { InversifyExpressServer } from 'inversify-express-utils';
 import { agent } from "supertest";
-import { container } from '../../../src/ioc';
 import { Axios } from 'axios';
 import { IDS } from '../../../src/types/index';
 import { unmarshalEthNftsResponse, unmarshalNftTransactionsEmptyResponse, unmarshalEthNftTransactionsResponse, unmarshalMaticNftsResponse, unmarshalBscNtsResponse, unmarshalNtsEmptyResponse, unmarshalMaticNftTransactionsResponse, unmarshalBscNfttransactionsResponse, unmarshalEthNftDetailsResponse, unmarshalMaticNftDetailsResponse, unmarshalBscNftDetailsResponse, goerlyErrorResponse, goerliNftTransactionsResponse } from './nfts-response';
@@ -8,11 +7,13 @@ import Sinon, { SinonStub } from 'sinon';
 import { expect } from 'chai';
 import { NftTokenDetails } from '../../../src/orm/model/nft-token-details';
 import Web3 from 'web3';
+import { testContainer } from '../../ioc/test-container';
+import { TestAxiosMock } from '../../mock/test-axios-mock';
 
-const app = new InversifyExpressServer(container).build()
+const app = new InversifyExpressServer(testContainer).build()
 const testAgent = agent(app)
 
-const axios:Axios = container.get(IDS.NODE_MODULES.axios)
+const axios:Axios = testContainer.get(IDS.NODE_MODULES.axios)
 
 const axiosGetStub = Sinon.stub(axios, 'get')
 const tokenDetailsStub = Sinon.stub(NftTokenDetails, 'findOne')
@@ -21,10 +22,10 @@ const saveTokenStub = Sinon.stub(NftTokenDetails, 'create')
 
 describe('test nfts api endpoints', ()=>{
     beforeEach(()=>{
-        container.snapshot()
+        testContainer.snapshot()
     })
     afterEach(()=>{
-        container.restore()
+        testContainer.restore()
     })
     it('should return eth nfts', async ()=>{
         axiosGetStub
@@ -279,7 +280,7 @@ describe('test nfts api endpoints', ()=>{
     it('should return eth nfts token details', async ()=>{
         let web3GetBlockStub:SinonStub
 
-        container.onActivation(IDS.NODE_MODULES.web3,(context,instasnce:Web3) => {
+        testContainer.onActivation(IDS.NODE_MODULES.web3,(context,instasnce:Web3) => {
             web3GetBlockStub = Sinon.stub(instasnce.eth, 'getBlock')
 
             web3GetBlockStub.resolves({timestamp: 1659947419})
@@ -318,7 +319,7 @@ describe('test nfts api endpoints', ()=>{
     it('should return matic nft token details', async ()=>{
         let web3GetBlockStub:SinonStub
 
-        container.onActivation(IDS.NODE_MODULES.web3,(context,instasnce:Web3) => {
+        testContainer.onActivation(IDS.NODE_MODULES.web3,(context,instasnce:Web3) => {
             web3GetBlockStub = Sinon.stub(instasnce.eth, 'getBlock')
 
             web3GetBlockStub.resolves({timestamp: 1659520065})
@@ -357,7 +358,7 @@ describe('test nfts api endpoints', ()=>{
     it('should return bsc nft token details', async ()=>{
         let web3GetBlockStub:SinonStub
 
-        container.onActivation(IDS.NODE_MODULES.web3,(context,instasnce:Web3) => {
+        testContainer.onActivation(IDS.NODE_MODULES.web3,(context,instasnce:Web3) => {
             web3GetBlockStub = Sinon.stub(instasnce.eth, 'getBlock')
 
             web3GetBlockStub.resolves({timestamp: 1647696865})

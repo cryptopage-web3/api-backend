@@ -27,7 +27,7 @@ export class GoerliSocialSmartContract implements ISocialSmartContract{
         }
 
         const comments:ISocialComment[] = [];
-        for(let i = 1; i <= count; i++){
+        for(let i = 1; i <= count && i <=10; i++){
             comments.push(await this.getCommentFromBlockchain(tokenId, i))
         }
 
@@ -36,7 +36,6 @@ export class GoerliSocialSmartContract implements ISocialSmartContract{
 
     async getCommentFromBlockchain(tokenId: string, commentId: number):Promise<ISocialComment>{
         const comment = await this._socialEthContract.methods.readComment(tokenId, commentId).call();
-
         return (({ipfsHash, creator, _owner, price, isUp, isDown,isView}) => ({ipfsHash, creator, _owner, price, isUp, isDown,isView}))(comment)
     }
 }

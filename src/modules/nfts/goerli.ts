@@ -21,11 +21,11 @@ export class GoerliScanNFTsManager implements INftsManager {
         const txs = await this._goerli.getNftTransactionsByAddress(address,1,100)
         const nfts = txs.filter(e => e.to.toLowerCase() === address.toLowerCase());
 
-        const promises: any = [];
+        const list: any[] = [];
+
         for (let i = 0; i < nfts.length; i++) {
-            promises.push(this.nftAsyncResolver(nfts[i]));
+            list.push( await this.nftAsyncResolver(nfts[i]));
         }
-        const list = await Promise.all(promises);
 
         return { list, count: nfts.length };
     }

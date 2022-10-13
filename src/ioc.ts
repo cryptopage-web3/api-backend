@@ -39,11 +39,16 @@ import { goerliSocialAbi } from './services/social-smart-contract/goerli-social-
 
 export const container = new Container();
 
+const web3Instances = {}
+
 container.bind(IDS.NODE_MODULES.axios).toConstantValue(axios)
 container.bind(IDS.NODE_MODULES.web3Factory)
     .toFactory(context => (chain:ChainId) => { 
-        console.log(`created web3 for ${chain}`)
-        return new Web3(getChainRpc(chain)) 
+        if(!web3Instances[chain]){
+            //console.log(`created web3 for ${chain}`)
+            web3Instances[chain] = new Web3(new Web3.providers.HttpProvider( getChainRpc(chain), {timeout: 5000}))
+        }
+        return web3Instances[chain]
     })
 container.bind(IDS.NODE_MODULES.web3).toDynamicValue(context => {
     const chain:ChainId | undefined = getChainIdFromAncestor(context.currentRequest)
