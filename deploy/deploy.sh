@@ -100,7 +100,7 @@ rm -rf $run_dir/node_modules $run_dir/dist 2&>1
 cp -rf $deploy_dir/node_modules $run_dir/node_modules 2&>1
 cp -rf $deploy_dir/dist $run_dir/dist 2&>1
 
-cd $run_dir
+cd $run_dir 2&>1
 
 echo "git pull $run_dir"
 
