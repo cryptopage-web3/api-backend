@@ -95,13 +95,13 @@ pm2 delete $pm2_deploy_name
 pm2 stop $pm2_run_name
 pm2 delete $pm2_run_name
 
-rm -rf $run_dir/node_modules $run_dir/dist 2&>1
+rm -rf $run_dir/node_modules $run_dir/dist
 
-cp -rf $deploy_dir/node_modules $run_dir/node_modules 2&>1
-cp -rf $deploy_dir/dist $run_dir/dist 2&>1
+cp -rf $deploy_dir/node_modules $run_dir/node_modules
+cp -rf $deploy_dir/dist $run_dir/dist
 
-cd $run_dir 2&>1
-
+cd $run_dir
+pwd
 echo "git pull $run_dir"
 
 git pull 2>&1
