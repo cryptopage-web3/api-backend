@@ -45,7 +45,7 @@ container.bind(IDS.NODE_MODULES.axios).toConstantValue(axios)
 container.bind(IDS.NODE_MODULES.web3Factory)
     .toFactory(context => (chain:ChainId) => { 
         if(!web3Instances[chain]){
-            //console.log(`created web3 for ${chain}`)
+            console.log(`created web3 for ${chain}`)
             web3Instances[chain] = new Web3(new Web3.providers.HttpProvider( getChainRpc(chain), {timeout: 5000}))
         }
         return web3Instances[chain]
@@ -80,11 +80,17 @@ container.bind(IDS.SERVICE.WEB3.Web3Manager)
         
         return implementedChains.indexOf(name) === -1
     })*/
-container.bind(IDS.SERVICE.WEB3.EthContract).toDynamicValue((context) => {
+container.bind(IDS.SERVICE.WEB3.EthContractFactory).toFactory(context => (abi: any[], contractAddress: string, chain?:ChainId) =>{
     const web3Factory:Function = context.container.get(IDS.NODE_MODULES.web3Factory)
-    const web3:Web3 = web3Factory(ChainId.goerli)
+    const web3:Web3 = web3Factory(chain || getChainIdFromAncestor(context.currentRequest))
 
-    return new web3.eth.Contract(goerliSocialAbi as any[], '0x2d722a9853ac048ce220fadbf3cab45146d76af6')
+    return new web3.eth.Contract(abi, contractAddress)
+})
+
+container.bind(IDS.SERVICE.WEB3.EthContract).toDynamicValue((context) => {
+    const contractFactory:Function = context.container.get(IDS.SERVICE.WEB3.EthContractFactory)
+    
+    return contractFactory(goerliSocialAbi as any[], '0x2d722a9853ac048ce220fadbf3cab45146d76af6', ChainId.goerli)
 }).whenAnyAncestorNamed(ChainId.goerli)
 
 container.bind(IDS.CONFIG.EtherscanApiKey).toConstantValue(envToString('ETHERSCAN_API_KEY'))

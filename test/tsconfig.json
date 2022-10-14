@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "ES2021",
+    "allowJs": true,
+    "noImplicitAny": false,
+    "suppressExcessPropertyErrors": true,
+    "noResolve": false,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "suppressImplicitAnyIndexErrors": true,
+
+    "lib": ["es6","DOM"],
+
+    "noUnusedParameters": false,
+    "noUnusedLocals": false,
+    "strictNullChecks": true,
+    "typeRoots": ["node_modules"],
+    "types":["reflect-metadata","node","@types/mocha", "@types/chai"],
+
+    "moduleResolution": "Node",
+    "sourceMap": true,
+    "outDir": "dist",
+    "baseUrl": "./src",
+  },
+  "include": ["src"],
+}

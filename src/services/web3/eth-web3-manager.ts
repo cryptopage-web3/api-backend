@@ -10,6 +10,7 @@ import { Axios } from 'axios';
 export class EthWeb3Manager implements IWeb3Manager {
     @inject(IDS.NODE_MODULES.web3) _web3: Web3
     @inject(IDS.NODE_MODULES.axios) _axios: Axios
+    @inject(IDS.SERVICE.WEB3.EthContractFactory) _ethContractFactory: Function
 
     async getDateFromBlock(blocknum: number): Promise<Date> {
         const block = await this._web3.eth.getBlock(blocknum);
@@ -29,7 +30,7 @@ export class EthWeb3Manager implements IWeb3Manager {
             "type": "function"
         }];
 
-        const contract = new this._web3.eth.Contract(minABI, address);
+        const contract = this._ethContractFactory(minABI, address);
         return contract.methods[key]().call();
     }
 
@@ -43,7 +44,7 @@ export class EthWeb3Manager implements IWeb3Manager {
         const minABI:any[] = [
             { "inputs": [{ "internalType": "uint256", "name": "tokenId", "type": "uint256" }], "name": "tokenURI", "outputs": [{ "internalType": "string", "name": "", "type": "string" }], "stateMutability": "view", "type": "function" }
         ];
-        const contract = new this._web3.eth.Contract(minABI, contrctAddress);
+        const contract = this._ethContractFactory(minABI, contrctAddress);
         const metadataUri = await contract.methods.tokenURI(tokenId).call().catch(err =>{
             console.error(`Failed to get tokenURI, contract: ${contrctAddress}, tokenId: ${tokenId}`, err)
             return null
