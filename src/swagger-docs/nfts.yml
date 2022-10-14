@@ -17,8 +17,6 @@ components:
                 type: number
               dislikes:
                 type: number
-              comments:
-                type: number
               date:
                 type: string
               name:
@@ -39,6 +37,25 @@ components:
                 type: string
               tokenId:
                 type: string
+              comments:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    ipfsHash:
+                      type: string
+                    creator:
+                      type: string
+                    _owner:
+                      type: string
+                    price:
+                      type: string
+                    isUp:
+                      type: boolean
+                    isDown:
+                      type: boolean
+                    isView:
+                      type: boolean
               attributes:
                 type: array
                 items:
