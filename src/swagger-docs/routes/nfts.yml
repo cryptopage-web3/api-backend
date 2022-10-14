@@ -51,7 +51,36 @@ paths:
                   $ref: '#/components/schemas/NFTTransactions'
         "400":
           $ref: '#/responses/PaginationError'
-    
+
+  /nfts/transaction/goerli/details/{contractAddress}/{tokenId}/{blockNumber}:
+    get:
+      summary: Get goerli nft transaction details.
+      tags: [NFT]
+      parameters:
+        - in: path
+          name: contractAddress
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: tokenId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: blockNumber
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                GoerliNftTransactionExample:
+                  $ref: '#/responses/examples/GoerliNftTransactionExample'
+
   /nfts/transaction/{chain}/details/{contractAddress}/{tokenId}/{blockNumber}:
     get:
       summary: Get nft transaction details.
@@ -62,7 +91,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [eth, bsc, matic,goerli]
+            enum: [eth, bsc, matic]
             default: eth
           description: chain name
         - in: path

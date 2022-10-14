@@ -1,18 +1,20 @@
 import { InversifyExpressServer } from 'inversify-express-utils';
 import { agent } from "supertest";
-import { container } from '../../../src/ioc';
 import { Axios } from 'axios';
 import { IDS } from '../../../src/types/index';
-import { unmarshalEthNftsResponse, unmarshalNftTransactionsEmptyResponse, unmarshalEthNftTransactionsResponse, unmarshalMaticNftsResponse, unmarshalBscNtsResponse, unmarshalNtsEmptyResponse, unmarshalMaticNftTransactionsResponse, unmarshalBscNfttransactionsResponse, unmarshalEthNftDetailsResponse, unmarshalMaticNftDetailsResponse, unmarshalBscNftDetailsResponse, goerlyErrorResponse, goerliNftTransactionsResponse } from './nfts-response';
+import { unmarshalEthNftsResponse, unmarshalNftTransactionsEmptyResponse, unmarshalEthNftTransactionsResponse, unmarshalMaticNftsResponse, unmarshalBscNtsResponse, unmarshalNtsEmptyResponse, unmarshalMaticNftTransactionsResponse, unmarshalBscNfttransactionsResponse, unmarshalEthNftDetailsResponse, unmarshalMaticNftDetailsResponse, unmarshalBscNftDetailsResponse, goerlyErrorResponse, goerliNftTransactionsResponse, goerliNftListTransactionsResponse } from './nfts-response';
 import Sinon, { SinonStub } from 'sinon';
 import { expect } from 'chai';
 import { NftTokenDetails } from '../../../src/orm/model/nft-token-details';
 import Web3 from 'web3';
+import { testContainer } from '../../ioc/test-container';
+import { testEthContractFactory } from '../../mock/test-web3-mock';
+import { ISocialComment } from '../../../src/services/social-smart-contract/types';
 
-const app = new InversifyExpressServer(container).build()
+const app = new InversifyExpressServer(testContainer).build()
 const testAgent = agent(app)
 
-const axios:Axios = container.get(IDS.NODE_MODULES.axios)
+const axios:Axios = testContainer.get(IDS.NODE_MODULES.axios)
 
 const axiosGetStub = Sinon.stub(axios, 'get')
 const tokenDetailsStub = Sinon.stub(NftTokenDetails, 'findOne')
@@ -21,10 +23,10 @@ const saveTokenStub = Sinon.stub(NftTokenDetails, 'create')
 
 describe('test nfts api endpoints', ()=>{
     beforeEach(()=>{
-        container.snapshot()
+        testContainer.snapshot()
     })
     afterEach(()=>{
-        container.restore()
+        testContainer.restore()
     })
     it('should return eth nfts', async ()=>{
         axiosGetStub
@@ -76,17 +78,108 @@ describe('test nfts api endpoints', ()=>{
             .get('/nfts/bsc/0x2465176C461AfB316ebc773C61fAEe85A6515DAA')
             .expect('Content-Type',/json/)
 
-            expect(response.body.count).to.eq(2)
-            expect(Array.isArray(response.body.list)).to.eq(true)
-            expect(response.body.list.length).to.eq(2)
-            expect(response.body.list[0]).to.contain(({
-                contract_address: '0x3d7b0001e03096d3795fd5d984ad679467546d73',
-                from: '0x3c284a074afe106adbc1b6eeea1c15983eafdc47',
-                to: '0x2465176C461AfB316ebc773C61fAEe85A6515DAA',
-                tokenId: '166401'
+        expect(response.body.count).to.eq(2)
+        expect(Array.isArray(response.body.list)).to.eq(true)
+        expect(response.body.list.length).to.eq(2)
+        expect(response.body.list[0]).to.contain(({
+            contract_address: '0x3d7b0001e03096d3795fd5d984ad679467546d73',
+            from: '0x3c284a074afe106adbc1b6eeea1c15983eafdc47',
+            to: '0x2465176C461AfB316ebc773C61fAEe85A6515DAA',
+            tokenId: '166401'
+        }))
+
+        expect(axiosGetStub.calledOnce).to.eq(true)
+    })
+
+    it('should return goerli nfts', async ()=>{
+        const token1Uri = 'https://ipfs.io/ipfs/QmdKCC7bkRXrKsdGysCcb4NmVrX3xxAiekwAQ49s6Aeza9';
+        const token1Meta = {
+            attributes: [],
+            description: '',
+            image: 'https://ipfs.io/ipfs/QmT5W87Sd1fijjoKqfHNQFQvenvJLaURSXZi3CxeL1ZFCA',
+            name: 'Hello'
+        }
+        const token2Uri = 'https://ipfs.io/ipfs/QmbBF2B2N7zGs17UNW6epw6PBZnSzMjLwd6ZyJkP7J66ex'
+        const token2Meta = {
+            attributes: [],
+            description: '',
+            image: 'https://ipfs.io/ipfs/QmT5W87Sd1fijjoKqfHNQFQvenvJLaURSXZi3CxeL1ZFCA',
+            name: 'Hello'
+        }
+        const comment:ISocialComment = {ipfsHash: 'hash', creator: 'crator', _owner: 'owner', price:'123', isUp: false, isDown: true,isView: true}
+
+        const tokenUriMethodStub = Sinon.stub()
+        const getCommentsCountMethodStub = Sinon.stub()
+        const readCommentMethodStub = Sinon.stub()
+
+        const tokenUriCallStub = Sinon.stub()
+        const getCommentsCountStub = Sinon.stub()
+        const readCommentStub = Sinon.stub()
+
+        tokenUriMethodStub.returns({call: tokenUriCallStub})
+        getCommentsCountMethodStub.returns({call: getCommentsCountStub})
+        readCommentMethodStub.returns({call: readCommentStub})
+
+        testContainer.rebind(IDS.SERVICE.WEB3.EthContractFactory)
+            .toFactory(context => testEthContractFactory({
+                tokenURI: tokenUriMethodStub,
+                getCommentCount: getCommentsCountMethodStub,
+                readComment: readCommentMethodStub,
             }))
 
-            expect(axiosGetStub.calledOnce).to.eq(true)
+        axiosGetStub
+            .onCall(0).resolves({data: goerliNftListTransactionsResponse})
+            .onCall(1).resolves({data: token1Meta})
+            .onCall(2).resolves({data: token2Meta})
+
+        tokenUriCallStub
+            .onCall(0).resolves(token1Uri)
+            .onCall(1).resolves(token2Uri)
+        
+        getCommentsCountStub
+            .onCall(0).resolves('0')
+            .onCall(1).resolves('1')
+        
+        readCommentStub.resolves(comment)
+
+        const response = await testAgent
+            .get(`/nfts/goerli/0x4bd1c8dc0a34d9cbb5c73d1126ee5f523ba798db`)
+            .expect('Content-Type',/json/)
+
+        expect(axiosGetStub.calledThrice).to.be.true
+        expect(axiosGetStub.getCall(0).args[0]).to.contains('api-goerli.etherscan.io/api?module=account&action=tokennfttx&address=0x4bd1c8dc0a34d9cbb5c73d1126ee5f523ba798db')
+        expect(axiosGetStub.getCall(1).args[0]).to.eq(token1Uri)
+        expect(axiosGetStub.getCall(2).args[0]).to.eq(token2Uri)
+
+        expect(tokenUriMethodStub.calledWith(goerliNftListTransactionsResponse.result[0].tokenID))
+        expect(tokenUriMethodStub.calledWith(goerliNftListTransactionsResponse.result[1].tokenID))
+        expect(tokenUriCallStub.calledTwice).to.be.true
+        
+        expect(getCommentsCountMethodStub.calledTwice).to.be.true
+        expect(getCommentsCountMethodStub.calledWith(goerliNftListTransactionsResponse.result[0].tokenID)).to.be.true
+        expect(getCommentsCountMethodStub.calledWith(goerliNftListTransactionsResponse.result[1].tokenID)).to.be.true
+        expect(getCommentsCountStub.calledTwice).to.be.true
+        
+        expect(readCommentMethodStub.calledOnce).to.be.true
+        expect(readCommentMethodStub.calledWith(goerliNftListTransactionsResponse.result[1].tokenID, 1)).to.be.true
+        expect(readCommentStub.calledOnce).to.be.true
+
+        expect(response.body.list.length).to.eq(2)
+        expect(response.body.list[0]).contain({
+            "from": "0x0000000000000000000000000000000000000000",
+            "to": "0x4bd1c8dc0a34d9cbb5c73d1126ee5f523ba798db",
+            "symbol": "PAGE.NFT",
+            "tokenId": "31",
+        })
+        expect(response.body.list[0].comments).to.be.a('array').that.is.empty
+
+        expect(response.body.list[1]).contain({
+            "from": "0x0000000000000000000000000000000000000000",
+            "to": "0x4bd1c8dc0a34d9cbb5c73d1126ee5f523ba798db",
+            "symbol": "PAGE.NFT",
+            "tokenId": "30",
+        })
+        expect(response.body.list[1].comments).to.deep.equal([comment])
     })
 
     it('should not return error eth nfts', async ()=>{
@@ -279,7 +372,7 @@ describe('test nfts api endpoints', ()=>{
     it('should return eth nfts token details', async ()=>{
         let web3GetBlockStub:SinonStub
 
-        container.onActivation(IDS.NODE_MODULES.web3,(context,instasnce:Web3) => {
+        testContainer.onActivation(IDS.NODE_MODULES.web3,(context,instasnce:Web3) => {
             web3GetBlockStub = Sinon.stub(instasnce.eth, 'getBlock')
 
             web3GetBlockStub.resolves({timestamp: 1659947419})
@@ -318,7 +411,7 @@ describe('test nfts api endpoints', ()=>{
     it('should return matic nft token details', async ()=>{
         let web3GetBlockStub:SinonStub
 
-        container.onActivation(IDS.NODE_MODULES.web3,(context,instasnce:Web3) => {
+        testContainer.onActivation(IDS.NODE_MODULES.web3,(context,instasnce:Web3) => {
             web3GetBlockStub = Sinon.stub(instasnce.eth, 'getBlock')
 
             web3GetBlockStub.resolves({timestamp: 1659520065})
@@ -357,7 +450,7 @@ describe('test nfts api endpoints', ()=>{
     it('should return bsc nft token details', async ()=>{
         let web3GetBlockStub:SinonStub
 
-        container.onActivation(IDS.NODE_MODULES.web3,(context,instasnce:Web3) => {
+        testContainer.onActivation(IDS.NODE_MODULES.web3,(context,instasnce:Web3) => {
             web3GetBlockStub = Sinon.stub(instasnce.eth, 'getBlock')
 
             web3GetBlockStub.resolves({timestamp: 1647696865})
