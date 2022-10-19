@@ -2,7 +2,7 @@ import { inject, injectable } from 'inversify';
 import { IWeb3Manager } from './types';
 import { IDS } from '../../types/index';
 import Web3 from 'web3';
-import { NftTokenData } from 'modules/nfts/types';
+import { Web3NftTokenData } from 'modules/nfts/types';
 import { normalizeUrl } from '../../util/url-util';
 import { Axios } from 'axios';
 
@@ -34,7 +34,7 @@ export class EthWeb3Manager implements IWeb3Manager {
         return contract.methods[key]().call();
     }
 
-    async getTokenData(contrctAddress: string, tokenId: string):Promise<NftTokenData> {
+    async getTokenData(contrctAddress: string, tokenId: string):Promise<Web3NftTokenData> {
         const meta = await this.getTokenMetadata(contrctAddress, tokenId)
 
         return Object.assign({}, meta,{price: '0'})

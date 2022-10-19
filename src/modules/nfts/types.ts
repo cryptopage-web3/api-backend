@@ -1,4 +1,5 @@
 import { ChainId } from '../transactions/types';
+import { ISocialComment } from '../../services/social-smart-contract/types';
 
 export interface INftsManager {
     _chain: ChainId
@@ -9,19 +10,18 @@ export interface INftsManager {
 }
 
 export interface INftItem {
-    from: string,
-    to: string,
     likes: number,
     dislikes: number,
-    comments: number,
-    date: Date,
+    comments: ISocialComment[],
+    date: string | Date,
     name: string,
-    collectionName: string,
+    symbol?: string
+    collectionName?: string,
     description: string,
-    type: string,
-    usdPrice: number,
-    url: string,
-    image: string,
+    type?: string,
+    usdPrice?: number,
+    url: string | undefined,
+    image?: string,
     contract_address: string,
     tokenId: string,
     attributes: any[]
@@ -65,7 +65,7 @@ export interface INftTxList {
     count: number
 }
 
-export interface NftTokenData {
+export interface Web3NftTokenData {
     url: string,
     type: string,
     name: string,
@@ -74,4 +74,4 @@ export interface NftTokenData {
     attributes: any[]
 }
 
-export type GetTokenFromApiCallback = () => Promise<NftTokenData>
+export type GetTokenFromApiCallback = () => Promise<Web3NftTokenData>

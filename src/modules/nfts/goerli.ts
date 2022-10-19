@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { INftsManager, INftsList, INftTransaction, NftTxType } from './types';
+import { INftsManager, INftsList, INftTransaction, NftTxType, INftItem } from './types';
 import { GoerliScanApi } from './../../services/etherscan/goerliscan-api';
 import { ChainId } from "modules/transactions/types";
 import { IDS } from '../../types/index';
@@ -7,6 +7,7 @@ import { IGoerliNftTransaction } from '../../services/etherscan/types';
 import { IWeb3Manager } from '../../services/web3/types';
 import { NftCache } from './NftCache';
 import { ISocialSmartContract } from '../../services/social-smart-contract/types';
+import { Alchemy, OwnedNft } from 'alchemy-sdk';
 
 @injectable()
 export class GoerliScanNFTsManager implements INftsManager {
@@ -14,23 +15,42 @@ export class GoerliScanNFTsManager implements INftsManager {
     @inject(IDS.SERVICE.WEB3.Web3Manager) private _web3Manager: IWeb3Manager
     @inject(IDS.SERVICE.SocialSmartContract) private _socialSmartContract: ISocialSmartContract
     @inject(IDS.MODULES.NftCache) _nftCache: NftCache
+    @inject(IDS.SERVICE.AlchemySdk) _alchemy:Alchemy
 
     _chain: ChainId;
 
     async getWalletAllNFTs(address, page, pageSize):Promise<INftsList> {
-        const txs = await this._goerli.getNftTransactionsByAddress(address,1,100)
-        const nfts = txs.filter(e => e.to.toLowerCase() === address.toLowerCase());
-
+        const response = await this._alchemy.nft.getNftsForOwner(address, {pageSize: 100})
+        
         const list: any[] = [];
 
-        for (let i = 0; i < nfts.length; i++) {
-            list.push( await this.nftAsyncResolver(nfts[i]));
+        for (let i = 0; i < response.ownedNfts.length; i++) {
+            list.push( await this.buildNftData(response.ownedNfts[i]))
         }
 
-        return { list, count: nfts.length };
+        return { list, count: response.totalCount }
     }
     
-    async nftAsyncResolver(data: IGoerliNftTransaction) {
+    async buildNftData(data:OwnedNft):Promise<INftItem> {
+        const comments = await this._socialSmartContract.getComments(data.tokenId)
+
+        return {
+            name: data.title,
+            symbol: data.contract.symbol,
+            description: data.description,
+            contract_address: data.contract.address,
+            tokenId: data.tokenId,
+            collectionName: data.contract?.name,
+            url: data.media[0]?.gateway,
+            attributes: data.rawMetadata?.attributes as any[],
+            likes: 0,
+            dislikes: 0,
+            comments,
+            date: data.timeLastUpdated,
+        }
+    }
+    
+    /*async nftAsyncResolver(data: IGoerliNftTransaction) {
         const metadata = await this._web3Manager.getTokenData(data.contractAddress, data.tokenID)
         const comments = await this._socialSmartContract.getComments(data.tokenID)
         const item = {
@@ -54,7 +74,7 @@ export class GoerliScanNFTsManager implements INftsManager {
             attributes: metadata.attributes
         }
         return item;
-    }
+    }*/
 
     async getWalletNFTTransactions(address: string, page: number, pageSize: number) {
         const list = await this._goerli.getNftTransactionsByAddress(address, page, pageSize);

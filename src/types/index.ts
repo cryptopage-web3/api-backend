@@ -1,9 +1,8 @@
-import Web3 from 'web3';
 export const IDS = {
     CONFIG:{
         EtherscanApiKey:Symbol('EtherscanApiKey'),
         GoerliApiKey:Symbol('GoerliApiKey'),
-        Web3RpcFactory: Symbol('Web3RpcFactory')
+        Web3RpcFactory: Symbol('Web3RpcFactory'),
     },
     CACHE:{
         PriceCache: Symbol('PriceCache')
@@ -26,6 +25,8 @@ export const IDS = {
         CovalentApi: Symbol('CovalentApi'),
         TronscanApi: Symbol('TronscanApi'),
         GoerliScanApi: Symbol('GoerliScanApi'),
+        AlchemySdkFactory: Symbol('AlchemySdkFactory'),
+        AlchemySdk: Symbol('AlchemySdk'),
         WEB3:{
             Web3Manager: Symbol('Web3Manager'),
             EthContract: Symbol('EthContract'),

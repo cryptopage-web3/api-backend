@@ -36,6 +36,8 @@ import { NftCache } from './modules/nfts/NftCache';
 import { GoerliSocialSmartContract } from './services/social-smart-contract/goerli-social-smart-contract';
 import { DefaultSocialSmartContract } from './services/social-smart-contract/default-social-smart-contract';
 import { goerliSocialAbi } from './services/social-smart-contract/goerli-social-abi';
+import { getAlchemyNetwork, buildAlchemyChainApiKeyVarname } from './services/alchemy/alchemy-util';
+import { Alchemy } from "alchemy-sdk";
 
 export const container = new Container();
 
@@ -43,9 +45,9 @@ const web3Instances = {}
 
 container.bind(IDS.NODE_MODULES.axios).toConstantValue(axios)
 container.bind(IDS.NODE_MODULES.web3Factory)
-    .toFactory(context => (chain:ChainId) => { 
+    .toFactory(context => (chain:ChainId) => {
         if(!web3Instances[chain]){
-            console.log(`created web3 for ${chain}`)
+            //console.log(`created web3 for ${chain}`)
             web3Instances[chain] = new Web3(new Web3.providers.HttpProvider( getChainRpc(chain), {timeout: 5000}))
         }
         return web3Instances[chain]
@@ -95,6 +97,7 @@ container.bind(IDS.SERVICE.WEB3.EthContract).toDynamicValue((context) => {
 
 container.bind(IDS.CONFIG.EtherscanApiKey).toConstantValue(envToString('ETHERSCAN_API_KEY'))
 container.bind(IDS.CONFIG.GoerliApiKey).toConstantValue(envToString('GOERLI_API_KEY'))
+container.bind('ALCHEMY_API_KEY_GOERLI').toConstantValue(envToString('ALCHEMY_API_KEY_GOERLI'))
 
 container.bind(IDS.CACHE.PriceCache).to(PriceCache)
 
@@ -122,6 +125,22 @@ container.bind(IDS.SERVICE.SocialSmartContract)
 container.bind(IDS.SERVICE.SocialSmartContract)
     .to(DefaultSocialSmartContract)
     .whenNoAncestorNamed(ChainId.goerli)
+
+container.bind(IDS.SERVICE.AlchemySdkFactory).toFactory(context => (chain:ChainId) =>{
+    const network = getAlchemyNetwork(chain)
+    const apiKey = context.container.get<string>(buildAlchemyChainApiKeyVarname(chain))
+    return new Alchemy({network, apiKey})
+})
+container.bind(IDS.SERVICE.AlchemySdk).toDynamicValue(context =>{
+    const chain = getChainIdFromAncestor(context.currentRequest)
+    if(!chain){
+        throw new Error(`Failed to create Alchemy-sdk for chain ${chain}`)
+    }
+
+    const factory = container.get<Function>(IDS.SERVICE.AlchemySdkFactory)
+    
+    return factory(chain)
+})
 
 container.bind(IDS.MODULES.NftCache).to(NftCache)
 

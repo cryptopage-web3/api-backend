@@ -1,11 +1,11 @@
 import { IWeb3Manager } from './types';
 import { ApiError } from '../../types/index';
 import { injectable } from 'inversify';
-import { NftTokenData } from 'modules/nfts/types';
+import { Web3NftTokenData } from 'modules/nfts/types';
 
 @injectable()
 export class DefaultWebManager implements IWeb3Manager {
-    getTokenData(contrctAddress: string, tokenId: string): Promise<NftTokenData> {
+    getTokenData(contrctAddress: string, tokenId: string): Promise<Web3NftTokenData> {
         throw new ApiError('Method not implemented.');
     }
     getDateFromBlock(blocknum: number): Promise<Date> {

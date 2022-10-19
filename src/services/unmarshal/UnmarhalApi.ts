@@ -220,7 +220,7 @@ export class UnmarshalApi {
             to: item.owner,
             likes: 0,
             dislikes: 0,
-            comments: 0,
+            comments: [],
             date: new Date(),
             name: item.issuer_specific_data.name,
             collectionName: item.issuer_specific_data.name,
