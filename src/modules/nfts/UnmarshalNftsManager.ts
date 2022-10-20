@@ -1,4 +1,4 @@
-import { INftsManager, INftsList, INftTransaction, NftTxType } from './types';
+import { INftsManager, INftsList, INftTransaction, NftTxType, INftTransactionsPagination } from './types';
 import { UnmarshalApi } from '../../services/unmarshal/UnmarhalApi';
 import { inject, injectable } from 'inversify';
 import { IDS } from '../../types/index';
@@ -25,8 +25,8 @@ export class UnmarshalNftsManager implements INftsManager {
         return this._unmarshalApi.getWalletAllNFTs(address, page, pageSize);
     }
     
-    async getWalletNFTTransactions(address, page, pageSize) {
-        const { list, count } = await this._unmarshalApi.getWalletNFTTransactions(address, page, pageSize);
+    async getWalletNFTTransactions(address, opts:INftTransactionsPagination) {
+        const { list, count } = await this._unmarshalApi.getWalletNFTTransactions(address, opts.page, opts.pageSize);
 
         return {
             list: list.map(t => this._normalizeNftTransactions(t)),

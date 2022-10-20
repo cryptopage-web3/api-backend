@@ -5,8 +5,14 @@ export interface INftsManager {
     _chain: ChainId
     
     getWalletAllNFTs(address: string, page: number, pageSize: number): Promise<INftsList>
-    getWalletNFTTransactions(address: string, page: number, pageSize: number)
+    getWalletNFTTransactions(address: string, opts: INftTransactionsPagination)
     getNftTransactionDetails(contractAddress: string, tokenId: string, blockNumber:number)
+}
+
+export interface INftTransactionsPagination {
+    pageSize: number
+    page?:number,
+    pageKey?: string
 }
 
 export interface INftItem {
@@ -34,6 +40,7 @@ export interface INftsList {
 
 export enum NftTxType {
     baseInfo='base_info',
+    fullInfo='full_info',
     image='image',
 }
 

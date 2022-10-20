@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { INftsManager, INftsList, INftTransaction, NftTxType, INftItem } from './types';
+import { INftsManager, INftsList, INftTransaction, NftTxType, INftItem, INftTransactionsPagination } from './types';
 import { GoerliScanApi } from './../../services/etherscan/goerliscan-api';
 import { ChainId } from "modules/transactions/types";
 import { IDS } from '../../types/index';
@@ -7,7 +7,7 @@ import { IGoerliNftTransaction } from '../../services/etherscan/types';
 import { IWeb3Manager } from '../../services/web3/types';
 import { NftCache } from './NftCache';
 import { ISocialSmartContract } from '../../services/social-smart-contract/types';
-import { Alchemy, OwnedNft } from 'alchemy-sdk';
+import { Alchemy, AssetTransfersCategory, AssetTransfersWithMetadataResult, OwnedNft } from 'alchemy-sdk';
 
 @injectable()
 export class GoerliScanNFTsManager implements INftsManager {
@@ -76,21 +76,30 @@ export class GoerliScanNFTsManager implements INftsManager {
         return item;
     }*/
 
-    async getWalletNFTTransactions(address: string, page: number, pageSize: number) {
-        const list = await this._goerli.getNftTransactionsByAddress(address, page, pageSize);
+    async getWalletNFTTransactions(address: string, opts: INftTransactionsPagination) {
+        const response = await this._alchemy.core.getAssetTransfers({
+            toAddress: address,
+            category: [AssetTransfersCategory.ERC721, AssetTransfersCategory.ERC1155],
+            withMetadata: true,
+            maxCount: opts.pageSize,
+            pageKey: opts.pageKey
+        })
+        //const list = await this._goerli.getNftTransactionsByAddress(address, page, pageSize);
         return { 
-            list:list.map(t => this._normalizeNftTransaction(t))
+            list:response.transfers.map(t => this._normalizeNftTransaction(t))
         };
     }
 
-    _normalizeNftTransaction(data:IGoerliNftTransaction):INftTransaction{
+    _normalizeNftTransaction(data:AssetTransfersWithMetadataResult):INftTransaction{
+        const tokenId = data.tokenId || data.erc1155Metadata?.[0].tokenId
+        
         return {
             type: NftTxType.baseInfo,
             txHash: data.hash,
-            blockNumber: parseInt(data.blockNumber),
-            contract_address: data.contractAddress,
-            tokenId: data.tokenID,
-            to: data.to,
+            blockNumber: parseInt(data.blockNum, 16),
+            contract_address: data.rawContract.address as string,
+            tokenId: parseInt(tokenId as string, 16).toString(),
+            to: data.to as string,
             from: data.from
         }
     }
