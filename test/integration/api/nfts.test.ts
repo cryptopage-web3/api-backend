@@ -259,7 +259,7 @@ describe('test nfts api endpoints', ()=>{
         const goerliNftAddress = '0x2aDe7E7ed11a4E35C2dDCCB6189d4fE710A165f5'
 
         const response = await testAgent
-            .get(`/nfts/transactions/goerli/${goerliNftAddress}?pageSize=10&pageKey=pageKey1`)
+            .get(`/nfts/transactions/goerli/${goerliNftAddress}?pageSize=10&continue[pageKey]=pageKey1`)
             .expect('Content-Type',/json/)
 
         expect(response.body.continue.pageKey).to.be.eq('pageKey2')
@@ -280,13 +280,15 @@ describe('test nfts api endpoints', ()=>{
         }))
 
         //@ts-expect-error
-        expect(alchemyGetNftTransfersStub.calledOnceWith({
+        expect(alchemyGetNftTransfersStub.calledOnce).to.be.true
+        //@ts-expect-error
+        expect(alchemyGetNftTransfersStub.getCall(0).args[0]).deep.equal({
             toAddress: goerliNftAddress,
             category: [AssetTransfersCategory.ERC721, AssetTransfersCategory.ERC1155],
             withMetadata: true,
             maxCount: 10,
             pageKey: 'pageKey1'
-        }))
+        })
 
         expect(getCommentsCountStub.calledTwice).to.be.true
         expect(getCommentsCountMethodStub.calledWith('1')).to.be.true
