@@ -48,7 +48,7 @@ paths:
           description: OK
           content:
             application/json:
-              example:
+              examples:
                 GoerliNftTransactionsExample:
                   $ref: '#/responses/examples/GoerliNftTransactionsExample'
         "400":

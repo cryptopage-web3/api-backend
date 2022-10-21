@@ -1,6 +1,6 @@
 responses:
   examples:
     GoerliNftTransactionsExample:
-      summary: A sample goerli transaction
+      summary: A sample goerli nft transactions for owner address
       value:
-        {}
+        {"list":[{"type":"base_info","txHash":"0x9d857ef0a5b928714ff805133db450cf3809c9fad8952383e897523dcaa38b72","blockNumber":7568618,"contract_address":"0x19962298f0b28be502ce83bd179eb212287ecb5d","tokenId":"10","to":"0x7ee2bbc5d5004683ed84035591582be1fc4953f5","from":"0x0000000000000000000000000000000000000000","comments":[{"ipfsHash":"QmQGqgVLqgPWJr4RpCygZt18UYqoFFCuJX8EEy8anDUgeY","creator":"0x7eE2BBC5d5004683ed84035591582be1Fc4953F5","_owner":"0x7eE2BBC5d5004683ed84035591582be1Fc4953F5","price":"8879848122020802701","isUp":true,"isDown":false,"isView":true}]},{"type":"base_info","txHash":"0x30696ab148c5c86eb2de0417dc5ead0be63362c2536c4c4b36e9b235aad9c719","blockNumber":7568806,"contract_address":"0x19962298f0b28be502ce83bd179eb212287ecb5d","tokenId":"11","to":"0x7ee2bbc5d5004683ed84035591582be1fc4953f5","from":"0x0000000000000000000000000000000000000000","comments":[]}],"continue":{"pageKey":"eb86bac2-c4f5-494b-a341-ca1ee5db9a8d"}}
