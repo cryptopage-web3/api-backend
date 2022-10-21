@@ -1,0 +1,6 @@
+responses:
+  examples:
+    GoerliNftTransactionsExample:
+      summary: A sample goerli transaction
+      value:
+        {}

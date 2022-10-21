@@ -48,8 +48,9 @@ paths:
           description: OK
           content:
             application/json:
-              schema:
-                  $ref: '#/components/schemas/NFTTransactions'
+              example:
+                GoerliNftTransactionsExample:
+                  $ref: '#/responses/examples/GoerliNftTransactionsExample'
         "400":
           $ref: '#/responses/PaginationError'
 
