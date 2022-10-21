@@ -28,7 +28,13 @@ export class GoerliSocialSmartContract implements ISocialSmartContract{
 
         const comments:ISocialComment[] = [];
         for(let i = 1; i <= count && i <=10; i++){
-            comments.push(await this.getCommentFromBlockchain(tokenId, i))
+            const comment = await this.getCommentFromBlockchain(tokenId, i)
+            
+            if(comment._owner === '0x0000000000000000000000000000000000000000'){
+                return comments
+            }
+
+            comments.push(comment)
         }
 
         return comments
