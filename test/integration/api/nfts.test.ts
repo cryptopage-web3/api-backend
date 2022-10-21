@@ -262,6 +262,7 @@ describe('test nfts api endpoints', ()=>{
             .get(`/nfts/transactions/goerli/${goerliNftAddress}?pageSize=10&pageKey=pageKey1`)
             .expect('Content-Type',/json/)
 
+        expect(response.body.continue.pageKey).to.be.eq('pageKey2')
         expect(response.body.list).to.be.an('array')
         expect(response.body.count).to.be.undefined
         expect(response.body.list.length).to.eq(2)
