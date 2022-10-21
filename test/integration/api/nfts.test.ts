@@ -2,7 +2,7 @@ import { InversifyExpressServer } from 'inversify-express-utils';
 import { agent } from "supertest";
 import { Axios } from 'axios';
 import { IDS } from '../../../src/types/index';
-import { unmarshalEthNftsResponse, unmarshalNftTransactionsEmptyResponse, unmarshalEthNftTransactionsResponse, unmarshalMaticNftsResponse, unmarshalBscNtsResponse, unmarshalNtsEmptyResponse, unmarshalMaticNftTransactionsResponse, unmarshalBscNfttransactionsResponse, unmarshalEthNftDetailsResponse, unmarshalMaticNftDetailsResponse, unmarshalBscNftDetailsResponse, goerlyErrorResponse, goerliNftTransactionsResponse, goerliNftListTransactionsResponse, alchemyAddressNftsResponse } from './nfts-response';
+import { unmarshalEthNftsResponse, unmarshalNftTransactionsEmptyResponse, unmarshalEthNftTransactionsResponse, unmarshalMaticNftsResponse, unmarshalBscNtsResponse, unmarshalNtsEmptyResponse, unmarshalMaticNftTransactionsResponse, unmarshalBscNfttransactionsResponse, unmarshalEthNftDetailsResponse, unmarshalMaticNftDetailsResponse, unmarshalBscNftDetailsResponse, goerlyErrorResponse, goerliNftTransactionsResponse, goerliNftListTransactionsResponse, alchemyAddressNftsResponse, alchemyNftTransfersResponse, goerliNftComment } from './nfts-response';
 import Sinon, { SinonStub } from 'sinon';
 import { expect } from 'chai';
 import { NftTokenDetails } from '../../../src/orm/model/nft-token-details';
@@ -12,6 +12,7 @@ import { testEthContractFactory } from '../../mock/test-web3-mock';
 import { ISocialComment } from '../../../src/services/social-smart-contract/types';
 import { interfaces } from 'inversify';
 import { TestAlchemyMock } from '../../mock/test-alchemy-mock';
+import { AssetTransfersCategory } from 'alchemy-sdk';
 
 const app = new InversifyExpressServer(testContainer).build()
 const testAgent = agent(app)
@@ -101,7 +102,6 @@ describe('test nfts api endpoints', ()=>{
             alchemyGetNftsStub.resolves(alchemyAddressNftsResponse)
             return instance
         })
-        const comment:ISocialComment = {ipfsHash: 'hash', creator: 'crator', _owner: 'owner', price:'123', isUp: false, isDown: true,isView: true}
 
         const getCommentsCountMethodStub = Sinon.stub()
         const readCommentMethodStub = Sinon.stub()
@@ -122,7 +122,7 @@ describe('test nfts api endpoints', ()=>{
             .onCall(0).resolves('0')
             .onCall(1).resolves('1')
         
-        readCommentStub.resolves(comment)
+        readCommentStub.resolves(goerliNftComment)
 
         const response = await testAgent
             .get(`/nfts/goerli/0x4bd1c8dc0a34d9cbb5c73d1126ee5f523ba798db`)
@@ -158,7 +158,7 @@ describe('test nfts api endpoints', ()=>{
             "contract_address": "0x19962298f0b28be502ce83bd179eb212287ecb5d",
             "tokenId": "20",
         })
-        expect(response.body.list[1].comments).to.deep.equal([comment])
+        expect(response.body.list[1].comments).to.deep.equal([goerliNftComment])
     })
 
     it('should not return error eth nfts', async ()=>{
@@ -227,23 +227,72 @@ describe('test nfts api endpoints', ()=>{
     })
 
     it('should return goerli nft transactions', async ()=>{
-        axiosGetStub.resolves({data: goerliNftTransactionsResponse})
+        let alchemyGetNftTransfersStub:SinonStub
+        
+        testContainer.onActivation(IDS.SERVICE.AlchemySdk, function(context:interfaces.Context, instance:TestAlchemyMock){
+            alchemyGetNftTransfersStub = Sinon.stub(instance.core, 'getAssetTransfers')
+            alchemyGetNftTransfersStub.resolves(alchemyNftTransfersResponse)
+            return instance
+        })
+
+        const getCommentsCountMethodStub = Sinon.stub()
+        const readCommentMethodStub = Sinon.stub()
+
+        const getCommentsCountStub = Sinon.stub()
+        const readCommentStub = Sinon.stub()
+
+        getCommentsCountMethodStub.returns({call: getCommentsCountStub})
+        readCommentMethodStub.returns({call: readCommentStub})
+
+        testContainer.rebind(IDS.SERVICE.WEB3.EthContractFactory)
+            .toFactory(context => testEthContractFactory({
+                getCommentCount: getCommentsCountMethodStub,
+                readComment: readCommentMethodStub,
+            }))
+
+        getCommentsCountStub
+            .onCall(0).resolves('0')
+            .onCall(1).resolves('1')
+        
+        readCommentStub.resolves(goerliNftComment)
+        
+        const goerliNftAddress = '0x2aDe7E7ed11a4E35C2dDCCB6189d4fE710A165f5'
 
         const response = await testAgent
-            .get('/nfts/transactions/goerli/0x2aDe7E7ed11a4E35C2dDCCB6189d4fE710A165f5')
+            .get(`/nfts/transactions/goerli/${goerliNftAddress}?pageSize=10&pageKey=pageKey1`)
             .expect('Content-Type',/json/)
 
         expect(response.body.list).to.be.an('array')
         expect(response.body.count).to.be.undefined
-        expect(response.body.list.length).to.eq(5)
+        expect(response.body.list.length).to.eq(2)
         expect(response.body.list[0]).to.contain(({
-            from: '0x0000000000000000000000000000000000000000',
-            to: '0x7ee2bbc5d5004683ed84035591582be1fc4953f5',
-            blockNumber: 7626116,
-            tokenId: '37'
+            from: alchemyNftTransfersResponse.transfers[0].from,
+            to: alchemyNftTransfersResponse.transfers[0].to,
+            blockNumber: 16,
+            tokenId: '1'
+        }))
+        expect(response.body.list[1]).to.contain(({
+            from: alchemyNftTransfersResponse.transfers[1].from,
+            to: alchemyNftTransfersResponse.transfers[1].to,
+            blockNumber: 22,
+            tokenId: '2'
         }))
 
-        expect(axiosGetStub.calledOnce).to.eq(true)
+        //@ts-expect-error
+        expect(alchemyGetNftTransfersStub.calledOnceWith({
+            toAddress: goerliNftAddress,
+            category: [AssetTransfersCategory.ERC721, AssetTransfersCategory.ERC1155],
+            withMetadata: true,
+            maxCount: 10,
+            pageKey: 'pageKey1'
+        }))
+
+        expect(getCommentsCountStub.calledTwice).to.be.true
+        expect(getCommentsCountMethodStub.calledWith('1')).to.be.true
+        expect(getCommentsCountMethodStub.calledWith('2')).to.be.true
+
+        expect(readCommentStub.calledOnce).to.be.true
+        expect(readCommentMethodStub.calledOnceWith('contract_2', '2'))
     })
 
     it('should return matic nft transactions', async ()=>{

@@ -5,6 +5,9 @@ export class TestAlchemyMock {
     nft = {
         getNftsForOwner: function(){}
     }
+    core = {
+        getAssetTransfers: function(){}
+    }
 }
 
 

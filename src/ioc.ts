@@ -19,7 +19,7 @@ import { GoerliscanTtransactionsManager } from './modules/transactions/goerli';
 import { UnmarshalApi } from './services/unmarshal/UnmarhalApi';
 import { UnmarshalTokenManager } from './modules/tokens/UnmarshalTokenManager';
 import { GoerliScanTokenManager } from './modules/tokens/goerli';
-import { GoerliScanNFTsManager } from './modules/nfts/goerli';
+import { GoerliNFTsManager } from './modules/nfts/goerli';
 import { CovalentApi } from './services/covalent/covalent-api';
 import { CovalentTokenManager } from './modules/tokens/sol';
 import { TronscanTokenManager } from './modules/tokens/tron';
@@ -189,7 +189,7 @@ container.bind(IDS.MODULES.NftsManager)
     .whenTargetNamed(ChainId.eth)
     .onActivation(nftManagerDecorator)
 container.bind(IDS.MODULES.NftsManager)
-    .to(GoerliScanNFTsManager).inSingletonScope()
+    .to(GoerliNFTsManager).inSingletonScope()
     .whenTargetNamed(ChainId.goerli)
     .onActivation(nftManagerDecorator)
 container.bind(IDS.MODULES.NftsManagerFactory)

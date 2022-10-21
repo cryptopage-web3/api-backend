@@ -64,7 +64,7 @@ export interface INftTransaction {
     tokenId: string
     likes?: number
     dislikes?: number
-    comments?: number
+    comments?: ISocialComment[]
 }
 
 export interface INftTxList {
