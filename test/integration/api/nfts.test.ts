@@ -9,7 +9,6 @@ import { NftTokenDetails } from '../../../src/orm/model/nft-token-details';
 import Web3 from 'web3';
 import { testContainer } from '../../ioc/test-container';
 import { testEthContractFactory } from '../../mock/test-web3-mock';
-import { ISocialComment } from '../../../src/services/social-smart-contract/types';
 import { interfaces } from 'inversify';
 import { TestAlchemyMock } from '../../mock/test-alchemy-mock';
 import { AssetTransfersCategory } from 'alchemy-sdk';
