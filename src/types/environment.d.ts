@@ -18,7 +18,7 @@ export interface Env {
 
     SWAGGER_LOCAL_SERVER_FIRST: string | undefined
 
-    PREVENT_LOG_CONTROLLER_ERRORS: 'yes' | undefined
+    PREVENT_LOG_ERRORS: 'yes' | undefined
 
     ALCHEMY_API_KEY_GOERLI: string
 }

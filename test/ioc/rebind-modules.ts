@@ -11,12 +11,28 @@ const web3Mocks = {}
 export function rebindModules(container: Container){
     container.rebind(IDS.NODE_MODULES.axios).toConstantValue(TestAxiosMock)
     container.rebind(IDS.NODE_MODULES.web3Factory).toFactory(context => (chain:ChainId) =>{
-        if(!web3Mocks[chain]){
+        const key = `web3_${chain}`
+
+        let instance
+
+        if(!context.container.isBound(key)){
             getChainRpc(chain)
-            web3Mocks[chain] = new TestWeb3Mock()
+            instance = new TestWeb3Mock()
+            context.container.bind(key).toConstantValue(instance)
+        } else {
+            instance = context.container.get(key)
         }
-        return web3Mocks[chain]
+
+        return instance
     })
     container.rebind(IDS.SERVICE.WEB3.EthContractFactory).toFactory(context => testEthContractFactory())
     container.rebind(IDS.SERVICE.AlchemySdkFactory).toFactory(context => testAlchemyMockFactory)
+}
+
+export function resetWeb3MockInstances(){
+    Object.keys(web3Mocks).forEach(key => ()=>{
+        const mock:TestWeb3Mock = web3Mocks[key]
+
+        delete web3Mocks[key]
+    })
 }

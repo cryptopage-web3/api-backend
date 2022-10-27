@@ -29,7 +29,13 @@ export class NftCache {
         const dbToken = await this._nftTokenRepo.getToken(chain, contractAddress, tokenId)
 
         if(dbToken){
-            return dbToken.get({plain: true})
+            const result = dbToken.get({plain: true})
+            
+            delete result['id']
+            delete result['createdAt']
+            delete result['updatedAt']
+
+            return result
         }
 
         const apiToken = await getTokenFromApi()

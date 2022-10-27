@@ -8,10 +8,12 @@ import { expect } from 'chai';
 import { NftTokenDetails } from '../../../src/orm/model/nft-token-details';
 import Web3 from 'web3';
 import { testContainer } from '../../ioc/test-container';
-import { testEthContractFactory } from '../../mock/test-web3-mock';
+import { testEthContractFactory, TestWeb3Mock } from '../../mock/test-web3-mock';
 import { interfaces } from 'inversify';
 import { TestAlchemyMock } from '../../mock/test-alchemy-mock';
 import { AssetTransfersCategory } from 'alchemy-sdk';
+import { container } from '../../../src/ioc';
+import { ChainId } from '../../../src/modules/transactions/types';
 
 const app = new InversifyExpressServer(testContainer).build()
 const testAgent = agent(app)
@@ -19,13 +21,14 @@ const testAgent = agent(app)
 const axios:Axios = testContainer.get(IDS.NODE_MODULES.axios)
 
 const axiosGetStub = Sinon.stub(axios, 'get')
-const tokenDetailsStub = Sinon.stub(NftTokenDetails, 'findOne')
+const getCacheTokenDetailsStub = Sinon.stub(NftTokenDetails, 'findOne')
 const axiosHeadStub = Sinon.stub(axios, 'head')
 const saveTokenStub = Sinon.stub(NftTokenDetails, 'create')
 
 describe('test nfts api endpoints', ()=>{
     beforeEach(()=>{
         testContainer.snapshot()
+        process.env.PREVENT_LOG_ERRORS = 'yes'
     })
     afterEach(()=>{
         testContainer.restore()
@@ -396,7 +399,7 @@ describe('test nfts api endpoints', ()=>{
         axiosGetStub.resolves({data: unmarshalEthNftDetailsResponse})
         axiosHeadStub.resolves({headers:{'content-type': 'image/png'}})
         saveTokenStub.resolves()
-        tokenDetailsStub.resolves(null)
+        getCacheTokenDetailsStub.resolves(null)
         
 
         const contractAddress = '0x495f947276749ce646f68ac8c248420045cb7b5e',
@@ -415,8 +418,9 @@ describe('test nfts api endpoints', ()=>{
         })
         expect(axiosGetStub.callCount).to.eq(1)
         expect(axiosHeadStub.callCount).to.eq(1)
-        expect(tokenDetailsStub.callCount).to.eq(1)
+        expect(getCacheTokenDetailsStub.callCount).to.eq(1)
         expect(saveTokenStub.callCount).to.eq(1)
+
         //@ts-expect-error
         expect(web3GetBlockStub.callCount).to.eq(1)
     })
@@ -435,7 +439,7 @@ describe('test nfts api endpoints', ()=>{
         axiosGetStub.resolves({data: unmarshalMaticNftDetailsResponse})
         axiosHeadStub.resolves({headers:{'content-type': 'image/gif'}})
         saveTokenStub.resolves()
-        tokenDetailsStub.resolves(null)
+        getCacheTokenDetailsStub.resolves(null)
 
         const contractAddress = '0x2953399124f0cbb46d2cbacd8a89cf0599974963',
             tokenId = '78965343665950388415519985342127408390054350375949077399659463369044632110752',
@@ -453,7 +457,7 @@ describe('test nfts api endpoints', ()=>{
         })
         expect(axiosGetStub.callCount).to.eq(1)
         expect(axiosHeadStub.callCount).to.eq(1)
-        expect(tokenDetailsStub.callCount).to.eq(1)
+        expect(getCacheTokenDetailsStub.callCount).to.eq(1)
         expect(saveTokenStub.callCount).to.eq(1)
 
         //@ts-expect-error
@@ -473,7 +477,7 @@ describe('test nfts api endpoints', ()=>{
 
         axiosGetStub.resolves({data: unmarshalBscNftDetailsResponse})
         saveTokenStub.resolves()
-        tokenDetailsStub.resolves(null)
+        getCacheTokenDetailsStub.resolves(null)
 
         const contractAddress = '0x7dcdefb5f0844619ac16bcd5f36c3014efa90931',
             tokenId = '340282366920938463463374607431768211749',
@@ -491,10 +495,165 @@ describe('test nfts api endpoints', ()=>{
         })
         expect(axiosGetStub.callCount).to.eq(1)
         expect(axiosHeadStub.callCount).to.eq(0)
-        expect(tokenDetailsStub.callCount).to.eq(1)
+        expect(getCacheTokenDetailsStub.callCount).to.eq(1)
         expect(saveTokenStub.callCount).to.eq(1)
 
         //@ts-expect-error
         expect(web3GetBlockStub.callCount).to.eq(1)
+    })
+
+    it('should return goerli nfts token details', async ()=>{
+        const web3Factory: Function = container.get(IDS.NODE_MODULES.web3Factory)
+        const web3: TestWeb3Mock = web3Factory(ChainId.goerli)
+        const web3GetBlockStub = Sinon.stub(web3.eth, 'getBlock')
+        
+        const getTokenUriMethodStub = Sinon.stub()
+        const getTokenUriCallStub = Sinon.stub()
+
+        const getCommentsCountMethodStub = Sinon.stub()
+        const readCommentMethodStub = Sinon.stub()
+
+        web3GetBlockStub.resolves({timestamp: 1659947419})
+        getTokenUriMethodStub.returns({call: getTokenUriCallStub})
+        getCommentsCountMethodStub.returns({call: readCommentMethodStub})
+
+        testContainer.rebind(IDS.SERVICE.WEB3.EthContractFactory)
+            .toFactory(context => testEthContractFactory({
+                tokenURI: getTokenUriMethodStub,
+                getCommentCount: getCommentsCountMethodStub
+            }))
+
+        const tokenUri = 'http://test.uri'
+        const tokenData = {
+            image: 'http://token_image.url', name:'test token name', description:'test toked descr', attributes:[{attr1:'test1'}]
+        }
+        
+        axiosGetStub.resolves({data: tokenData})
+        getCacheTokenDetailsStub.resolves(null)
+        saveTokenStub.resolves()
+        getTokenUriCallStub.resolves(tokenUri)
+        readCommentMethodStub.resolves(0)
+        
+        const contractAddress = '0x495f947276749ce646f68ac8c248420045cb7b5e',
+            tokenId = '64',
+            blockNumber = 15300497
+
+        const response = await testAgent
+            .get(`/nfts/transaction/goerli/details/${contractAddress}/${tokenId}/${blockNumber}`)
+            .expect('Content-Type',/json/)
+
+        expect(response.body).deep.equal({
+            "tokenId": "64",
+            "chain": "goerli",
+            "contractAddress": "0x495f947276749ce646f68ac8c248420045cb7b5e",
+            "url": tokenData.image,
+            "type": "image",
+            "name": tokenData.name,
+            "description": tokenData.description,
+            "attributes": tokenData.attributes,
+            "date": "2022-08-08T08:30:19.000Z",
+            comments: []
+        })
+        
+        expect(getCacheTokenDetailsStub.callCount).to.eq(1)
+        
+        expect(getCommentsCountMethodStub.calledOnceWith(tokenId)).to.be.true
+        expect(readCommentMethodStub.calledOnce).to.be.true
+        
+        expect(axiosGetStub.callCount).to.eq(1)
+        
+        expect(saveTokenStub.callCount).to.eq(1)
+        expect(web3GetBlockStub.callCount).to.eq(1)
+        expect(web3GetBlockStub.getCall(0).args).to.deep.equal([blockNumber.toString()])
+
+        expect(getTokenUriMethodStub.calledOnceWith(tokenId)).to.be.true
+        expect(getTokenUriCallStub.calledOnce).to.be.true
+
+        expect(axiosGetStub.calledOnceWith(tokenUri)).to.be.true
+    })
+
+    it('should return error goerli nfts token details', async ()=>{
+        const web3Factory: Function = container.get(IDS.NODE_MODULES.web3Factory)
+        const web3: TestWeb3Mock = web3Factory(ChainId.goerli)
+        const web3GetBlockStub = Sinon.stub(web3.eth, 'getBlock')
+        
+        const getTokenUriMethodStub = Sinon.stub()
+        const getTokenUriCallStub = Sinon.stub()
+
+        const getCommentsCountMethodStub = Sinon.stub()
+        const readCommentMethodStub = Sinon.stub()
+
+        web3GetBlockStub.resolves({timestamp: 1659947419})
+        getTokenUriMethodStub.returns({call: getTokenUriCallStub})
+        getCommentsCountMethodStub.returns({call: readCommentMethodStub})
+
+        testContainer.rebind(IDS.SERVICE.WEB3.EthContractFactory)
+            .toFactory(context => testEthContractFactory({
+                tokenURI: getTokenUriMethodStub,
+                getCommentCount: getCommentsCountMethodStub
+            }))
+
+        const tokenUri = 'http://test.uri'
+        
+        axiosGetStub.rejects({message:'Test axios error message'})
+        getCacheTokenDetailsStub.resolves(null)
+        getTokenUriCallStub.resolves(tokenUri)
+        readCommentMethodStub.resolves(0)
+        
+        const contractAddress = '0x495f947276749ce646f68ac8c248420045cb7b5e',
+            tokenId = '86322540947695616051707333350443506684962566151002367173878109827558281315304',
+            blockNumber = 15300497
+
+        const response = await testAgent
+            .get(`/nfts/transaction/goerli/details/${contractAddress}/${tokenId}/${blockNumber}`)
+            .expect('Content-Type',/json/)
+
+        expect(response.body).contain({
+            message: 'Unexpected error'
+        })
+        
+        expect(getCacheTokenDetailsStub.callCount).to.eq(1)
+        
+        expect(getCommentsCountMethodStub.calledOnceWith(tokenId)).to.be.true
+        expect(readCommentMethodStub.calledOnce).to.be.true
+        
+        expect(axiosGetStub.callCount).to.eq(1)
+        
+        expect(saveTokenStub.callCount).to.eq(0)
+        expect(web3GetBlockStub.callCount).to.eq(1)
+        expect(web3GetBlockStub.getCall(0).args).to.deep.equal([blockNumber.toString()])
+
+        expect(getTokenUriMethodStub.calledOnceWith(tokenId)).to.be.true
+        expect(getTokenUriCallStub.calledOnce).to.be.true
+
+        expect(axiosGetStub.calledOnceWith(tokenUri)).to.be.true
+        
+        Sinon.resetHistory()
+
+        getTokenUriCallStub.rejects({message: 'failed to get token uri test error'})
+
+        const response2 = await testAgent
+            .get(`/nfts/transaction/goerli/details/${contractAddress}/${tokenId}/${blockNumber}`)
+            .expect('Content-Type',/json/)
+
+        expect(response2.body).contain({
+            message: 'Unexpected error'
+        })
+
+        expect(getCacheTokenDetailsStub.callCount).to.eq(1)
+
+        expect(getTokenUriMethodStub.calledOnceWith(tokenId)).to.be.true
+        expect(getTokenUriCallStub.calledOnce).to.be.true
+        
+        expect(axiosGetStub.callCount).to.eq(0)
+        
+        expect(saveTokenStub.callCount).to.eq(0)
+        expect(web3GetBlockStub.callCount).to.eq(1)
+        expect(web3GetBlockStub.getCall(0).args).to.deep.equal([blockNumber.toString()])
+
+        expect(getTokenUriMethodStub.calledOnceWith(tokenId)).to.be.true
+        expect(getTokenUriCallStub.calledOnce).to.be.true
+
+        expect(axiosGetStub.callCount).to.eq(0)
     })
 })

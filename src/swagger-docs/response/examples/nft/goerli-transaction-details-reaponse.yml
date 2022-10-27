@@ -1,6 +1,0 @@
-responses:
-  examples:
-    GoerliNftTransactionExample:
-      summary: A sample goerli nft transaction
-      value:
-        {"id":3,"tokenId":"64","chain":"goerli","contractAddress":"0x19962298f0b28be502ce83bd179eb212287ecb5d","name":"3333","type":"image","description":"44444","url":"https://ipfs.io/ipfs/QmWUUKtaywisLWcPTQqminMWZL4KdjRgkWnhEEpRvnd3wm","attributes":[],"createdAt":"2022-10-11T16:38:18.000Z","updatedAt":"2022-10-11T16:38:18.000Z","date":"2022-10-09T01:08:36.000Z","comments":[{"ipfsHash":"QmahCfMKphUSeUfmGHS6viECg8HVKACfLqS4taJEZbNDV2","creator":"0x7eE2BBC5d5004683ed84035591582be1Fc4953F5","_owner":"0x7eE2BBC5d5004683ed84035591582be1Fc4953F5","price":"8988193353885212634","isUp":true,"isDown":false,"isView":true}]}

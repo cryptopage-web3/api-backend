@@ -46,14 +46,20 @@ export class EthWeb3Manager implements IWeb3Manager {
         ];
         const contract = this._ethContractFactory(minABI, contrctAddress);
         const metadataUri = await contract.methods.tokenURI(tokenId).call().catch(err =>{
-            console.error(`Failed to get tokenURI, contract: ${contrctAddress}, tokenId: ${tokenId}`, err)
-            return null
+            if(!process.env.PREVENT_LOG_ERRORS){
+                console.error(`Failed to get tokenURI, contract: ${contrctAddress}, tokenId: ${tokenId}`, err.message)
+            }
+            
+            return Promise.reject(err)
         });
         const urlNormalized = normalizeUrl(metadataUri);
         if(urlNormalized){
             const { data } = await this._axios.get(urlNormalized).catch(err => {
-                console.log(`Failed to getNft data tokenID: ${tokenId}`, metadataUri, urlNormalized, err.message)
-                return { data :{}}
+                if(!process.env.PREVENT_LOG_ERRORS){
+                    console.error(`Failed to getNft data tokenID: ${tokenId}`, metadataUri, urlNormalized, err.message)
+                }
+                
+                return Promise.reject(err)
             });
             return {
                 url: data.image || data.animation_url,
