@@ -31,9 +31,11 @@ export class NftCache {
         if(dbToken){
             const result = dbToken.get({plain: true})
             
-            delete result['id']
-            delete result['createdAt']
-            delete result['updatedAt']
+            const removeFields = ['id','createdAt','updatedAt']
+
+            removeFields.forEach((key)=>{
+                delete result[key]
+            })
 
             return result
         }
