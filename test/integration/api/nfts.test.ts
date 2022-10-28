@@ -28,7 +28,6 @@ const saveTokenStub = Sinon.stub(NftTokenDetails, 'create')
 describe('test nfts api endpoints', ()=>{
     beforeEach(()=>{
         testContainer.snapshot()
-        process.env.PREVENT_LOG_ERRORS = 'yes'
     })
     afterEach(()=>{
         testContainer.restore()
@@ -48,7 +47,8 @@ describe('test nfts api endpoints', ()=>{
                 from: '0x8b27de7f6a7542ee70e2420e1bc67fc479d01984',
                 to: '0xb29c388e3fd63e1050ac5e4ca1d046dca36f004c',
                 //name: 'v1 punk #8561',
-                tokenId: '8561'
+                tokenId: '8561',
+                contentUrl: unmarshalEthNftsResponse.nft_assets[0].issuer_specific_data.image_url
             }))
 
             expect(axiosGetStub.calledOnce).to.eq(true)
@@ -62,17 +62,18 @@ describe('test nfts api endpoints', ()=>{
             .get('/nfts/matic/0xBA7089b207205c1B2282A18c1C80E856Fd424de0')
             .expect('Content-Type',/json/)
 
-            expect(response.body.count).to.eq(102)
-            expect(response.body.list).to.be.an('array')
-            expect(response.body.list.length).to.eq(4)
-            expect(response.body.list[0]).to.contain(({
-                contract_address: '0x2953399124f0cbb46d2cbacd8a89cf0599974963',
-                from: '0xb7f8d0b571f9fc79e896c778ccdff2f92279ac21',
-                to: '0xBA7089b207205c1B2282A18c1C80E856Fd424de0',
-                tokenId: '1267276096787188443380565843485598748588859320258549594955629332512307718469'
-            }))
+        expect(axiosGetStub.calledOnce).to.eq(true)
 
-            expect(axiosGetStub.calledOnce).to.eq(true)
+        expect(response.body.count).to.eq(102)
+        expect(response.body.list).to.be.an('array')
+        expect(response.body.list.length).to.eq(4)
+        expect(response.body.list[0]).to.contain(({
+            contract_address: '0x2953399124f0cbb46d2cbacd8a89cf0599974963',
+            from: '0xb7f8d0b571f9fc79e896c778ccdff2f92279ac21',
+            to: '0xBA7089b207205c1B2282A18c1C80E856Fd424de0',
+            tokenId: '1267276096787188443380565843485598748588859320258549594955629332512307718469',
+            contentUrl: unmarshalMaticNftsResponse.nft_assets[0].issuer_specific_data.image_url
+        }))
     })
 
     it('should return bsc nfts', async () => {
@@ -90,7 +91,8 @@ describe('test nfts api endpoints', ()=>{
             contract_address: '0x3d7b0001e03096d3795fd5d984ad679467546d73',
             from: '0x3c284a074afe106adbc1b6eeea1c15983eafdc47',
             to: '0x2465176C461AfB316ebc773C61fAEe85A6515DAA',
-            tokenId: '166401'
+            tokenId: '166401',
+            contentUrl: unmarshalBscNtsResponse.nft_assets[0].issuer_specific_data.image_url
         }))
 
         expect(axiosGetStub.calledOnce).to.eq(true)
@@ -150,6 +152,7 @@ describe('test nfts api endpoints', ()=>{
             "description": "token 19 descr",
             "contract_address": "0x19962298f0b28be502ce83bd179eb212287ecb5d",
             "tokenId": "19",
+            contentUrl: alchemyAddressNftsResponse.ownedNfts[0].media[0]?.gateway
         })
         expect(response.body.list[0].comments).to.be.a('array').that.is.empty
 
@@ -159,6 +162,7 @@ describe('test nfts api endpoints', ()=>{
             "description": "",
             "contract_address": "0x19962298f0b28be502ce83bd179eb212287ecb5d",
             "tokenId": "20",
+            contentUrl: alchemyAddressNftsResponse.ownedNfts[1].media[0]?.gateway
         })
         expect(response.body.list[1].comments).to.deep.equal([goerliNftComment])
     })
@@ -413,7 +417,7 @@ describe('test nfts api endpoints', ()=>{
         expect(response.body).contain({
             tokenId,
             type: 'image',
-            url: unmarshalEthNftDetailsResponse.nft_token_details[0].image_url,
+            contentUrl: unmarshalEthNftDetailsResponse.nft_token_details[0].image_url,
             date: '2022-08-08T08:30:19.000Z'
         })
         expect(axiosGetStub.callCount).to.eq(1)
@@ -452,7 +456,7 @@ describe('test nfts api endpoints', ()=>{
         expect(response.body).contain({
             tokenId,
             type: 'image',
-            url: unmarshalMaticNftDetailsResponse.nft_token_details[0].image_url,
+            contentUrl: unmarshalMaticNftDetailsResponse.nft_token_details[0].image_url,
             date: '2022-08-03T09:47:45.000Z'
         })
         expect(axiosGetStub.callCount).to.eq(1)
@@ -490,7 +494,7 @@ describe('test nfts api endpoints', ()=>{
         expect(response.body).contain({
             tokenId,
             type: 'image',
-            url: unmarshalBscNftDetailsResponse.nft_token_details[0].image_url,
+            contentUrl: unmarshalBscNftDetailsResponse.nft_token_details[0].image_url,
             date: '2022-03-19T13:34:25.000Z'
         })
         expect(axiosGetStub.callCount).to.eq(1)
@@ -546,7 +550,7 @@ describe('test nfts api endpoints', ()=>{
             "tokenId": "64",
             "chain": "goerli",
             "contractAddress": "0x495f947276749ce646f68ac8c248420045cb7b5e",
-            "url": tokenData.image,
+            "contentUrl": tokenData.image,
             "type": "image",
             "name": tokenData.name,
             "description": tokenData.description,

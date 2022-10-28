@@ -11,7 +11,7 @@ export class NftTokenDetails extends Model<NftTokenDetailsInferAttr, InferCreati
     declare name: string
     declare type: string
     declare description: string
-    declare url: string
+    declare contentUrl: string
     declare attributes: any[]
 }
 
@@ -22,7 +22,7 @@ NftTokenDetails.init({
     name: DataTypes.STRING(255),
     type: DataTypes.STRING(100),
     description: DataTypes.STRING(2000),
-    url: DataTypes.STRING(600),
+    contentUrl: DataTypes.STRING(600),
     attributes: DataTypes.JSON
 },{
     sequelize: db

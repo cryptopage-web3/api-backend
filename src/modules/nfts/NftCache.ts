@@ -46,7 +46,7 @@ export class NftCache {
             tokenId,
             chain,
             contractAddress,
-            url: apiToken.url,
+            contentUrl: apiToken.url,
             type: apiToken.type,
             name: apiToken.name,
             description: apiToken.description,

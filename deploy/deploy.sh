@@ -63,7 +63,7 @@ npm t 2>&1
 
 exit_if_error "integration tests failed"
 
-npm run db:sync 2&>1
+npx sequelize-cli db:migrate 2&>1
 
 exit_if_error "database update failed"
 

@@ -26,7 +26,7 @@ export interface INftItem {
     description: string,
     type?: string,
     usdPrice?: number,
-    url: string | undefined,
+    contentUrl: string | undefined,
     image?: string,
     contract_address: string,
     tokenId: string,

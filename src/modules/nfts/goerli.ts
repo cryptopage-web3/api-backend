@@ -41,7 +41,7 @@ export class GoerliNFTsManager implements INftsManager {
             contract_address: data.contract.address,
             tokenId: data.tokenId,
             collectionName: data.contract?.name,
-            url: data.media[0]?.gateway,
+            contentUrl: data.media[0]?.gateway,
             attributes: data.rawMetadata?.attributes as any[],
             likes: 0,
             dislikes: 0,
