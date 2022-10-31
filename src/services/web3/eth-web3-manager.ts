@@ -5,12 +5,14 @@ import Web3 from 'web3';
 import { Web3NftTokenData } from 'modules/nfts/types';
 import { normalizeUrl } from '../../util/url-util';
 import { Axios } from 'axios';
+import { ErrorLogRepo } from '../../orm/repo/error-log-repo';
 
 @injectable()
 export class EthWeb3Manager implements IWeb3Manager {
     @inject(IDS.NODE_MODULES.web3) _web3: Web3
     @inject(IDS.NODE_MODULES.axios) _axios: Axios
     @inject(IDS.SERVICE.WEB3.EthContractFactory) _ethContractFactory: Function
+    @inject(IDS.ORM.REPO.ErrorLogRepo) _errorLogRepo: ErrorLogRepo
 
     async getDateFromBlock(blocknum: number): Promise<Date> {
         const block = await this._web3.eth.getBlock(blocknum);
@@ -46,12 +48,16 @@ export class EthWeb3Manager implements IWeb3Manager {
         ];
         const contract = this._ethContractFactory(minABI, contrctAddress);
         const metadataUri = await contract.methods.tokenURI(tokenId).call().catch(err =>{
+            this._errorLogRepo.log('web3_contract_call_get_token_uri')
+
             console.error(`Failed to get tokenURI, contract: ${contrctAddress}, tokenId: ${tokenId}`, err)
             return null
         });
         const urlNormalized = normalizeUrl(metadataUri);
         if(urlNormalized){
             const { data } = await this._axios.get(urlNormalized).catch(err => {
+                this._errorLogRepo.log('external_url_get_token_json')
+                
                 console.log(`Failed to getNft data tokenID: ${tokenId}`, metadataUri, urlNormalized, err.message)
                 return { data :{}}
             });

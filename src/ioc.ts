@@ -38,6 +38,7 @@ import { DefaultSocialSmartContract } from './services/social-smart-contract/def
 import { goerliSocialAbi } from './services/social-smart-contract/goerli-social-abi';
 import { getAlchemyNetwork, buildAlchemyChainApiKeyVarname } from './services/alchemy/alchemy-util';
 import { Alchemy } from "alchemy-sdk";
+import { ErrorLogRepo } from './orm/repo/error-log-repo';
 
 export const container = new Container();
 
@@ -218,6 +219,7 @@ container.bind(IDS.MODULES.TokenManagerFactory)
 
 container.bind(IDS.ORM.REPO.ContractDetailsRepo).to(ContractDetailsRepo)
 container.bind(IDS.ORM.REPO.NftTokenDetailsRepo).to(NftTokenDetailsRepo)
+container.bind(IDS.ORM.REPO.ErrorLogRepo).to(ErrorLogRepo)
 
 function getChainIdFromAncestor(request: interfaces.Request):ChainId | undefined {
     const parent = request.parentRequest

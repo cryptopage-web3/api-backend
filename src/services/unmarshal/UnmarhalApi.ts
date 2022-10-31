@@ -9,6 +9,7 @@ import { IUnmarshanNftItem, IUnmarshalNftResponse, UnmarshalNftDetails, IUnmarsh
 import { UnmarshalApiHelper } from './helper';
 import { PriceCache } from '../../cache/coins';
 import { normalizeUrl } from '../../util/url-util';
+import { ErrorLogRepo } from '../../orm/repo/error-log-repo';
 
 @injectable()
 export class UnmarshalApi {
@@ -16,6 +17,7 @@ export class UnmarshalApi {
     @inject(IDS.ORM.REPO.ContractDetailsRepo) _contractDetailsRepo:ContractDetailsRepo
     @inject(IDS.SERVICE.UnmarshalApiHelper) _helper: UnmarshalApiHelper
     @inject(IDS.CACHE.PriceCache) _priceCache: PriceCache
+    @inject(IDS.ORM.REPO.ErrorLogRepo) _errorLogRepo: ErrorLogRepo
 
     _chain: ChainId
 
@@ -268,6 +270,7 @@ export class UnmarshalApi {
         const url = normalizeUrl(info.image_url)
 
         const type = await this._helper.getType(url).catch(err =>{
+            this._errorLogRepo.log('unmarshal_api_get_token_details')
             console.error(`failed to get nft content type:, ${url}`, err)
         })
 
@@ -312,12 +315,6 @@ export class UnmarshalApi {
         const data = await this.getNFTTransactionsFromApi(address, page, pageSize);
         const transactions = data.transactions || [] 
 
-        //const promises: Promise<any>[] = [];
-       /* for (const item of transactions) {
-            const promise = this.getNFTTransactionDataFromItem(item);
-            promises.push(promise);
-        }*/
-        //const list = await Promise.all(promises);
         return { list: transactions, count: data.total_txs };
     }
 }

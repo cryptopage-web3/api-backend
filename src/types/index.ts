@@ -44,6 +44,7 @@ export const IDS = {
         REPO:{
             ContractDetailsRepo: Symbol('ContractDetailsRepo'),
             NftTokenDetailsRepo: Symbol('NftTokenDetailsRepo'),
+            ErrorLogRepo: Symbol('ErrorLogRepo'),
         }
     }
 }
