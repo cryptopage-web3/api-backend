@@ -1,4 +1,6 @@
-require('dotenv').config();
+import { initEnvVariables } from './env-init';
+
+initEnvVariables()
 
 import 'reflect-metadata'
 
