@@ -229,8 +229,8 @@ export class UnmarshalApi {
             description: item.description,
             type: item.type,
             usdPrice: Number(item.price),
-            url: normalizeUrl(item.external_link),
-            image: normalizeUrl(item.issuer_specific_data.image_url),
+            //contentUrl: normalizeUrl(item.external_link),
+            contentUrl: normalizeUrl(item.issuer_specific_data.image_url),
             contract_address: item.asset_contract,
             tokenId: item.token_id,
             attributes: item.nft_metadata

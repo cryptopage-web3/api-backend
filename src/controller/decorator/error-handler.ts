@@ -9,7 +9,7 @@ export function errorHandler(){
             try {
                 return await originalMethod.apply(this, args)
             } catch (error) {
-                if(process.env.PREVENT_LOG_CONTROLLER_ERRORS !== 'yes'){
+                if(process.env.PREVENT_LOG_ERRORS !== 'yes'){
                     console.error('Failed to call controller:', args[args.length - 3].originalUrl, error)
                 }
                 
