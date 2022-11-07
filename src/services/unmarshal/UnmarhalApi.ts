@@ -75,7 +75,11 @@ export class UnmarshalApi {
 
     async getTokensFromApi(address: string) {
         const url = `${this.baseUrl}/v1/${this.chainName}/address/${address}/assets?auth_key=${this.apiKey}`
-        const { data } = await this._axios.get(url);
+        const { data } = await this._axios.get(url).catch(err =>{
+            this._errorLogRepo.log('unmarshal_get_address_tokens', err.message, `/v2/${this.chainName}/address/${address}/assets`)
+
+            return Promise.reject(err)
+        })
         if (!data?.length) {
             return [];
         }
@@ -133,7 +137,11 @@ export class UnmarshalApi {
 
     async getTransactionsFromApi(address: string, page, pageSize) {
         const url = `${this.baseUrl}/v2/${this.chainName}/address/${address}/transactions?page=${page}&pageSize=${pageSize}&auth_key=${this.apiKey}`;
-        const { data } = await this._axios.get(url);
+        const { data } = await this._axios.get(url).catch(err =>{
+            this._errorLogRepo.log('unmarshal_get_address_transactions', err.message, `/v2/${this.chainName}/address/${address}/transactions`)
+
+            return Promise.reject(err)
+        })
 
         if (data.transactions?.length == 0) {
             return { items: [], count: 0 };
@@ -144,7 +152,11 @@ export class UnmarshalApi {
 
     async getTransactionsCount(address) {
         const url = `${this.baseUrl}/v2/${this.chainName}/address/${address}/transactions?page=1&pageSize=1&auth_key=${this.apiKey}`;
-        const { data: { total_txs } } = await this._axios.get(url);
+        const { data: { total_txs } } = await this._axios.get(url).catch(err =>{
+            this._errorLogRepo.log('unmarshal_get_address_transactions_count', err.message, `/v2/${this.chainName}/address/${address}/transactions`)
+
+            return Promise.reject(err)
+        })
 
         return total_txs;
     }
@@ -170,7 +182,11 @@ export class UnmarshalApi {
     }
 
     async getTransactionDetails(txHash) {
-        const { data } = await this._axios.get(`${this.baseUrl}/v2/${this.chainName}/transactions/${txHash}?auth_key=${this.apiKey}`);
+        const { data } = await this._axios.get(`${this.baseUrl}/v2/${this.chainName}/transactions/${txHash}?auth_key=${this.apiKey}`).catch(err =>{
+            this._errorLogRepo.log('unmarshal_get_transaction_details', err.message, `/v2/${this.chainName}/transactions/${txHash}`)
+
+            return Promise.reject(err)
+        })
 
         const transfers = [...(data.sent || []), ...(data.other || []), ...(data.received || [])];
         const tranfersInfo = transfers.map(e => {
