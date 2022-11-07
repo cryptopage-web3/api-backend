@@ -68,7 +68,7 @@ export class EthWeb3Manager implements IWeb3Manager {
             });
             return {
                 url: data.image || data.animation_url,
-                type: data.image ? 'image' : '721',
+                //type: data.image ? 'image' : '721',
                 name: data.name,
                 description: data.description,
                 attributes: data.attributes || []
