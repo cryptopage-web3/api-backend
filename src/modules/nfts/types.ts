@@ -74,7 +74,6 @@ export interface INftTxList {
 
 export interface Web3NftTokenData {
     url: string,
-    type: string,
     name: string,
     price: string,
     description: string,

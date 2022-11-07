@@ -27,7 +27,6 @@ export interface IUnmarshalNftResponse {
 
 export interface UnmarshalNftDetails {
     url: string
-    type: string
     name: string
     price: string
     description: string

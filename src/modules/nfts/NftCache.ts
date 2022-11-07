@@ -26,7 +26,7 @@ export class NftCache {
     }
 
     async _getTokenDetails(chain: ChainId, contractAddress: string, tokenId: string, getTokenFromApi: GetTokenFromApiCallback ){
-        const dbToken = await this._nftTokenRepo.getToken(chain, contractAddress, tokenId)
+        /*const dbToken = await this._nftTokenRepo.getToken(chain, contractAddress, tokenId)
 
         if(dbToken){
             const result = dbToken.get({plain: true})
@@ -38,7 +38,7 @@ export class NftCache {
             })
 
             return result
-        }
+        }*/
 
         const apiToken = await getTokenFromApi()
 
@@ -47,17 +47,15 @@ export class NftCache {
             chain,
             contractAddress,
             contentUrl: apiToken.url,
-            type: apiToken.type,
             name: apiToken.name,
             description: apiToken.description,
             attributes: apiToken.attributes
         }
-
-        if(apiToken.type){
-            this._nftTokenRepo.createToken(tokenData).catch(err =>{
-                console.log('failed to save token data to database', err)
-            })
-        }
+        
+       /* this._nftTokenRepo.createToken(tokenData).catch(err =>{
+            console.log('failed to save token data to database', err)
+        })*/
+        
 
         return tokenData
     }

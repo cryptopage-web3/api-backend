@@ -21,9 +21,7 @@ const testAgent = agent(app)
 const axios:Axios = testContainer.get(IDS.NODE_MODULES.axios)
 
 const axiosGetStub = Sinon.stub(axios, 'get')
-const getCacheTokenDetailsStub = Sinon.stub(NftTokenDetails, 'findOne')
 const axiosHeadStub = Sinon.stub(axios, 'head')
-const saveTokenStub = Sinon.stub(NftTokenDetails, 'create')
 
 describe('test nfts api endpoints', ()=>{
     beforeEach(()=>{
@@ -400,11 +398,7 @@ describe('test nfts api endpoints', ()=>{
             return instasnce
         })
         
-        axiosGetStub.resolves({data: unmarshalEthNftDetailsResponse})
-        axiosHeadStub.resolves({headers:{'content-type': 'image/png'}})
-        saveTokenStub.resolves()
-        getCacheTokenDetailsStub.resolves(null)
-        
+        axiosGetStub.resolves({data: unmarshalEthNftDetailsResponse})        
 
         const contractAddress = '0x495f947276749ce646f68ac8c248420045cb7b5e',
             tokenId = '86322540947695616051707333350443506684962566151002367173878109827558281315304',
@@ -416,14 +410,10 @@ describe('test nfts api endpoints', ()=>{
 
         expect(response.body).contain({
             tokenId,
-            type: 'image',
             contentUrl: unmarshalEthNftDetailsResponse.nft_token_details[0].image_url,
             date: '2022-08-08T08:30:19.000Z'
         })
         expect(axiosGetStub.callCount).to.eq(1)
-        expect(axiosHeadStub.callCount).to.eq(1)
-        expect(getCacheTokenDetailsStub.callCount).to.eq(1)
-        expect(saveTokenStub.callCount).to.eq(1)
 
         //@ts-expect-error
         expect(web3GetBlockStub.callCount).to.eq(1)
@@ -442,8 +432,6 @@ describe('test nfts api endpoints', ()=>{
 
         axiosGetStub.resolves({data: unmarshalMaticNftDetailsResponse})
         axiosHeadStub.resolves({headers:{'content-type': 'image/gif'}})
-        saveTokenStub.resolves()
-        getCacheTokenDetailsStub.resolves(null)
 
         const contractAddress = '0x2953399124f0cbb46d2cbacd8a89cf0599974963',
             tokenId = '78965343665950388415519985342127408390054350375949077399659463369044632110752',
@@ -455,14 +443,10 @@ describe('test nfts api endpoints', ()=>{
 
         expect(response.body).contain({
             tokenId,
-            type: 'image',
             contentUrl: unmarshalMaticNftDetailsResponse.nft_token_details[0].image_url,
             date: '2022-08-03T09:47:45.000Z'
         })
         expect(axiosGetStub.callCount).to.eq(1)
-        expect(axiosHeadStub.callCount).to.eq(1)
-        expect(getCacheTokenDetailsStub.callCount).to.eq(1)
-        expect(saveTokenStub.callCount).to.eq(1)
 
         //@ts-expect-error
         expect(web3GetBlockStub.callCount).to.eq(1)
@@ -480,8 +464,6 @@ describe('test nfts api endpoints', ()=>{
         })
 
         axiosGetStub.resolves({data: unmarshalBscNftDetailsResponse})
-        saveTokenStub.resolves()
-        getCacheTokenDetailsStub.resolves(null)
 
         const contractAddress = '0x7dcdefb5f0844619ac16bcd5f36c3014efa90931',
             tokenId = '340282366920938463463374607431768211749',
@@ -493,14 +475,11 @@ describe('test nfts api endpoints', ()=>{
 
         expect(response.body).contain({
             tokenId,
-            type: 'image',
             contentUrl: unmarshalBscNftDetailsResponse.nft_token_details[0].image_url,
             date: '2022-03-19T13:34:25.000Z'
         })
         expect(axiosGetStub.callCount).to.eq(1)
         expect(axiosHeadStub.callCount).to.eq(0)
-        expect(getCacheTokenDetailsStub.callCount).to.eq(1)
-        expect(saveTokenStub.callCount).to.eq(1)
 
         //@ts-expect-error
         expect(web3GetBlockStub.callCount).to.eq(1)
@@ -533,8 +512,6 @@ describe('test nfts api endpoints', ()=>{
         }
         
         axiosGetStub.resolves({data: tokenData})
-        getCacheTokenDetailsStub.resolves(null)
-        saveTokenStub.resolves()
         getTokenUriCallStub.resolves(tokenUri)
         readCommentMethodStub.resolves(0)
         
@@ -551,7 +528,6 @@ describe('test nfts api endpoints', ()=>{
             "chain": "goerli",
             "contractAddress": "0x495f947276749ce646f68ac8c248420045cb7b5e",
             "contentUrl": tokenData.image,
-            "type": "image",
             "name": tokenData.name,
             "description": tokenData.description,
             "attributes": tokenData.attributes,
@@ -559,14 +535,11 @@ describe('test nfts api endpoints', ()=>{
             comments: []
         })
         
-        expect(getCacheTokenDetailsStub.callCount).to.eq(1)
-        
         expect(getCommentsCountMethodStub.calledOnceWith(tokenId)).to.be.true
         expect(readCommentMethodStub.calledOnce).to.be.true
         
         expect(axiosGetStub.callCount).to.eq(1)
         
-        expect(saveTokenStub.callCount).to.eq(1)
         expect(web3GetBlockStub.callCount).to.eq(1)
         expect(web3GetBlockStub.getCall(0).args).to.deep.equal([blockNumber.toString()])
 
@@ -600,7 +573,6 @@ describe('test nfts api endpoints', ()=>{
         const tokenUri = 'http://test.uri'
         
         axiosGetStub.rejects({message:'Test axios error message'})
-        getCacheTokenDetailsStub.resolves(null)
         getTokenUriCallStub.resolves(tokenUri)
         readCommentMethodStub.resolves(0)
         
@@ -616,14 +588,11 @@ describe('test nfts api endpoints', ()=>{
             message: 'Unexpected error'
         })
         
-        expect(getCacheTokenDetailsStub.callCount).to.eq(1)
-        
         expect(getCommentsCountMethodStub.calledOnceWith(tokenId)).to.be.true
         expect(readCommentMethodStub.calledOnce).to.be.true
         
         expect(axiosGetStub.callCount).to.eq(1)
         
-        expect(saveTokenStub.callCount).to.eq(0)
         expect(web3GetBlockStub.callCount).to.eq(1)
         expect(web3GetBlockStub.getCall(0).args).to.deep.equal([blockNumber.toString()])
 
@@ -644,14 +613,11 @@ describe('test nfts api endpoints', ()=>{
             message: 'Unexpected error'
         })
 
-        expect(getCacheTokenDetailsStub.callCount).to.eq(1)
-
         expect(getTokenUriMethodStub.calledOnceWith(tokenId)).to.be.true
         expect(getTokenUriCallStub.calledOnce).to.be.true
         
         expect(axiosGetStub.callCount).to.eq(0)
         
-        expect(saveTokenStub.callCount).to.eq(0)
         expect(web3GetBlockStub.callCount).to.eq(1)
         expect(web3GetBlockStub.getCall(0).args).to.deep.equal([blockNumber.toString()])
 

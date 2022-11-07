@@ -264,19 +264,17 @@ export class UnmarshalApi {
 
     async getNFTDetailsFromApi(contractAddress, tokenId): Promise<UnmarshalNftDetails> {
         const apiUrl = `${this.baseUrl}/v2/${this.chainName}/address/${contractAddress}/details?page=1&pageSize=1&tokenId=${tokenId}&auth_key=${this.apiKey}`
-        const { data } = await this._axios.get(apiUrl);
+        const { data } = await this._axios.get(apiUrl).catch(err =>{
+            this._errorLogRepo.log('unmarshal_get_nft_details', err.message, `/v2/${this.chainName}/address/${contractAddress}/details`)
+
+            return Promise.reject(err)
+        })
         const info = data.nft_token_details[0];
 
         const url = normalizeUrl(info.image_url)
 
-        const type = await this._helper.getType(url).catch(err =>{
-            this._errorLogRepo.log('unmarshal_api_get_token_details')
-            console.error(`failed to get nft content type:, ${url}`, err)
-        })
-
         return {
             url,
-            type,
             name: info.name,
             price: info.price,
             description: info.description,
@@ -293,13 +291,20 @@ export class UnmarshalApi {
 
     async getNFTTransactionsFromApi(address: string, page, pageSize):Promise<IUnmarshalNtfTxsResponse> {
         const url = `${this.baseUrl}/v2/${this.chainName}/address/${address}/nft-transactions?page=${page}&pageSize=${pageSize}&auth_key=${this.apiKey}`
-        const { data } = await this._axios.get(url);
+        const { data } = await this._axios.get(url).catch(err =>{
+            this._errorLogRepo.log('unmarshal_get_nft_transactions', err.message, `/v2/${this.chainName}/address/${address}/nft-transactions?page=${page}&pageSize=${pageSize}`)
+            return Promise.reject(err)
+        });
         return data;
     }
 
     async getNFTAssetsFromApi(address: string, page, pageSize):Promise<IUnmarshalNftResponse> {
         const url = `${this.baseUrl}/v2/${this.chainName}/address/${address}/nft-assets?page=${page}&pageSize=${pageSize}&auth_key=${this.apiKey}`
-        const { data } = await this._axios.get(url);
+        const { data } = await this._axios.get(url).catch(err =>{
+            this._errorLogRepo.log('unmarshal_get_nft_assets', err.message, `/v2/${this.chainName}/address/${address}/nft-assets?page=${page}&pageSize=${pageSize}`)
+
+            return Promise.reject(err)
+        })
         return data;
     }
 
