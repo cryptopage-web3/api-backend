@@ -29,7 +29,7 @@ export const IDS = {
         AlchemySdk: Symbol('AlchemySdk'),
         WEB3:{
             Web3Manager: Symbol('Web3Manager'),
-            SocialEthSmartContract: Symbol('EthContract'),
+            SocialEthSmartContract: Symbol('SocialEthSmartContract'),
             EthContractFactory: Symbol('EthContractFactory'),
         },
         SocialSmartContract: Symbol('SocialSmartContract')

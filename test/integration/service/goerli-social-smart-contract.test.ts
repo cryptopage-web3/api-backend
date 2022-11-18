@@ -12,7 +12,7 @@ const getCommentsCountCallStub = Sinon.stub()
 const readCommentMethodStub = Sinon.stub()
 const readCommentCallStub = Sinon.stub()
 
-container.bind(IDS.SERVICE.WEB3.EthContract)
+container.bind(IDS.SERVICE.WEB3.SocialEthSmartContract)
     .toDynamicValue(context => ({ methods:{
         getCommentCount: getCommentsCountMethodStub,
         readComment: readCommentMethodStub
