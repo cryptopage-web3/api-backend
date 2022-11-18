@@ -15,7 +15,7 @@ export class NftCache {
     async getNftTransactionDetails(web3Manager:IWeb3Manager,chain:ChainId, contractAddress: string, tokenId: string, blockNumber:number | null,getTokenFromApi: GetTokenFromApiCallback) {
         const [tokenDetails, blockDate, comments] = await Promise.all([
             this._getTokenDetails(chain, contractAddress, tokenId, getTokenFromApi),
-            typeof blockNumber == 'number' ? web3Manager.getDateFromBlock(blockNumber) : undefined,
+            !!blockNumber ? web3Manager.getDateFromBlock(blockNumber) : undefined,
             this._socialSmartContract.getComments(tokenId)
         ])
 
