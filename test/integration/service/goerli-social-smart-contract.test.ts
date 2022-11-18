@@ -1,9 +1,9 @@
-import { GoerliSocialSmartContract } from '../../../src/services/social-smart-contract/goerli-social-smart-contract';
+import { GoerliSocialSmartContract } from '../../../src/services/web3/social-smart-contract/goerli-social-smart-contract';
 import { IDS } from '../../../src/types/index';
 import { Container } from 'inversify';
 import Sinon from 'sinon';
 import { expect } from 'chai';
-import { ISocialComment } from '../../../src/services/social-smart-contract/types';
+import { ISocialComment } from '../../../src/services/web3/social-smart-contract/types';
 
 const container = new Container()
 

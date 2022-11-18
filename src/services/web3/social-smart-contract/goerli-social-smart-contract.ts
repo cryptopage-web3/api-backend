@@ -1,20 +1,20 @@
 import { inject, injectable } from "inversify";
 import { ISocialComment, ISocialSmartContract } from './types';
-import { IDS } from '../../types/index';
+import { IDS } from '../../../types/index';
 import Web3 from 'web3';
 
 @injectable()
 export class GoerliSocialSmartContract implements ISocialSmartContract{
     @inject(IDS.NODE_MODULES.web3) _web3: Web3
 
-    @inject(IDS.SERVICE.WEB3.EthContract) private _socialEthContract
+    @inject(IDS.SERVICE.WEB3.SocialEthSmartContract) private _socialContract
 
     async getCommentCount(tokenId: string): Promise<number> {
         const minABI:any[] = [
             { "inputs": [{ "internalType": "uint256", "name": "tokenId", "type": "uint256" }], "name": "getCommentCount", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }
         ];
         
-        const count = await this._socialEthContract.methods.getCommentCount(tokenId).call();
+        const count = await this._socialContract.methods.getCommentCount(tokenId).call();
 
         return parseInt(count)
     }
@@ -41,7 +41,7 @@ export class GoerliSocialSmartContract implements ISocialSmartContract{
     }
 
     async getCommentFromBlockchain(tokenId: string, commentId: number):Promise<ISocialComment>{
-        const comment = await this._socialEthContract.methods.readComment(tokenId, commentId).call();
+        const comment = await this._socialContract.methods.readComment(tokenId, commentId).call();
         return (({ipfsHash, creator, _owner, price, isUp, isDown,isView}) => ({ipfsHash, creator, _owner, price, isUp, isDown,isView}))(comment)
     }
 }

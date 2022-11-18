@@ -136,3 +136,30 @@ paths:
       responses:
         "400":
           $ref: '#/responses/PaginationError'
+  /nfts/token-details/{chain}/contract/{contractAddress}/token/{tokenId}:
+    get:
+      summary: Get single nft details.
+      tags: [NFT]
+      parameters:
+        - in: path
+          name: chain
+          required: true
+          schema:
+            type: string
+            enum: [goerli]
+            default: goerli
+          description: chain name
+        - $ref: '#/parameters/path/contractAddress'
+        - in: path
+          name: tokenId
+          schema:
+            type: string
+            required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                GoerliSingleNftDetailsExample:
+                  $ref: '#/responses/examples/GoerliSingleNftDetailsExample'

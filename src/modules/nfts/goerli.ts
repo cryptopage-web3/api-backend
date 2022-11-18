@@ -6,7 +6,7 @@ import { IDS } from '../../types/index';
 import { IGoerliNftTransaction } from '../../services/etherscan/types';
 import { IWeb3Manager } from '../../services/web3/types';
 import { NftCache } from './NftCache';
-import { ISocialSmartContract, ISocialComment } from '../../services/social-smart-contract/types';
+import { ISocialSmartContract, ISocialComment } from '../../services/web3/social-smart-contract/types';
 import { Alchemy, AssetTransfersCategory, AssetTransfersWithMetadataResult, OwnedNft } from 'alchemy-sdk';
 
 @injectable()
@@ -99,6 +99,17 @@ export class GoerliNFTsManager implements INftsManager {
             contractAddress,
             tokenId,
             blockNumber,
+            ()=> this._web3Manager.getTokenData(contractAddress, tokenId)
+        )
+    }
+
+    getNftDetails(contractAddress: string, tokenId: string) {
+        return this._nftCache.getNftTransactionDetails(
+            this._web3Manager,
+            this._chain,
+            contractAddress,
+            tokenId,
+            null,
             ()=> this._web3Manager.getTokenData(contractAddress, tokenId)
         )
     }

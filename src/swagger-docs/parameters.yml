@@ -36,6 +36,12 @@ parameters:
       required: true
       schema:
         type: string
+    contractAddress:
+      in: path
+      name: contractAddress
+      required: true
+      schema:
+        type: string
     chain:
       in: path
       name: chain

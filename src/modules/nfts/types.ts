@@ -1,12 +1,13 @@
 import { ChainId } from '../transactions/types';
-import { ISocialComment } from '../../services/social-smart-contract/types';
+import { ISocialComment } from '../../services/web3/social-smart-contract/types';
 
 export interface INftsManager {
     _chain: ChainId
     
     getWalletAllNFTs(address: string, page: number, pageSize: number): Promise<INftsList>
     getWalletNFTTransactions(address: string, opts: INftTransactionsPagination)
-    getNftTransactionDetails(contractAddress: string, tokenId: string, blockNumber:number)
+    getNftTransactionDetails(contractAddress: string, tokenId: string, blockNumber:number | null)
+    getNftDetails(contractAddress: string, tokenId: string)
 }
 
 export interface INftTransactionsPagination {

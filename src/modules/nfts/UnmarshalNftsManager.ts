@@ -1,7 +1,7 @@
 import { INftsManager, INftsList, INftTransaction, NftTxType, INftTransactionsPagination } from './types';
 import { UnmarshalApi } from '../../services/unmarshal/UnmarhalApi';
 import { inject, injectable } from 'inversify';
-import { IDS } from '../../types/index';
+import { IDS, ApiError } from '../../types/index';
 import { ChainId } from '../transactions/types';
 import { IWeb3Manager } from '../../services/web3/types';
 import { IUnmarshalNftTransaction } from '../../services/unmarshal/types';
@@ -55,5 +55,9 @@ export class UnmarshalNftsManager implements INftsManager {
             blockNumber,
             () => this._unmarshalApi.getNFTDetailsFromApi(contractAddress, tokenId)
         )
+    }
+
+    async getNftDetails(contractAddress: string, tokenId: string) {
+        throw new ApiError('Method not implemented')
     }
 }

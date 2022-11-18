@@ -33,9 +33,9 @@ import Web3 from 'web3';
 import { getChainRpc } from './enums/chains';
 import { EthWeb3Manager } from './services/web3/eth-web3-manager';
 import { NftCache } from './modules/nfts/NftCache';
-import { GoerliSocialSmartContract } from './services/social-smart-contract/goerli-social-smart-contract';
-import { DefaultSocialSmartContract } from './services/social-smart-contract/default-social-smart-contract';
-import { goerliSocialAbi } from './services/social-smart-contract/goerli-social-abi';
+import { GoerliSocialSmartContract } from './services/web3/social-smart-contract/goerli-social-smart-contract';
+import { DefaultSocialSmartContract } from './services/web3/social-smart-contract/default-social-smart-contract';
+import { goerliSocialAbi } from './services/web3/social-smart-contract/goerli-social-abi';
 import { getAlchemyNetwork, buildAlchemyChainApiKeyVarname } from './services/alchemy/alchemy-util';
 import { Alchemy } from "alchemy-sdk";
 import { ErrorLogRepo } from './orm/repo/error-log-repo';
@@ -90,7 +90,7 @@ container.bind(IDS.SERVICE.WEB3.EthContractFactory).toFactory(context => (abi: a
     return new web3.eth.Contract(abi, contractAddress)
 })
 
-container.bind(IDS.SERVICE.WEB3.EthContract).toDynamicValue((context) => {
+container.bind(IDS.SERVICE.WEB3.SocialEthSmartContract).toDynamicValue((context) => {
     const contractFactory:Function = context.container.get(IDS.SERVICE.WEB3.EthContractFactory)
     
     return contractFactory(goerliSocialAbi as any[], '0x2d722a9853ac048ce220fadbf3cab45146d76af6', ChainId.goerli)

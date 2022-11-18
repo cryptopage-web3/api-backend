@@ -5,7 +5,6 @@ import { IDS } from '../../../src/types/index';
 import { unmarshalEthNftsResponse, unmarshalNftTransactionsEmptyResponse, unmarshalEthNftTransactionsResponse, unmarshalMaticNftsResponse, unmarshalBscNtsResponse, unmarshalNtsEmptyResponse, unmarshalMaticNftTransactionsResponse, unmarshalBscNfttransactionsResponse, unmarshalEthNftDetailsResponse, unmarshalMaticNftDetailsResponse, unmarshalBscNftDetailsResponse, goerlyErrorResponse, goerliNftTransactionsResponse, goerliNftListTransactionsResponse, alchemyAddressNftsResponse, alchemyNftTransfersResponse, goerliNftComment } from './nfts-response';
 import Sinon, { SinonStub } from 'sinon';
 import { expect } from 'chai';
-import { NftTokenDetails } from '../../../src/orm/model/nft-token-details';
 import Web3 from 'web3';
 import { testContainer } from '../../ioc/test-container';
 import { testEthContractFactory, TestWeb3Mock } from '../../mock/test-web3-mock';

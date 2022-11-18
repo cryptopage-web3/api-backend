@@ -61,4 +61,19 @@ export class NftsController implements interfaces.Controller {
 
         res.json(result)
     }
+
+    @httpGet(`/token-details/:chain(${chainValidator})/contract/:contractAddress/token/:tokenId`)
+    @errorHandler()
+    async getTokenDetails(
+        @requestParam('chain') chain: ChainId,
+        @requestParam('contractAddress') contractAddress: string,
+        @requestParam('tokenId') tokenId: string,
+        @response() res: express.Response
+    ){
+        const manager = this._nftManagerFactory(chain)
+
+        const result = await manager.getNftDetails(contractAddress, tokenId)
+
+        res.json(result)
+    }
 }
