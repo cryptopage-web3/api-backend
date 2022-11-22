@@ -57,10 +57,14 @@ export class EthWeb3Manager implements IWeb3Manager {
         });
         const urlNormalized = normalizeUrl(metadataUri);
         if(urlNormalized){
-            const { data } = await this._axios.get(urlNormalized).catch(err => {
+            const { data } = await this._axios.get(urlNormalized, {
+                params: {
+                    withoutWatermark: true
+                }
+            }).catch(err => {
                 this._errorLogRepo.log('external_url_get_token_json', err.message, urlNormalized)
 
-                if(!process.env.PREVENT_LOG_ERRORS){    
+                if(!process.env.PREVENT_LOG_ERRORS){
                     console.error(`Failed to getNft data tokenID: ${tokenId}`, metadataUri, urlNormalized, err.message)
                 }
                 
