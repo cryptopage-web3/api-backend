@@ -14,7 +14,7 @@ export function errorHandler(){
                 }
                 
                 const message = error instanceof ApiError ? error.message : 'Unexpected error'
-                args[args.length - 2].status(500).json({message})
+                args[args.length - 2].status(500).json({message, error})
             }
         }
     
