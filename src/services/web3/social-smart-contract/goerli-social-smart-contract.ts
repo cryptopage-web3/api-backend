@@ -1,12 +1,13 @@
 import { inject, injectable } from "inversify";
-import { ISocialComment, ISocialSmartContract } from './types';
+import { ISocialComment, ISocialSmartContract, IBaseSocialPost, ISocialPost } from './types';
 import { IDS } from '../../../types/index';
 import Web3 from 'web3';
 
 @injectable()
-export class GoerliSocialSmartContract implements ISocialSmartContract{
-    @inject(IDS.NODE_MODULES.web3) _web3: Web3
+export class GoerliSocialSmartContract implements ISocialSmartContract {
+    static contractAddress = '0x2d722a9853ac048ce220fadbf3cab45146d76af6'
 
+    @inject(IDS.NODE_MODULES.web3) _web3: Web3
     @inject(IDS.SERVICE.WEB3.SocialEthSmartContract) private _socialContract
 
     async getCommentCount(tokenId: string): Promise<number> {
@@ -43,5 +44,24 @@ export class GoerliSocialSmartContract implements ISocialSmartContract{
     async getCommentFromBlockchain(tokenId: string, commentId: number):Promise<ISocialComment>{
         const comment = await this._socialContract.methods.readComment(tokenId, commentId).call();
         return (({ipfsHash, creator, _owner, price, isUp, isDown,isView}) => ({ipfsHash, creator, _owner, price, isUp, isDown,isView}))(comment)
+    }
+
+    async readPostForContract(contractAddress: string, tokenId: string): Promise<ISocialPost> {
+        if(contractAddress != GoerliSocialSmartContract.contractAddress){
+            return {} as ISocialPost
+        }
+
+        const post = await this._socialContract.methods.readPost(tokenId).call().catch(err => {
+            if (!process.env.PREVENT_LOG_ERRORS) {
+                console.error(`Failed to get readPost, contract: 0x2d722a9853ac048ce220fadbf3cab45146d76af6, tokenId: ${tokenId}`, err.message)
+            }
+
+            return Promise.reject(err)
+        });
+
+        post.accessPrice = parseInt(post.accessPrice)
+        post.accessDuration = parseInt(post.accessDuration)
+
+        return post
     }
 }

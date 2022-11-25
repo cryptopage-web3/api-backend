@@ -42,16 +42,21 @@ import { ErrorLogRepo } from './orm/repo/error-log-repo';
 
 export const container = new Container();
 
-const web3Instances = {}
-
 container.bind(IDS.NODE_MODULES.axios).toConstantValue(axios)
 container.bind(IDS.NODE_MODULES.web3Factory)
     .toFactory(context => (chain:ChainId) => {
-        if(!web3Instances[chain]){
-            //console.log(`created web3 for ${chain}`)
-            web3Instances[chain] = new Web3(new Web3.providers.HttpProvider( getChainRpc(chain), {timeout: 5000}))
+        const key = `web3_${chain}`
+
+        let instance
+
+        if(!context.container.isBound(key)){
+            instance = new Web3(new Web3.providers.HttpProvider( getChainRpc(chain), {timeout: 5000}))
+            context.container.bind(key).toConstantValue(instance)
+        } else {
+            instance = context.container.get(key)
         }
-        return web3Instances[chain]
+
+        return instance
     })
 container.bind(IDS.NODE_MODULES.web3).toDynamicValue(context => {
     const chain:ChainId | undefined = getChainIdFromAncestor(context.currentRequest)

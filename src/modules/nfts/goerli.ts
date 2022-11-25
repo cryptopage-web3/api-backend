@@ -3,7 +3,6 @@ import { INftsManager, INftsList, INftTransaction, NftTxType, INftItem, INftTran
 import { GoerliScanApi } from './../../services/etherscan/goerliscan-api';
 import { ChainId } from "modules/transactions/types";
 import { IDS } from '../../types/index';
-import { IGoerliNftTransaction } from '../../services/etherscan/types';
 import { IWeb3Manager } from '../../services/web3/types';
 import { NftCache } from './NftCache';
 import { ISocialSmartContract, ISocialComment } from '../../services/web3/social-smart-contract/types';
@@ -99,7 +98,7 @@ export class GoerliNFTsManager implements INftsManager {
             contractAddress,
             tokenId,
             blockNumber,
-            ()=> this._web3Manager.getTokenData(contractAddress, tokenId)
+            ()=> this._getTokenData(contractAddress, tokenId)
         )
     }
 
@@ -110,7 +109,18 @@ export class GoerliNFTsManager implements INftsManager {
             contractAddress,
             tokenId,
             null,
-            ()=> this._web3Manager.getTokenData(contractAddress, tokenId)
+            ()=> this._getTokenData(contractAddress, tokenId)
         )
+    }
+
+    async _getTokenData(contractAddress: string, tokenId: string){
+        const [tokenData, postInfo] = await Promise.all([
+            this._web3Manager.getTokenData(contractAddress, tokenId),
+            this._socialSmartContract.readPostForContract(contractAddress, tokenId)
+        ])
+
+        const {isEncrypted,accessPrice,accessDuration} = postInfo
+
+        return Object.assign({}, tokenData,{isEncrypted, accessPrice, accessDuration})
     }
 }

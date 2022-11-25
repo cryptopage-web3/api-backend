@@ -1,5 +1,5 @@
 import { injectable } from 'inversify';
-import { ISocialSmartContract } from './types';
+import { ISocialSmartContract, ISocialPost } from './types';
 
 @injectable()
 export class DefaultSocialSmartContract implements ISocialSmartContract{
@@ -9,5 +9,9 @@ export class DefaultSocialSmartContract implements ISocialSmartContract{
 
     async getComments(tokenId: string) {
         return []
+    }
+
+    async readPostForContract(contractAddress: string, post: string) {
+        return {} as ISocialPost
     }
 }
