@@ -13,6 +13,7 @@ import { TestAlchemyMock } from '../../mock/test-alchemy-mock';
 import { AssetTransfersCategory } from 'alchemy-sdk';
 import { container } from '../../../src/ioc';
 import { ChainId } from '../../../src/modules/transactions/types';
+import { NftTokenDetails } from '../../../src/orm/model/nft-token-details';
 
 const app = new InversifyExpressServer(testContainer).build()
 const testAgent = agent(app)
@@ -21,6 +22,8 @@ const axios:Axios = testContainer.get(IDS.NODE_MODULES.axios)
 
 const axiosGetStub = Sinon.stub(axios, 'get')
 const axiosHeadStub = Sinon.stub(axios, 'head')
+const getCacheTokenDetailsStub = Sinon.stub(NftTokenDetails, 'findOne')
+const saveTokenStub = Sinon.stub(NftTokenDetails, 'create')
 
 describe('test nfts api endpoints', ()=>{
     beforeEach(()=>{
@@ -393,6 +396,8 @@ describe('test nfts api endpoints', ()=>{
     
         web3GetBlockStub.resolves({timestamp: 1659947419})
         axiosGetStub.resolves({data: unmarshalEthNftDetailsResponse})
+        saveTokenStub.resolves()
+        getCacheTokenDetailsStub.resolves(null)
     
         const contractAddress = '0x495f947276749ce646f68ac8c248420045cb7b5e',
             tokenId = '86322540947695616051707333350443506684962566151002367173878109827558281315304',
@@ -409,6 +414,8 @@ describe('test nfts api endpoints', ()=>{
         })
         expect(axiosGetStub.callCount).to.eq(1)
         expect(web3GetBlockStub.callCount).to.eq(1)
+        expect(getCacheTokenDetailsStub.callCount).to.eq(1)
+        expect(saveTokenStub.callCount).to.eq(1)
     })
 
     it('should return matic nft token details', async ()=>{
@@ -418,7 +425,8 @@ describe('test nfts api endpoints', ()=>{
     
         web3GetBlockStub.resolves({timestamp: 1659520065})
         axiosGetStub.resolves({data: unmarshalMaticNftDetailsResponse})
-        axiosHeadStub.resolves({headers:{'content-type': 'image/gif'}})
+        saveTokenStub.resolves()
+        getCacheTokenDetailsStub.resolves(null)
     
         const contractAddress = '0x2953399124f0cbb46d2cbacd8a89cf0599974963',
             tokenId = '78965343665950388415519985342127408390054350375949077399659463369044632110752',
@@ -435,6 +443,8 @@ describe('test nfts api endpoints', ()=>{
         })
         expect(axiosGetStub.callCount).to.eq(1)
         expect(web3GetBlockStub.callCount).to.eq(1)
+        expect(getCacheTokenDetailsStub.callCount).to.eq(1)
+        expect(saveTokenStub.callCount).to.eq(1)
     })
 
     it('should return bsc nft token details', async ()=>{
@@ -444,6 +454,8 @@ describe('test nfts api endpoints', ()=>{
     
         web3GetBlockStub.resolves({timestamp: 1647696865})
         axiosGetStub.resolves({data: unmarshalBscNftDetailsResponse})
+        saveTokenStub.resolves()
+        getCacheTokenDetailsStub.resolves(null)
     
         const contractAddress = '0x7dcdefb5f0844619ac16bcd5f36c3014efa90931',
             tokenId = '340282366920938463463374607431768211749',
@@ -461,6 +473,9 @@ describe('test nfts api endpoints', ()=>{
         expect(axiosGetStub.callCount).to.eq(1)
         expect(axiosHeadStub.callCount).to.eq(0)
     
+        expect(getCacheTokenDetailsStub.callCount).to.eq(1)
+        expect(saveTokenStub.callCount).to.eq(1)
+
         expect(web3GetBlockStub.callCount).to.eq(1)
     })
 
@@ -476,6 +491,8 @@ describe('test nfts api endpoints', ()=>{
         const readCommentMethodStub = Sinon.stub()
     
         web3GetBlockStub.resolves({timestamp: 1659947419})
+        getCacheTokenDetailsStub.resolves(null)
+        saveTokenStub.resolves()
         getTokenUriMethodStub.returns({call: getTokenUriCallStub})
         getCommentsCountMethodStub.returns({call: readCommentMethodStub})
     
@@ -518,6 +535,8 @@ describe('test nfts api endpoints', ()=>{
         expect(readCommentMethodStub.calledOnce).to.be.true
     
         expect(axiosGetStub.callCount).to.eq(1)
+        expect(getCacheTokenDetailsStub.callCount).to.eq(1)
+        expect(saveTokenStub.callCount).to.eq(1)
     
         expect(web3GetBlockStub.callCount).to.eq(1)
         expect(web3GetBlockStub.getCall(0).args).to.deep.equal([blockNumber.toString()])
