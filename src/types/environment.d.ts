@@ -1,6 +1,7 @@
 import { Blockchains } from "../services/rarible/types"
 
 export interface Env {
+    NODE_ENV: 'test' | 'production' | 'development'
     PORT: string
     HOST: string | undefined
 
@@ -21,6 +22,8 @@ export interface Env {
     PREVENT_LOG_ERRORS: 'yes' | 'no' | undefined
 
     ALCHEMY_API_KEY_GOERLI: string
+
+    API_RATE_LIMIT: string
 }
 
 export type EnvVarName = keyof Env

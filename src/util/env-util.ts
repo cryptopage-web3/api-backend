@@ -61,6 +61,10 @@ export function isProd(){
     return process.env.NODE_ENV === 'production';
 }
 
+export function isTest(){
+    return process.env.NODE_ENV === 'test';
+}
+
 function getRawValue(envName:EnvVarName, defaultValue) {
     if( defaultValue === undefined && process.env[envName] === undefined){
         throw new Error(`Environment variable ${envName} is required`);
