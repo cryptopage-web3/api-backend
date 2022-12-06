@@ -1,0 +1,6 @@
+responses:
+  examples:
+    RateLimitExample:
+      summary: A sample rate limit response
+      value:
+        {message: "Too Many Requests. Rate limit 30 per second"}

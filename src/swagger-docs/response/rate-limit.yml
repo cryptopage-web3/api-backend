@@ -1,0 +1,9 @@
+responses:
+  RateLimit:
+    description: A sample rate limit response
+    content:
+      application/json:
+        examples:
+          RateLimitExample:
+            $ref: '#/responses/examples/RateLimitExample'
+        

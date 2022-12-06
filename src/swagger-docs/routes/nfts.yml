@@ -26,6 +26,8 @@ paths:
                   $ref: '#/responses/examples/GoerliAddressNftsExample'
         "400":
           $ref: '#/responses/PaginationError'
+        "429":
+          $ref: '#/responses/RateLimit'
   /nfts/transactions/goerli/{address}:
     get:
       summary: Get goerli nft transactions
@@ -50,6 +52,8 @@ paths:
                   $ref: '#/responses/examples/GoerliNftTransactionsExample'
         "400":
           $ref: '#/responses/PaginationError'
+        "429":
+          $ref: '#/responses/RateLimit'
   /nfts/transactions/{chain}/{address}:
     get:
       summary: Get nft transactions from address.
@@ -72,9 +76,10 @@ paths:
           description: OK
           content:
             application/json:
-              
         "400":
           $ref: '#/responses/PaginationError'
+        "429":
+          $ref: '#/responses/RateLimit'
 
   /nfts/transaction/goerli/details/{contractAddress}/{tokenId}/{blockNumber}:
     get:
@@ -104,6 +109,8 @@ paths:
               examples:
                 GoerliNftTransactionExample:
                   $ref: '#/responses/examples/GoerliNftTransactionExample'
+        "429":
+          $ref: '#/responses/RateLimit'
 
   /nfts/transaction/{chain}/details/{contractAddress}/{tokenId}/{blockNumber}:
     get:
@@ -136,6 +143,8 @@ paths:
       responses:
         "400":
           $ref: '#/responses/PaginationError'
+        "429":
+          $ref: '#/responses/RateLimit'
   /nfts/token-details/{chain}/contract/{contractAddress}/token/{tokenId}:
     get:
       summary: Get single nft details.
@@ -163,3 +172,5 @@ paths:
               examples:
                 GoerliSingleNftDetailsExample:
                   $ref: '#/responses/examples/GoerliSingleNftDetailsExample'
+        "429":
+          $ref: '#/responses/RateLimit'
