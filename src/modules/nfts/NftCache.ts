@@ -51,6 +51,11 @@ export class NftCache {
             description: apiToken.description,
             attributes: apiToken.attributes
         }
+
+        const {isEncrypted,accessPrice,accessDuration} = apiToken as any
+
+        Object.assign(tokenData, {isEncrypted, accessPrice, accessDuration})
+        
         
         this._nftTokenRepo.createToken(tokenData).catch(err =>{
             console.log('failed to save token data to database', err)

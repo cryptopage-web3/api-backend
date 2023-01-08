@@ -3,6 +3,8 @@ import { ISocialComment, ISocialSmartContract, IBaseSocialPost, ISocialPost } fr
 import { IDS } from '../../../types/index';
 import Web3 from 'web3';
 
+const NftContractAddress = '0x19962298f0b28be502ce83bd179eb212287ecb5d'
+
 @injectable()
 export class GoerliSocialSmartContract implements ISocialSmartContract {
     static contractAddress = '0x2d722a9853ac048ce220fadbf3cab45146d76af6'
@@ -47,7 +49,7 @@ export class GoerliSocialSmartContract implements ISocialSmartContract {
     }
 
     async readPostForContract(contractAddress: string, tokenId: string): Promise<ISocialPost> {
-        if(contractAddress != GoerliSocialSmartContract.contractAddress){
+        if(contractAddress != NftContractAddress){
             return {} as ISocialPost
         }
 
