@@ -12,6 +12,9 @@ export class NftTokenDetails extends Model<NftTokenDetailsInferAttr, InferCreati
     declare description: string
     declare contentUrl: string
     declare attributes: any[]
+    declare isEncrypted: boolean
+    declare accessPrice: string | undefined
+    declare accessDuration: string | undefined
 }
 
 NftTokenDetails.init({
@@ -20,8 +23,11 @@ NftTokenDetails.init({
     contractAddress: DataTypes.STRING(255),
     name: DataTypes.STRING(255),
     description: DataTypes.STRING(2000),
-    contentUrl: DataTypes.STRING(600),
-    attributes: DataTypes.JSON
+    contentUrl: DataTypes.TEXT,
+    attributes: DataTypes.JSON,
+    isEncrypted: DataTypes.BOOLEAN,
+    accessPrice: DataTypes.STRING,
+    accessDuration: DataTypes.STRING
 },{
     sequelize: db
 })

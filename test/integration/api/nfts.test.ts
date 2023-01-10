@@ -14,6 +14,7 @@ import { AssetTransfersCategory } from 'alchemy-sdk';
 import { container } from '../../../src/ioc';
 import { ChainId } from '../../../src/modules/transactions/types';
 import { NftTokenDetails } from '../../../src/orm/model/nft-token-details';
+import { GoerliSocialSmartContract } from '../../../src/services/web3/social-smart-contract/goerli-social-smart-contract';
 
 const app = new InversifyExpressServer(testContainer).build()
 const testAgent = agent(app)
@@ -489,29 +490,39 @@ describe('test nfts api endpoints', ()=>{
     
         const getCommentsCountMethodStub = Sinon.stub()
         const readCommentMethodStub = Sinon.stub()
+
+        const getReadPostNethodStub = Sinon.stub()
+        const callReadPostMethodStub = Sinon.stub()
     
         web3GetBlockStub.resolves({timestamp: 1659947419})
         getCacheTokenDetailsStub.resolves(null)
         saveTokenStub.resolves()
         getTokenUriMethodStub.returns({call: getTokenUriCallStub})
         getCommentsCountMethodStub.returns({call: readCommentMethodStub})
+        getReadPostNethodStub.returns({call: callReadPostMethodStub})
     
         testContainer.rebind(IDS.SERVICE.WEB3.EthContractFactory)
             .toFactory(context => testEthContractFactory({
                 tokenURI: getTokenUriMethodStub,
-                getCommentCount: getCommentsCountMethodStub
+                getCommentCount: getCommentsCountMethodStub,
+                readPost: getReadPostNethodStub
             }))
     
         const tokenUri = 'http://test.uri'
         const tokenData = {
-            image: 'http://token_image.url', name:'test token name', description:'test toked descr', attributes:[{attr1:'test1'}]
+            image: 'http://token_image.url',
+            name:'test token name',
+            description:'test toked descr',
+            attributes:[{attr1:'test1'}]
         }
+        const postData = { isEncrypted: false, accessPrice: 135, accessDuration: 120}
     
         axiosGetStub.resolves({data: tokenData})
         getTokenUriCallStub.resolves(tokenUri)
         readCommentMethodStub.resolves(0)
+        callReadPostMethodStub.resolves(postData)
     
-        const contractAddress = '0x495f947276749ce646f68ac8c248420045cb7b5e',
+        const contractAddress = GoerliSocialSmartContract.cryptoPageNftContractAddress,
             tokenId = '64',
             blockNumber = 15300497
     
@@ -522,17 +533,23 @@ describe('test nfts api endpoints', ()=>{
         expect(response.body).deep.equal({
             "tokenId": "64",
             "chain": "goerli",
-            "contractAddress": "0x495f947276749ce646f68ac8c248420045cb7b5e",
+            "contractAddress": contractAddress,
             "contentUrl": tokenData.image,
             "name": tokenData.name,
             "description": tokenData.description,
             "attributes": tokenData.attributes,
+            "isEncrypted": postData.isEncrypted,
+            "accessPrice": postData.accessPrice,
+            "accessDuration": postData.accessDuration,
             "date": "2022-08-08T08:30:19.000Z",
             comments: []
         })
     
         expect(getCommentsCountMethodStub.calledOnceWith(tokenId)).to.be.true
         expect(readCommentMethodStub.calledOnce).to.be.true
+        
+        expect(getReadPostNethodStub.calledOnceWith(tokenId)).to.be.true
+        expect(callReadPostMethodStub.calledOnce).to.be.true
     
         expect(axiosGetStub.callCount).to.eq(1)
         expect(getCacheTokenDetailsStub.callCount).to.eq(1)

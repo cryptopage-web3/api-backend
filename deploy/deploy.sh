@@ -63,7 +63,7 @@ npm t 2>&1
 
 exit_if_error "integration tests failed"
 
-npm run db:sync
+npx sequelize-cli db:migrate
 
 exit_if_error "database update failed"
 
@@ -105,6 +105,10 @@ pwd
 echo "git pull $run_dir"
 
 git pull 2>&1
+
+npx sequelize-cli db:migrate
+
+exit_if_error "database update failed"
 
 export NODE_ENV=production
 export PORT=$run_port

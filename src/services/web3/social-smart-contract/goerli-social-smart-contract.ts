@@ -3,21 +3,20 @@ import { ISocialComment, ISocialSmartContract, IBaseSocialPost, ISocialPost } fr
 import { IDS } from '../../../types/index';
 import Web3 from 'web3';
 
-const NftContractAddress = '0x19962298f0b28be502ce83bd179eb212287ecb5d'
-
 @injectable()
 export class GoerliSocialSmartContract implements ISocialSmartContract {
-    static contractAddress = '0x2d722a9853ac048ce220fadbf3cab45146d76af6'
+    static communityContractAddress = '0x2d722a9853ac048ce220fadbf3cab45146d76af6'
+    static cryptoPageNftContractAddress = '0x19962298f0b28be502ce83bd179eb212287ecb5d'
 
     @inject(IDS.NODE_MODULES.web3) _web3: Web3
-    @inject(IDS.SERVICE.WEB3.SocialEthSmartContract) private _socialContract
+    @inject(IDS.SERVICE.WEB3.SocialEthSmartContract) private _web3CommunityContract
 
     async getCommentCount(tokenId: string): Promise<number> {
         const minABI:any[] = [
             { "inputs": [{ "internalType": "uint256", "name": "tokenId", "type": "uint256" }], "name": "getCommentCount", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }
         ];
         
-        const count = await this._socialContract.methods.getCommentCount(tokenId).call();
+        const count = await this._web3CommunityContract.methods.getCommentCount(tokenId).call();
 
         return parseInt(count)
     }
@@ -44,18 +43,18 @@ export class GoerliSocialSmartContract implements ISocialSmartContract {
     }
 
     async getCommentFromBlockchain(tokenId: string, commentId: number):Promise<ISocialComment>{
-        const comment = await this._socialContract.methods.readComment(tokenId, commentId).call();
+        const comment = await this._web3CommunityContract.methods.readComment(tokenId, commentId).call();
         return (({ipfsHash, creator, _owner, price, isUp, isDown,isView}) => ({ipfsHash, creator, _owner, price, isUp, isDown,isView}))(comment)
     }
 
     async readPostForContract(contractAddress: string, tokenId: string): Promise<ISocialPost> {
-        if(contractAddress != NftContractAddress){
+        if(contractAddress != GoerliSocialSmartContract.cryptoPageNftContractAddress){
             return {} as ISocialPost
         }
 
-        const post = await this._socialContract.methods.readPost(tokenId).call().catch(err => {
+        const post = await this._web3CommunityContract.methods.readPost(tokenId).call().catch(err => {
             if (!process.env.PREVENT_LOG_ERRORS) {
-                console.error(`Failed to get readPost, contract: 0x2d722a9853ac048ce220fadbf3cab45146d76af6, tokenId: ${tokenId}`, err.message)
+                console.error(`Failed to get readPost, contract: ${GoerliSocialSmartContract.communityContractAddress}, tokenId: ${tokenId}`, err.message)
             }
 
             return Promise.reject(err)

@@ -98,7 +98,7 @@ container.bind(IDS.SERVICE.WEB3.EthContractFactory).toFactory(context => (abi: a
 container.bind(IDS.SERVICE.WEB3.SocialEthSmartContract).toDynamicValue((context) => {
     const contractFactory:Function = context.container.get(IDS.SERVICE.WEB3.EthContractFactory)
     
-    return contractFactory(goerliSocialAbi as any[], '0x2d722a9853ac048ce220fadbf3cab45146d76af6', ChainId.goerli)
+    return contractFactory(goerliSocialAbi as any[], GoerliSocialSmartContract.communityContractAddress, ChainId.goerli)
 }).whenAnyAncestorNamed(ChainId.goerli)
 
 container.bind(IDS.CONFIG.EtherscanApiKey).toConstantValue(envToString('ETHERSCAN_API_KEY'))

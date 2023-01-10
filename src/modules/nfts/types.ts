@@ -78,7 +78,10 @@ export interface Web3NftTokenData {
     name: string,
     price: string,
     description: string,
-    attributes: any[]
+    attributes: any[],
+    isEncrypted?: boolean,
+    accessPrice?: string,
+    accessDuration?: string
 }
 
 export type GetTokenFromApiCallback = () => Promise<Web3NftTokenData>

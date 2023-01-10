@@ -9,8 +9,15 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    await queryInterface.renameColumn('NftTokenDetails', 'url', 'contentUrl')
     await queryInterface.bulkDelete('NftTokenDetails')
+
+    await queryInterface.sequelize.query(`ALTER TABLE NftTokenDetails
+      CHANGE COLUMN contentUrl contentUrl LONGTEXT NULL AFTER description;`)
+
+    await queryInterface.sequelize.query(`ALTER TABLE NftTokenDetails ADD accessPrice VARCHAR(255);`)
+    await queryInterface.sequelize.query(`ALTER TABLE NftTokenDetails ADD accessDuration VARCHAR(255);`)
+    await queryInterface.sequelize.query(`ALTER TABLE NftTokenDetails ADD isEncrypted TINYINT(1);`)
+    
   },
 
   async down (queryInterface, Sequelize) {
@@ -20,7 +27,5 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-
-    await queryInterface.renameColumn('NftTokenDetails', 'contentUrl', 'url')
   }
 };
