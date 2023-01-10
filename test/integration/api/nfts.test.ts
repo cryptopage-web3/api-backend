@@ -539,7 +539,7 @@ describe('test nfts api endpoints', ()=>{
             "description": tokenData.description,
             "attributes": tokenData.attributes,
             "isEncrypted": postData.isEncrypted,
-            "accessPrice": postData.accessPrice,
+            "accessPrice": postData.accessPrice.toString(),
             "accessDuration": postData.accessDuration,
             "date": "2022-08-08T08:30:19.000Z",
             comments: []
