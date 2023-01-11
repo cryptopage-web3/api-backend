@@ -24,6 +24,8 @@ export interface Env {
     ALCHEMY_API_KEY_GOERLI: string
 
     API_RATE_LIMIT: string
+
+    NFT_DETAILS_CACHE_TTL_IN_MINUTES: string | undefined
 }
 
 export type EnvVarName = keyof Env
