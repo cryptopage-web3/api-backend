@@ -1,0 +1,6 @@
+responses:
+  examples:
+    LastErrorsResponse:
+      summary: A sample of errors list
+      value:
+        {"errors": [{"id": 3,"key": "unmarshal_get_address_transactions_count", "descr": "Request failed with status code 400","context": "/v2/ethereum/address/vitalik/transactions", "isSummarized": false, "createdAt": "2023-02-10T11:47:52.000Z", "updatedAt": "2023-02-10T11:47:52.000Z"}, { "id": 2,"key": "external_url_get_token_json","descr": "Request failed with status code 500","context": "https://xcp9so0072.execute-api.us-east-1.amazonaws.com/0","isSummarized": false,"createdAt": "2022-12-03T09:31:19.000Z","updatedAt": "2022-12-03T09:31:19.000Z"}]}

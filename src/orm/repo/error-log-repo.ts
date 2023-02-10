@@ -12,4 +12,8 @@ export class ErrorLogRepo {
             console.error(`Failed to save error log to database`, saveError)
         })
     }
+
+    getLastErrors(limit:number){
+        return ErrorLog.findAll({ order:[['id','desc']], limit})
+    }
 }

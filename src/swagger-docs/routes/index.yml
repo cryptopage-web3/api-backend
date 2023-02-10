@@ -1,0 +1,22 @@
+paths:
+  /last-errors:
+    get:
+      summary: Get last server errors.
+      description: Get last server errors.
+      tags: [DEBUG]
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+          description: Pagination for eth chain from prev page response
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                LastErrorsResponse:
+                  $ref: '#/responses/examples/LastErrorsResponse'
