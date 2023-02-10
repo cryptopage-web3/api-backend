@@ -48,7 +48,7 @@ export class EthWeb3Manager implements IWeb3Manager {
         ];
         const contract = this._ethContractFactory(minABI, contrctAddress);
         const metadataUri = await contract.methods.tokenURI(tokenId).call().catch(err =>{
-            this._errorLogRepo.log('web3_contract_call_get_token_uri', err.message)
+            this._errorLogRepo.log('web3_contract_call_get_token_uri', err.message, {contrctAddress, tokenId})
 			if(!process.env.PREVENT_LOG_ERRORS){
                 console.error(`Failed to get tokenURI, contract: ${contrctAddress}, tokenId: ${tokenId}`, err.message)
 			}
