@@ -26,6 +26,8 @@ export interface Env {
     API_RATE_LIMIT: string
 
     NFT_DETAILS_CACHE_TTL_IN_MINUTES: string | undefined
+
+    WEB3_RPC_URL_GOERLI: string
 }
 
 export type EnvVarName = keyof Env

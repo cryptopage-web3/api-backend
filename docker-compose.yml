@@ -1,0 +1,9 @@
+services:
+  node:
+    image: node:18
+    working_dir: /app
+    volumes:
+      - ./:/app:cached
+    ports:
+      - "3010:3010"
+#    command: cd /app && npm run dev

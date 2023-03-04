@@ -1,3 +1,4 @@
+import { envToString } from 'util/env-util';
 import { ChainId } from '../modules/transactions/types';
 
 export const chainConfig = {
@@ -59,7 +60,7 @@ export const chainConfig = {
         nativeCoinSymbol: 'Goerli ETH',
         apiUrl: 'https://api.goerli.etherscan.io/api?',
         apiKey: 'VQDBC4GZA5MQT2F6IRW2U6RPH66HJRSF6S',
-        rpc: 'https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161',
+        rpc: envToString('WEB3_RPC_URL_GOERLI'),
         nativeCoinId: 'ethereum'
     }
 }
