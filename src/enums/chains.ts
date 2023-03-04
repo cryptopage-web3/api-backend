@@ -1,5 +1,5 @@
-import { envToString } from 'util/env-util';
 import { ChainId } from '../modules/transactions/types';
+import { envToString } from '../util/env-util';
 
 export const chainConfig = {
     [ChainId.eth]: {
