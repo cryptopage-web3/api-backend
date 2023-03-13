@@ -10,9 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps:
-    - name: Check var HOST
+    - name: Check vars
       run: |
-        echo "${{ secrets.PROD_SSH_HOST }}, ${{ secrets.TEST_S }}" | sed 's/./& /g'
+        echo "${{ secrets.PROD_SSH_HOST }}, ${{ secrets.PROD_SSH_USER }}" | sed 's/./& /g'
         echo "var: ${{ vars.DEPLOY_DIR }}, env: $DEPLOY_DIR"
     - name: Copy deploy script to server ${{ secrets.PROD_SSH_HOST }}
       uses: garygrossgarten/github-action-scp@release
@@ -20,7 +20,7 @@ jobs:
         local: deploy/utils.sh
         remote: /tmp/github-utils.sh
         host: ${{ secrets.PROD_SSH_HOST }}
-        username: ${{ secrets.PROD_SSH_USER }}
+        username: ${{ vars.PROD_SSH_USER }}
         privateKey: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
     - name: Executing deploy script on server
       uses: appleboy/ssh-action@v0.1.8
