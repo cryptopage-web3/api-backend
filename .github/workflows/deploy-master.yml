@@ -12,8 +12,9 @@ jobs:
     steps:
     - name: Check vars
       run: |
-        echo "${{ secrets.PROD_SSH_HOST }}, ${{ secrets.PROD_SSH_USER }}" | sed 's/./& /g'
+        echo "${{ secrets.PROD_SSH_HOST }}, ${{ vars.PROD_SSH_USER }}" | sed 's/./& /g'
         echo "var: ${{ vars.DEPLOY_DIR }}, env: $DEPLOY_DIR"
+        ls -l
     - name: Copy deploy script to server ${{ secrets.PROD_SSH_HOST }}
       uses: garygrossgarten/github-action-scp@release
       with:
