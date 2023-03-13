@@ -1,0 +1,39 @@
+name: Remote deploy master
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+    - uses: actions/checkout@v3
+    - name: Copy deploy script to server
+      uses: garygrossgarten/github-action-scp@release
+      with:
+        local: deploy
+        remote: /tmp
+        host: ${{ secrets.PROD_SSH_HOST }}
+        username: ${{ vars.PROD_SSH_USER }}
+        privateKey: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+    - name: Executing deploy script on server
+      uses: appleboy/ssh-action@v0.1.8
+      env:
+        PM2_NAME: ${{ vars.PM2_NAME }}
+        DEPLOY_DIR: ${{ vars.DEPLOY_DIR }}
+        RUN_DIR: ${{ vars.RUN_DIR }}
+        DEPLOY_PORT: ${{ vars.DEPLOY_PORT }}
+        RUN_PORT: ${{ vars.RUN_PORT }}
+        TG_TEXT_PREFIX: ${{ vars.TG_TEXT_PREFIX }}
+        TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+        TG_BOT_ID: ${{ secrets.TG_BOT_ID }}
+        DEPLOY_LOG_FILE: ${{ vars.DEPLOY_LOG_FILE }}
+      with:
+        envs: PM2_NAME,DEPLOY_DIR,RUN_DIR,DEPLOY_PORT,RUN_PORT,TG_TEXT_PREFIX,TG_CHAT_ID,TG_BOT_ID,DEPLOY_LOG_FILE
+        host: ${{ secrets.PROD_SSH_HOST }}
+        username: ${{ vars.PROD_SSH_USER }}
+        key: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+        script: /bin/bash /tmp/deploy.sh > "$DEPLOY_LOG_FILE"
