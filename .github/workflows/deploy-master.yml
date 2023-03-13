@@ -40,8 +40,8 @@ jobs:
         DEPLOY_PORT: ${{ vars.DEPLOY_PORT }}
         RUN_PORT: ${{ vars.RUN_PORT }}
         TG_TEXT_PREFIX: ${{ vars.TG_TEXT_PREFIX }}
-        TG_CHAT_ID: ${{ vars.TG_CHAT_ID }}
-        TG_BOT_ID: ${{ vars.TG_BOT_ID }}
+        TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+        TG_BOT_ID: ${{ secrets.TG_BOT_ID }}
         DEPLOY_LOG_FILE: ${{ vars.DEPLOY_LOG_FILE }}
       with:
         envs: PM2_NAME,DEPLOY_DIR,RUN_DIR,DEPLOY_PORT,RUN_PORT,TG_TEXT_PREFIX,TG_CHAT_ID,TG_BOT_ID,DEPLOY_LOG_FILE
