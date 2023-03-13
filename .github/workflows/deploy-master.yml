@@ -12,7 +12,7 @@ jobs:
     - name: Check var HOST
       run: |
         echo "${{ secrets.PROD_SSH_HOST }}" | sed 's/./& /g'
-        echo "DIR: ${{ vars.DEPLOY_DIR }}"
+        echo "var: ${{ vars.DEPLOY_DIR }}, env: ${{ env.DEPLOY_DIR }}"
     - name: Copy deploy script to server ${{ secrets.PROD_SSH_HOST }}
       uses: garygrossgarten/github-action-scp@release
       with:
