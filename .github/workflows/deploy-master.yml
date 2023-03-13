@@ -14,13 +14,13 @@ jobs:
       uses: appleboy/ssh-action@v0.1.8
       with:
         host: ${{ secrets.PROD_SSH_HOST }}
-        username: ${{ secrets.PROD_SSH_USER }}
+        username: ${{ vars.PROD_SSH_USER }}
         key: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
         script: ls -l
     - uses: actions/checkout@v3
     - name: Check vars
       run: |
-        echo "${{ secrets.PROD_SSH_HOST }}, ${{ vars.PROD_SSH_USER }}" | sed 's/./& /g'
+        echo "${{ vars.PROD_SSH_USER }} @ ${{ secrets.PROD_SSH_HOST }}" | sed 's/./& /g'
         echo "var: ${{ vars.DEPLOY_DIR }}, env: $DEPLOY_DIR"
         ls -l
     - name: Copy deploy script to server ${{ secrets.PROD_SSH_HOST }}
