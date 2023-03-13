@@ -7,11 +7,13 @@ on:
 jobs:
   deploy:
     name: Deploy
+    with:
+      ENVIRONMENT: production
     runs-on: ubuntu-latest
     steps:
     - name: Check var HOST
       run: |
-        echo "${{ secrets.PROD_SSH_HOST }}" | sed 's/./& /g'
+        echo "${{ secrets.PROD_SSH_HOST }}, ${{ secrets.TEST_S }}" | sed 's/./& /g'
         echo "var: ${{ vars.DEPLOY_DIR }}, env: ${{ env.DEPLOY_DIR }}"
     - name: Copy deploy script to server ${{ secrets.PROD_SSH_HOST }}
       uses: garygrossgarten/github-action-scp@release
