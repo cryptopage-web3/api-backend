@@ -10,6 +10,7 @@ import { UnmarshalApiHelper } from './helper';
 import { PriceCache } from '../../cache/coins';
 import { normalizeUrl } from '../../util/url-util';
 import { ErrorLogRepo } from '../../orm/repo/error-log-repo';
+import { envToString } from '../../util/env-util';
 
 @injectable()
 export class UnmarshalApi {
@@ -39,7 +40,7 @@ export class UnmarshalApi {
         this.rpc = config.rpc;
     }
 
-    apiKey = '3Z1C4SxhUE6Cj7P5zxWv47katMQQXlffeHz61xe9';
+    apiKey = envToString('UNMARSHAL_API_KEY');
     baseUrl = 'https://api.unmarshal.com';
     txStatus = {
         completed: 'Success',

@@ -28,6 +28,14 @@ export interface Env {
     NFT_DETAILS_CACHE_TTL_IN_MINUTES: string | undefined
 
     WEB3_RPC_URL_GOERLI: string
+
+    POLYSCAN_API_KEY: string
+
+    BSCSCAN_API_KEY: string
+
+    COVALENT_API_KEY: string
+
+    UNMARSHAL_API_KEY: string
 }
 
 export type EnvVarName = keyof Env

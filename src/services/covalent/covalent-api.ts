@@ -5,6 +5,7 @@ import { inject, injectable } from 'inversify';
 import { IDS } from '../../types/index';
 import { Axios } from 'axios';
 import { PriceCache } from '../../cache/coins';
+import { envToString } from '../../util/env-util';
 
 @injectable()
 export class CovalentApi {
@@ -25,7 +26,7 @@ export class CovalentApi {
         this.nativeCoinSymbol = config.nativeCoinSymbol;
     }
 
-    apiKey = 'ckey_d826382c6f1b430c97ad2521c0d';
+    apiKey = envToString('COVALENT_API_KEY');
     baseUrl = 'https://api.covalenthq.com/v1';
 
     get getPageToken() {

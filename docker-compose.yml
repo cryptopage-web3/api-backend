@@ -1,9 +1,10 @@
 services:
   node:
-    image: node:18
+    build: .
     working_dir: /app
     volumes:
       - ./:/app:cached
     ports:
       - "3010:3010"
-#    command: cd /app && npm run dev
+    command: npm run build:dev
+    container_name: cryptopay_node

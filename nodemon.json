@@ -2,7 +2,8 @@
     "delay": 2500,
     "watch":[
         "dist",
-        "src/swagger-docs"
+        "src/swagger-docs",
+        ".env"
     ],
     "ext":".ts, .js, .json, .ejs, .env, .yml",
     "ignore": [

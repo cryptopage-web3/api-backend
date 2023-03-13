@@ -10,7 +10,7 @@ export const chainConfig = {
         explorerUrl: 'https://etherscan.io/tx/',
         nativeCoinSymbol: 'ETH',
         apiUrl: 'https://api.etherscan.io/api?',
-        apiKey: 'VQDBC4GZA5MQT2F6IRW2U6RPH66HJRSF6S',
+        apiKey: envToString('ETHERSCAN_API_KEY'),
         rpc: 'https://eth.public-rpc.com',
         nativeCoinId: 'ethereum'
     },
@@ -22,7 +22,7 @@ export const chainConfig = {
         explorerUrl: 'https://bscscan.com/tx/',
         nativeCoinSymbol: 'BNB',
         apiUrl: 'https://api.bscscan.com/api?',
-        apiKey: 'TQDPK4XAU4BZT8WQNN6IETRRXXDI37W64Y',
+        apiKey: envToString('BSCSCAN_API_KEY'),
         rpc: 'https://bscrpc.com',
         nativeCoinId: 'binancecoin'
     },
@@ -34,7 +34,7 @@ export const chainConfig = {
         explorerUrl: 'https://polygonscan.com/tx/',
         nativeCoinSymbol: 'MATIC',
         apiUrl: 'https://api.polygonscan.com/api?',
-        apiKey: '4DCKF5U2YGR1HNG1KHWP8DSK47AH85W28Z',
+        apiKey: envToString('POLYSCAN_API_KEY'),
         rpc: 'https://polygon-rpc.com',
         nativeCoinId: 'matic-network'
     },
@@ -59,7 +59,7 @@ export const chainConfig = {
         explorerUrl: 'https://goerli.etherscan.io/tx/',
         nativeCoinSymbol: 'Goerli ETH',
         apiUrl: 'https://api.goerli.etherscan.io/api?',
-        apiKey: 'VQDBC4GZA5MQT2F6IRW2U6RPH66HJRSF6S',
+        apiKey: envToString('GOERLI_API_KEY'),
         rpc: envToString('WEB3_RPC_URL_GOERLI'),
         nativeCoinId: 'ethereum'
     }
