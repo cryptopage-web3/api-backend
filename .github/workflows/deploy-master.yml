@@ -17,7 +17,7 @@ jobs:
     - name: Copy deploy script to server ${{ secrets.PROD_SSH_HOST }}
       uses: garygrossgarten/github-action-scp@release
       with:
-        local: ./deploy
+        local: deploy
         remote: /tmp
         host: ${{ secrets.PROD_SSH_HOST }}
         username: ${{ secrets.PROD_SSH_USER }}
