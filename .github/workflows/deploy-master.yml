@@ -9,7 +9,7 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     steps:
-    - name: Copy deploy script to server
+    - name: Copy deploy script to server ${{ secrets.PROD_SSH_HOST }}
       uses: garygrossgarten/github-action-scp@release
       with:
         local: deploy
