@@ -7,9 +7,8 @@ on:
 jobs:
   deploy:
     name: Deploy
-    with:
-      ENVIRONMENT: production
     runs-on: ubuntu-latest
+    environment: production
     steps:
     - name: Check var HOST
       run: |
