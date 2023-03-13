@@ -1,0 +1,26 @@
+name: Remote deploy master
+on:
+  push:
+    branches:
+      - git-workflow
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: Copy deploy script to server
+      uses: garygrossgarten/github-action-scp@release
+      with:
+        local: deploy
+        remote: /tmp
+        host: ${{ secrets.PROD_SSH_HOST }}
+        username: ${{ secrets.PROD_SSH_USER }}
+        privateKey: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+    - name: Executing deploy script on server
+      uses: appleboy/ssh-action@v0.1.8
+      with:
+        host: ${{ secrets.PROD_SSH_HOST }}
+        username: ${{ secrets.PROD_SSH_USER }}
+        key: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+        script: /bin/bash /tmp/deploy.sh > ${{ env.DEPLOY_LOG_FILE }}

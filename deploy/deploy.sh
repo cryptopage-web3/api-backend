@@ -20,6 +20,8 @@ pm2_deploy_name="${PM2_NAME}_deploy"
 
 tg_message "Deploy started"
 
+exit
+
 echo "Stop server"
 
 pm2 stop $pm2_deploy_name
