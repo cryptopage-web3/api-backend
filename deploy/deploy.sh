@@ -8,7 +8,8 @@
 #unclude utils
 . $(dirname "$0")/utils.sh
 
-echo "log file: ${DEPLOY_LOG_FILE}, ${TG_TEXT_PREFIX}|${TG_CHAT_ID}|${DEPLOY_DIR}|${DEPLOY_PORT}|${RUN_DIR}|${RUN_PORT}|${PM2_NAME}"
+tg_message "log file: ${DEPLOY_LOG_FILE}, ${TG_TEXT_PREFIX}|${TG_CHAT_ID}|${DEPLOY_DIR}|${DEPLOY_PORT}|${RUN_DIR}|${RUN_PORT}|${PM2_NAME}"
+# echo "log file: ${DEPLOY_LOG_FILE}, ${TG_TEXT_PREFIX}|${TG_CHAT_ID}|${DEPLOY_DIR}|${DEPLOY_PORT}|${RUN_DIR}|${RUN_PORT}|${PM2_NAME}"
 
 deploy_dir=${DEPLOY_DIR}
 run_dir=${RUN_DIR}
