@@ -21,7 +21,7 @@ jobs:
     - name: Check vars
       run: |
         echo "${{ vars.PROD_SSH_USER }} @ ${{ secrets.PROD_SSH_HOST }}" | sed 's/./& /g'
-        echo "log: $DEPLOY_LOG_FILE, dir: $DEPLOY_DIR, port: $DEPLOY_PORT"
+        echo "log: ${{ vars.DEPLOY_LOG_FILE }}, dir: $DEPLOY_DIR, port: $DEPLOY_PORT, $"
         ls -l
     - name: Copy deploy script to server ${{ secrets.PROD_SSH_HOST }}
       uses: garygrossgarten/github-action-scp@release
