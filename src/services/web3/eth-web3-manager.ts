@@ -6,6 +6,8 @@ import { Web3NftTokenData } from 'modules/nfts/types';
 import { normalizeUrl } from '../../util/url-util';
 import { Axios } from 'axios';
 import { ErrorLogRepo } from '../../orm/repo/error-log-repo';
+import { ChainId } from '../../modules/transactions/types';
+import { BlockDetailsRepo } from '../../orm/repo/block-details-repo';
 
 @injectable()
 export class EthWeb3Manager implements IWeb3Manager {
@@ -13,9 +15,32 @@ export class EthWeb3Manager implements IWeb3Manager {
     @inject(IDS.NODE_MODULES.axios) _axios: Axios
     @inject(IDS.SERVICE.WEB3.EthContractFactory) _ethContractFactory: Function
     @inject(IDS.ORM.REPO.ErrorLogRepo) _errorLogRepo: ErrorLogRepo
+    @inject(IDS.ORM.REPO.BlockDetailsRepo) _blockDetailsRepo: BlockDetailsRepo
 
-    async getDateFromBlock(blocknum: number): Promise<Date> {
-        const block = await this._web3.eth.getBlock(blocknum);
+    _chainId:ChainId
+
+    setChainId(chainId: ChainId) {
+        this._chainId = chainId
+    }
+
+    async getDateFromBlock(blockNum: number): Promise<Date> {
+        const cached = await this._blockDetailsRepo.getDetails(this._chainId, blockNum)
+
+        if(cached){
+            return cached.blockDate
+        }
+
+        const web3BlockDate = await this._getWeb3BlockDate(blockNum)
+
+        this._blockDetailsRepo.saveDetails(
+            this._chainId, blockNum, web3BlockDate
+        ).catch(err => console.error('Failed to save block details', err))
+
+        return web3BlockDate
+    }
+
+    async _getWeb3BlockDate(blockNum: number){
+        const block = await this._web3.eth.getBlock(blockNum);
         const timestamp = typeof block.timestamp === 'number' 
             ? block.timestamp
             : parseInt(block.timestamp)

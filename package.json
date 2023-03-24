@@ -9,6 +9,8 @@
     "build": "tsc --pretty",
     "server:dev": "nodemon -L",
     "db:sync": "node dist/orm/sync-db.js",
+    "db:gen": "npx sequelize-cli migration:generate --name",
+    "db:up": "npx sequelize-cli db:migrate",
     "test:single": "NODE_ENV=test mocha -r ts-node/register -r reflect-metadata -r chai/register-expect.js -r dotenv/config -r test/hooks.ts",
     "test": "npm run test:single -- -p test/**/*.test.ts",
     "test:watch": "jest --watch --config=jest.config.js",

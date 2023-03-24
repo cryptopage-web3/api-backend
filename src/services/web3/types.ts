@@ -1,5 +1,7 @@
 import { Web3NftTokenData } from '../../modules/nfts/types';
-export interface IWeb3Manager {
+import { IChainContext } from '../../types/index';
+
+export interface IWeb3Manager extends IChainContext {
     getDateFromBlock(blocknum: number): Promise<Date>
     getFieldFromContract(address: string, key: string)
     getTokenData(contrctAddress: string, tokenId: string):Promise<Web3NftTokenData>

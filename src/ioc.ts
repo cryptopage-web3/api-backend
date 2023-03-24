@@ -39,6 +39,7 @@ import { goerliSocialAbi } from './services/web3/social-smart-contract/goerli-so
 import { getAlchemyNetwork, buildAlchemyChainApiKeyVarname } from './services/alchemy/alchemy-util';
 import { Alchemy } from "alchemy-sdk";
 import { ErrorLogRepo } from './orm/repo/error-log-repo';
+import { BlockDetailsRepo } from './orm/repo/block-details-repo';
 
 export const container = new Container();
 
@@ -80,6 +81,7 @@ container.bind(IDS.SERVICE.WEB3.Web3Manager)
 container.bind(IDS.SERVICE.WEB3.Web3Manager)
     .to(EthWeb3Manager)
     .inSingletonScope().whenAnyAncestorNamed(ChainId.bsc)
+container.onActivation(IDS.SERVICE.WEB3.Web3Manager, injectChainDecorator)
     /*
 container.bind(IDS.SERVICE.WEB3.Web3Manager)
     .to(DefaultWebManager).when((request)=> {
@@ -225,6 +227,7 @@ container.bind(IDS.MODULES.TokenManagerFactory)
 container.bind(IDS.ORM.REPO.ContractDetailsRepo).to(ContractDetailsRepo)
 container.bind(IDS.ORM.REPO.NftTokenDetailsRepo).to(NftTokenDetailsRepo)
 container.bind(IDS.ORM.REPO.ErrorLogRepo).to(ErrorLogRepo)
+container.bind(IDS.ORM.REPO.BlockDetailsRepo).to(BlockDetailsRepo)
 
 function getChainIdFromAncestor(request: interfaces.Request):ChainId | undefined {
     const parent = request.parentRequest
@@ -240,4 +243,21 @@ function getChainIdFromAncestor(request: interfaces.Request):ChainId | undefined
     }
 
     return getChainIdFromAncestor(parent)
+}
+
+function injectChainDecorator(context: interfaces.Context, instance): interfaces.Next {
+    if(typeof instance['setChainId'] !== 'function'){
+        throw new Error(`${instance.constructor.name} does not have implemented method 'setChainId'`)
+    }
+
+    const chainId = getChainIdFromAncestor(context.currentRequest)
+    //console.log('set chain id', chainId, context.currentRequest.serviceIdentifier)
+    if(!chainId){
+        throw new Error(`Failed to find chainId for ${instance.constructor.name}`)
+    }
+
+    instance.setChainId(chainId)
+
+    return instance
+    
 }

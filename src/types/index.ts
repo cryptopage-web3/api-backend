@@ -1,3 +1,4 @@
+import { ChainId } from '../modules/transactions/types';
 export const IDS = {
     CONFIG:{
         EtherscanApiKey:Symbol('EtherscanApiKey'),
@@ -45,8 +46,13 @@ export const IDS = {
             ContractDetailsRepo: Symbol('ContractDetailsRepo'),
             NftTokenDetailsRepo: Symbol('NftTokenDetailsRepo'),
             ErrorLogRepo: Symbol('ErrorLogRepo'),
+            BlockDetailsRepo: Symbol('BlockDetailsRepo')
         }
     }
 }
 
 export class ApiError extends Error {}
+
+export interface IChainContext {
+    setChainId(chainId: ChainId)
+}

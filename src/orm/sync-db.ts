@@ -6,7 +6,9 @@ import { readdirSync } from "fs";
 import { resolve } from "path";
 import { db } from "./sequelize";
 
-function allowSql(sql:string){
+const stringFilter = process.argv[2];
+
+function allowExecSql(sql:string){
     const allow = ['SET','SELECT','SHOW']
     for(let i in allow){
         if(sql.startsWith(allow[i])){
@@ -14,6 +16,10 @@ function allowSql(sql:string){
         }
     }
     return false
+}
+
+function allowStr(sql:string){
+    return !stringFilter || sql.indexOf(stringFilter) !== -1
 }
 
 (async ()=>{
@@ -34,11 +40,13 @@ function allowSql(sql:string){
         conn.query = function(...qopts){
             const sql:string = qopts[0].sql || qopts[0];
             
-            if(allowSql(sql) ){
+            if(allowExecSql(sql) ){
                 //console.log('run', sql)
                 return origQuery.call(conn,...qopts)
             } else {
-                console.log(sql)
+                if(allowStr(sql)){
+                    console.log(sql)
+                }
                 qopts[1](null, {constructor:{},reduce:()=>{}})
                 return {setMaxListeners: ()=>{}}
             }
@@ -61,7 +69,7 @@ function allowSql(sql:string){
     });
 
     await db.sync({ alter: true }).then(()=>{
-        console.log('Database updated')
+        console.log('this is "SQL DISPLAY ONLY" command, databse was not updated')
     })
 })() 
 
