@@ -5,7 +5,6 @@ import { IDS } from '../../../src/types/index';
 import { unmarshalEthNftsResponse, unmarshalNftTransactionsEmptyResponse, unmarshalEthNftTransactionsResponse, unmarshalMaticNftsResponse, unmarshalBscNtsResponse, unmarshalNtsEmptyResponse, unmarshalMaticNftTransactionsResponse, unmarshalBscNfttransactionsResponse, unmarshalEthNftDetailsResponse, unmarshalMaticNftDetailsResponse, unmarshalBscNftDetailsResponse, goerlyErrorResponse, goerliNftTransactionsResponse, goerliNftListTransactionsResponse, alchemyAddressNftsResponse, alchemyNftTransfersResponse, goerliNftComment } from './nfts-response';
 import Sinon, { SinonStub } from 'sinon';
 import { expect } from 'chai';
-import Web3 from 'web3';
 import { testContainer } from '../../ioc/test-container';
 import { testEthContractFactory, TestWeb3Mock } from '../../mock/test-web3-mock';
 import { interfaces } from 'inversify';
@@ -15,6 +14,7 @@ import { container } from '../../../src/ioc';
 import { ChainId } from '../../../src/modules/transactions/types';
 import { NftTokenDetails } from '../../../src/orm/model/nft-token-details';
 import { GoerliSocialSmartContract } from '../../../src/services/web3/social-smart-contract/goerli-social-smart-contract';
+import { BlockDetails } from '../../../src/orm/model/block-details';
 
 const app = new InversifyExpressServer(testContainer).build()
 const testAgent = agent(app)
@@ -25,6 +25,8 @@ const axiosGetStub = Sinon.stub(axios, 'get')
 const axiosHeadStub = Sinon.stub(axios, 'head')
 const getCacheTokenDetailsStub = Sinon.stub(NftTokenDetails, 'findOne')
 const saveTokenStub = Sinon.stub(NftTokenDetails, 'create')
+const getBlockDetailsStub = Sinon.stub(BlockDetails, 'findOne')
+const saveBlockDetailsStub = Sinon.stub(BlockDetails, 'create')
 
 describe('test nfts api endpoints', ()=>{
     beforeEach(()=>{
@@ -399,6 +401,8 @@ describe('test nfts api endpoints', ()=>{
         axiosGetStub.resolves({data: unmarshalEthNftDetailsResponse})
         saveTokenStub.resolves()
         getCacheTokenDetailsStub.resolves(null)
+        getBlockDetailsStub.resolves(null)
+        saveBlockDetailsStub.resolves()
     
         const contractAddress = '0x495f947276749ce646f68ac8c248420045cb7b5e',
             tokenId = '86322540947695616051707333350443506684962566151002367173878109827558281315304',
@@ -417,6 +421,8 @@ describe('test nfts api endpoints', ()=>{
         expect(web3GetBlockStub.callCount).to.eq(1)
         expect(getCacheTokenDetailsStub.callCount).to.eq(1)
         expect(saveTokenStub.callCount).to.eq(1)
+        expect(getBlockDetailsStub.callCount).to.eq(2)
+        expect(saveBlockDetailsStub.callCount).to.eq(1)
     })
 
     it('should return matic nft token details', async ()=>{
@@ -428,6 +434,8 @@ describe('test nfts api endpoints', ()=>{
         axiosGetStub.resolves({data: unmarshalMaticNftDetailsResponse})
         saveTokenStub.resolves()
         getCacheTokenDetailsStub.resolves(null)
+        getBlockDetailsStub.resolves(null)
+        saveBlockDetailsStub.resolves()
     
         const contractAddress = '0x2953399124f0cbb46d2cbacd8a89cf0599974963',
             tokenId = '78965343665950388415519985342127408390054350375949077399659463369044632110752',
@@ -446,6 +454,8 @@ describe('test nfts api endpoints', ()=>{
         expect(web3GetBlockStub.callCount).to.eq(1)
         expect(getCacheTokenDetailsStub.callCount).to.eq(1)
         expect(saveTokenStub.callCount).to.eq(1)
+        expect(getBlockDetailsStub.callCount).to.eq(2)
+        expect(saveBlockDetailsStub.callCount).to.eq(1)
     })
 
     it('should return bsc nft token details', async ()=>{
@@ -457,6 +467,8 @@ describe('test nfts api endpoints', ()=>{
         axiosGetStub.resolves({data: unmarshalBscNftDetailsResponse})
         saveTokenStub.resolves()
         getCacheTokenDetailsStub.resolves(null)
+        getBlockDetailsStub.resolves(null)
+        saveBlockDetailsStub.resolves()
     
         const contractAddress = '0x7dcdefb5f0844619ac16bcd5f36c3014efa90931',
             tokenId = '340282366920938463463374607431768211749',
@@ -478,6 +490,8 @@ describe('test nfts api endpoints', ()=>{
         expect(saveTokenStub.callCount).to.eq(1)
 
         expect(web3GetBlockStub.callCount).to.eq(1)
+        expect(getBlockDetailsStub.callCount).to.eq(2)
+        expect(saveBlockDetailsStub.callCount).to.eq(1)
     })
 
     it('should return goerli nfts token details', async ()=>{
@@ -500,6 +514,8 @@ describe('test nfts api endpoints', ()=>{
         getTokenUriMethodStub.returns({call: getTokenUriCallStub})
         getCommentsCountMethodStub.returns({call: readCommentMethodStub})
         getReadPostNethodStub.returns({call: callReadPostMethodStub})
+        getBlockDetailsStub.resolves(null)
+        saveBlockDetailsStub.resolves()
     
         testContainer.rebind(IDS.SERVICE.WEB3.EthContractFactory)
             .toFactory(context => testEthContractFactory({
@@ -562,6 +578,8 @@ describe('test nfts api endpoints', ()=>{
         expect(getTokenUriCallStub.calledOnce).to.be.true
     
         expect(axiosGetStub.calledOnceWith(tokenUri)).to.be.true
+        expect(getBlockDetailsStub.callCount).to.eq(2)
+        expect(saveBlockDetailsStub.callCount).to.eq(1)
     })
 
     it('should return error goerli nfts token details', async ()=>{
@@ -592,6 +610,8 @@ describe('test nfts api endpoints', ()=>{
         axiosGetStub.rejects({message:'Test axios error message'})
         getTokenUriCallStub.resolves(tokenUri)
         readCommentMethodStub.resolves(0)
+        getBlockDetailsStub.resolves(null)
+        saveBlockDetailsStub.resolves()
     
         const contractAddress = '0x495f947276749ce646f68ac8c248420045cb7b5e',
             tokenId = '86322540947695616051707333350443506684962566151002367173878109827558281315304',
@@ -617,6 +637,8 @@ describe('test nfts api endpoints', ()=>{
         expect(getTokenUriCallStub.calledOnce).to.be.true
     
         expect(axiosGetStub.calledOnceWith(tokenUri)).to.be.true
+        expect(getBlockDetailsStub.callCount).to.eq(2)
+        expect(saveBlockDetailsStub.callCount).to.eq(1)
     
         Sinon.resetHistory()
     
@@ -642,5 +664,7 @@ describe('test nfts api endpoints', ()=>{
         expect(getTokenUriCallStub.calledOnce).to.be.true
     
         expect(axiosGetStub.callCount).to.eq(0)
+        expect(getBlockDetailsStub.callCount).to.eq(2)
+        expect(saveBlockDetailsStub.callCount).to.eq(1)
     })
 })
