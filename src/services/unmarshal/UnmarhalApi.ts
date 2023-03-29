@@ -290,6 +290,19 @@ export class UnmarshalApi {
         })
         const info = data.nft_token_details[0];
 
+        const url = normalizeUrl(info.image_url)
+        const result = {
+            url,
+            name: info.name,
+            price: info.price,
+            description: info.description,
+            attributes: info.properties
+        }
+
+        if(url){
+            return result
+        }
+
         if(info.token_uri){
             const metadata = await this._web3Util.loadTokenMetadata(info.token_uri)
             
@@ -302,15 +315,7 @@ export class UnmarshalApi {
             }
         }
 
-        const url = normalizeUrl(info.image_url)
-
-        return {
-            url,
-            name: info.name,
-            price: info.price,
-            description: info.description,
-            attributes: info.properties
-        }
+        return result
     }
 
     async getNFTDetailsFromBlockchain(address, blockNumber) {
