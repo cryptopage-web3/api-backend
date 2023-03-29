@@ -35,6 +35,7 @@ export const IDS = {
             Web3Manager: Symbol('Web3Manager'),
             SocialEthSmartContract: Symbol('SocialEthSmartContract'),
             EthContractFactory: Symbol('EthContractFactory'),
+            Web3Util: Symbol('Web3Util')
         },
         SocialSmartContract: Symbol('SocialSmartContract')
 

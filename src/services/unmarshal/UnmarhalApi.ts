@@ -11,6 +11,7 @@ import { PriceCache } from '../../cache/coins';
 import { normalizeUrl } from '../../util/url-util';
 import { ErrorLogRepo } from '../../orm/repo/error-log-repo';
 import { envToString } from '../../util/env-util';
+import { Web3Util } from '../web3/web3-util';
 
 @injectable()
 export class UnmarshalApi {
@@ -19,6 +20,7 @@ export class UnmarshalApi {
     @inject(IDS.SERVICE.UnmarshalApiHelper) _helper: UnmarshalApiHelper
     @inject(IDS.CACHE.PriceCache) _priceCache: PriceCache
     @inject(IDS.ORM.REPO.ErrorLogRepo) _errorLogRepo: ErrorLogRepo
+    @inject(IDS.SERVICE.WEB3.Web3Util) _web3Util: Web3Util
 
     _chain: ChainId
 
@@ -287,6 +289,18 @@ export class UnmarshalApi {
             return Promise.reject(err)
         })
         const info = data.nft_token_details[0];
+
+        if(info.token_uri){
+            const metadata = await this._web3Util.loadTokenMetadata(info.token_uri)
+            
+            return {
+                url: normalizeUrl(metadata?.url),
+                name: info.name || metadata?.name,
+                price: info.price,
+                description: info.description || metadata?.description,
+                attributes: info.properties
+            }
+        }
 
         const url = normalizeUrl(info.image_url)
 

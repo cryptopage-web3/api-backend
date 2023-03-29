@@ -41,6 +41,7 @@ import { Alchemy } from "alchemy-sdk";
 import { ErrorLogRepo } from './orm/repo/error-log-repo';
 import { BlockDetailsRepo } from './orm/repo/block-details-repo';
 import { getLogger } from "./util/logger";
+import { Web3Util } from './services/web3/web3-util';
 
 export const container = new Container();
 
@@ -94,6 +95,7 @@ container.bind(IDS.SERVICE.WEB3.SocialEthSmartContract).toDynamicValue((context)
     
     return contractFactory(goerliSocialAbi as any[], GoerliSocialSmartContract.communityContractAddress, ChainId.goerli)
 }).whenAnyAncestorNamed(ChainId.goerli)
+container.bind(IDS.SERVICE.WEB3.Web3Util).to(Web3Util)
 
 container.bind(IDS.CONFIG.EtherscanApiKey).toConstantValue(envToString('ETHERSCAN_API_KEY'))
 container.bind(IDS.CONFIG.GoerliApiKey).toConstantValue(envToString('GOERLI_API_KEY'))

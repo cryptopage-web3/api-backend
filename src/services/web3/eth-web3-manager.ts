@@ -3,19 +3,18 @@ import { IWeb3Manager } from './types';
 import { IDS } from '../../types/index';
 import Web3 from 'web3';
 import { Web3NftTokenData } from 'modules/nfts/types';
-import { normalizeUrl } from '../../util/url-util';
-import { Axios } from 'axios';
 import { ErrorLogRepo } from '../../orm/repo/error-log-repo';
 import { ChainId } from '../../modules/transactions/types';
 import { BlockDetailsRepo } from '../../orm/repo/block-details-repo';
+import { Web3Util } from './web3-util';
 
 @injectable()
 export class EthWeb3Manager implements IWeb3Manager {
     @inject(IDS.NODE_MODULES.web3) _web3: Web3
-    @inject(IDS.NODE_MODULES.axios) _axios: Axios
     @inject(IDS.SERVICE.WEB3.EthContractFactory) _ethContractFactory: Function
     @inject(IDS.ORM.REPO.ErrorLogRepo) _errorLogRepo: ErrorLogRepo
     @inject(IDS.ORM.REPO.BlockDetailsRepo) _blockDetailsRepo: BlockDetailsRepo
+    @inject(IDS.SERVICE.WEB3.Web3Util) _web3Util: Web3Util
 
     _chainId:ChainId
 
@@ -80,30 +79,8 @@ export class EthWeb3Manager implements IWeb3Manager {
             
             return Promise.reject(err)
         });
-        const urlNormalized = normalizeUrl(metadataUri);
-        if(urlNormalized){
-            const { data } = await this._axios.get(urlNormalized, {
-                params: {
-                    withoutWatermark: true
-                }
-            }).catch(err => {
-                this._errorLogRepo.log('external_url_get_token_json', err.message, urlNormalized)
-
-                if(!process.env.PREVENT_LOG_ERRORS){
-                    console.error(`Failed to getNft data tokenID: ${tokenId}`, metadataUri, urlNormalized, err.message)
-                }
-                
-                return Promise.reject(err)
-            });
-            return {
-                url: data.image || data.animation_url,
-                //type: data.image ? 'image' : '721',
-                name: data.name,
-                description: data.description,
-                attributes: data.attributes || []
-            }
-        }
         
-        return null
+        
+        return this._web3Util.loadTokenMetadata(metadataUri, tokenId)
     }
 }

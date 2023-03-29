@@ -10,6 +10,9 @@ export function normalizeUrl(url:string) {
         return url.replace('ipfs://', 'https://ipfs.io/')
     } else if (url.startsWith('ipfs://')) {
         return url.replace('ipfs://', 'https://ipfs.io/ipfs/')
+    } else if(url.indexOf('ipfs/ipfs/') !== -1){
+        const [,ipfsHash] = url.split('ipfs/ipfs/')
+        return `https://ipfs.io/ipfs/${ipfsHash}`
     } else {
         return url;
     }
