@@ -46,18 +46,7 @@ export const container = new Container();
 container.bind(IDS.NODE_MODULES.axios).toConstantValue(axios)
 container.bind(IDS.NODE_MODULES.web3Factory)
     .toFactory(context => (chain:ChainId) => {
-        const key = `web3_${chain}`
-
-        let instance
-
-        if(!context.container.isBound(key)){
-            instance = new Web3(new Web3.providers.HttpProvider( getChainRpc(chain), {timeout: 5000}))
-            context.container.bind(key).toConstantValue(instance)
-        } else {
-            instance = context.container.get(key)
-        }
-
-        return instance
+        return new Web3(new Web3.providers.HttpProvider( getChainRpc(chain), {timeout: 5000}))
     })
 container.bind(IDS.NODE_MODULES.web3).toDynamicValue(context => {
     const chain:ChainId | undefined = getChainIdFromAncestor(context.currentRequest)
