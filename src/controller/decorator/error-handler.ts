@@ -1,4 +1,8 @@
 import { ApiError } from '../../types/index';
+import { getLogger } from '../../util/logger';
+
+const logger = getLogger('controller-error-handler')
+
 export function errorHandler(){
     return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
         // Save a reference to the original method
@@ -10,7 +14,7 @@ export function errorHandler(){
                 return await originalMethod.apply(this, args)
             } catch (error) {
                 if(process.env.PREVENT_LOG_ERRORS !== 'yes'){
-                    console.error('Failed to call controller:', args[args.length - 3].originalUrl, error)
+                    logger.error('Failed to call controller:', args[args.length - 3].originalUrl, error)
                 }
                 
                 const message = error instanceof ApiError ? error.message : 'Unexpected error'

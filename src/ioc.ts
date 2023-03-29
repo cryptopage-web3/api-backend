@@ -40,8 +40,11 @@ import { getAlchemyNetwork, buildAlchemyChainApiKeyVarname } from './services/al
 import { Alchemy } from "alchemy-sdk";
 import { ErrorLogRepo } from './orm/repo/error-log-repo';
 import { BlockDetailsRepo } from './orm/repo/block-details-repo';
+import { getLogger } from "./util/logger";
 
 export const container = new Container();
+
+container.bind(IDS.UTIL.Logger).toDynamicValue(() => getLogger)
 
 container.bind(IDS.NODE_MODULES.axios).toConstantValue(axios)
 container.bind(IDS.NODE_MODULES.web3Factory)

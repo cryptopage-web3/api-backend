@@ -5,6 +5,9 @@ export const IDS = {
         GoerliApiKey:Symbol('GoerliApiKey'),
         Web3RpcFactory: Symbol('Web3RpcFactory'),
     },
+    UTIL:{
+        Logger:Symbol('logger')
+    },
     CACHE:{
         PriceCache: Symbol('PriceCache')
     },
