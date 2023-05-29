@@ -107,7 +107,8 @@ echo "git pull $run_dir"
 
 git pull 2>&1
 
-npx sequelize-cli db:migrate
+#npx sequelize-cli db:migrate
+npm run db:sync 2>&1
 
 exit_if_error "database update failed"
 
