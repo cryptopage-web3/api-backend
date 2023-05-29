@@ -38,4 +38,4 @@ jobs:
         port: ${{ secrets.PROD_SSH_PORT }}
         username: ${{ vars.PROD_SSH_USER }}
         key: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
-        script: \[ -s "/home/user/.nvm/nvm.sh" ] && \. "/home/user/.nvm/nvm.sh" && /bin/bash /tmp/deploy.sh > "$DEPLOY_LOG_FILE"
+        script: \[ -s "/home/usr/.nvm/nvm.sh" ] && \. "/home/usr/.nvm/nvm.sh" && /bin/bash /tmp/deploy.sh > "$DEPLOY_LOG_FILE"
