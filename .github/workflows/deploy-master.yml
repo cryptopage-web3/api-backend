@@ -17,6 +17,7 @@ jobs:
         local: deploy
         remote: /tmp
         host: ${{ secrets.PROD_SSH_HOST }}
+        port: ${{ secrets.PROD_SSH_PORT }}
         username: ${{ vars.PROD_SSH_USER }}
         privateKey: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
     - name: Executing deploy script on server
