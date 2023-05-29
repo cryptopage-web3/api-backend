@@ -23,7 +23,7 @@ function allowStr(sql:string){
 }
 
 (async ()=>{
-    const dbLink = db as any
+    /*const dbLink = db as any
     const origdbQuery = db.query as any
 
     dbLink.query = function(...opts){
@@ -53,7 +53,7 @@ function allowStr(sql:string){
         }
 
         return conn
-    }
+    }*/
 
     const dir = resolve(__dirname,'model');
 
@@ -69,7 +69,9 @@ function allowStr(sql:string){
     });
 
     await db.sync({ alter: true }).then(()=>{
-        console.log('this is "SQL DISPLAY ONLY" command, databse was not updated')
+        console.log('db updated')
+        process.exit(0)
+        //console.log('this is "SQL DISPLAY ONLY" command, databse was not updated')
     })
 })() 
 
