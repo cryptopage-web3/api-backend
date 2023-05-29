@@ -35,6 +35,7 @@ jobs:
       with:
         envs: PM2_NAME,DEPLOY_DIR,RUN_DIR,DEPLOY_PORT,RUN_PORT,TG_TEXT_PREFIX,TG_CHAT_ID,TG_BOT_ID,DEPLOY_LOG_FILE
         host: ${{ secrets.PROD_SSH_HOST }}
+        port: ${{ secrets.PROD_SSH_PORT }}
         username: ${{ vars.PROD_SSH_USER }}
         key: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
         script: /bin/bash /tmp/deploy.sh > "$DEPLOY_LOG_FILE"
