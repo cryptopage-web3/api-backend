@@ -1,21 +1,33 @@
-import { InversifyExpressServer } from 'inversify-express-utils';
-import { agent } from "supertest";
-import { container } from '../../../src/ioc';
+import { cleanUpMetadata, InversifyExpressServer } from 'inversify-express-utils';
+import { agent, SuperAgentTest } from "supertest";
 import { Axios } from 'axios';
 import { etherscanTransactionsResponse, etherscanErc20TransactionsResponse, unmarshalBscTransactionsResponse, solscanTransactionsResponse, trongridTransactionsResponse, unmarshalEmptyResponse, goerliTransactionsResponse } from './transactions-response';
 import { IDS } from '../../../src/types/index';
 import { unmarshalPolygonTransactionResponse } from './transactions-response';
 import Sinon, { SinonStub } from 'sinon';
 import { expect } from 'chai';
+import { Application } from 'express';
+import { testContainer } from '../../ioc/test-container';
 
-const app = new InversifyExpressServer(container).build()
-const testAgent = agent(app)
+let app: Application
+let testAgent: SuperAgentTest
 
-const axios:Axios = container.get(IDS.NODE_MODULES.axios)
-
-const axiosGetStub:SinonStub = Sinon.stub(axios, 'get')
+let axios:Axios 
+let axiosGetStub: Sinon.SinonStub
 
 describe('test get transactions list', ()=>{
+    before(async ()=>{
+        await import ('../../../src/controller/transactions-controller')
+        app = new InversifyExpressServer(testContainer).build()
+        testAgent = agent(app)
+        
+        axios = testContainer.get(IDS.NODE_MODULES.axios)
+        axiosGetStub  = Sinon.stub(axios,'get')
+    })
+    after(()=>{
+        cleanUpMetadata()
+        Sinon.restore()
+    })
     it('should return eth transactions list', async ()=>{
         axiosGetStub
             .onCall(0).resolves({data: etherscanTransactionsResponse})

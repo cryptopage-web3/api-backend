@@ -13,7 +13,7 @@
     "db:up": "npx sequelize-cli db:migrate",
     "db:down": "npx sequelize-cli db:migrate:undo",
     "test:single": "NODE_ENV=test mocha -r ts-node/register -r reflect-metadata -r chai/register-expect.js -r dotenv/config -r test/hooks.ts",
-    "test": "npm run test:single -- -p test/**/*.test.ts",
+    "test": "npm run test:single -- test/**/*.test.ts",
     "test:watch": "jest --watch --config=jest.config.js",
     "test:cov": "jest --coverage --config=jest.config.js",
     "prepare": "husky install"

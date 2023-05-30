@@ -1,19 +1,31 @@
-import { InversifyExpressServer } from 'inversify-express-utils';
-import { agent } from "supertest";
-import { container } from '../../../src/ioc';
+import { cleanUpMetadata, InversifyExpressServer } from 'inversify-express-utils';
+import { agent, SuperAgentTest } from "supertest";
 import { Axios } from 'axios';
 import { IDS } from '../../../src/types/index';
 import { unmarshalEthTokensResponse, unmarshalBscTokensResponse, unmarshalPolygonTokensResponse, covalentSolTokensResponse, tronscanTokensResponse } from './tokens-response';
 import Sinon from 'sinon';
 import { expect } from 'chai';
+import { Application } from 'express';
+import { testContainer } from '../../ioc/test-container';
 
-const app = new InversifyExpressServer(container).build()
-const testAgent = agent(app)
+let app: Application
+let testAgent: SuperAgentTest
 
-const axios:Axios = container.get(IDS.NODE_MODULES.axios)
-const axiosGetStub = Sinon.stub(axios,'get')
+let axios:Axios 
+let axiosGetStub: Sinon.SinonStub
 
 describe('test tokens api endpoints', ()=>{
+    before(async ()=>{
+        await import ('../../../src/controller/token-controller')
+        app = new InversifyExpressServer(testContainer).build()
+        testAgent = agent(app)
+        axios = testContainer.get(IDS.NODE_MODULES.axios)
+        axiosGetStub  = Sinon.stub(axios,'get')
+    })
+    after(()=>{
+        cleanUpMetadata()
+        Sinon.restore()
+    })
     it('should return eth tokens', async ()=>{
         axiosGetStub
             .resolves({data: unmarshalEthTokensResponse})

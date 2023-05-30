@@ -1,5 +1,5 @@
-import { InversifyExpressServer } from 'inversify-express-utils';
-import { agent } from "supertest";
+import { cleanUpMetadata, InversifyExpressServer } from 'inversify-express-utils';
+import { agent, SuperAgentTest } from "supertest";
 import { Axios } from 'axios';
 import { IDS } from '../../../src/types/index';
 import { unmarshalEthNftsResponse, unmarshalNftTransactionsEmptyResponse, unmarshalEthNftTransactionsResponse, unmarshalMaticNftsResponse, unmarshalBscNtsResponse, unmarshalNtsEmptyResponse, unmarshalMaticNftTransactionsResponse, unmarshalBscNfttransactionsResponse, unmarshalEthNftDetailsResponse, unmarshalMaticNftDetailsResponse, unmarshalBscNftDetailsResponse, goerlyErrorResponse, goerliNftTransactionsResponse, goerliNftListTransactionsResponse, alchemyAddressNftsResponse, alchemyNftTransfersResponse, goerliNftComment } from './nfts-response';
@@ -15,20 +15,38 @@ import { ChainId } from '../../../src/modules/transactions/types';
 import { NftTokenDetails } from '../../../src/orm/model/nft-token-details';
 import { GoerliSocialSmartContract } from '../../../src/services/web3/social-smart-contract/goerli-social-smart-contract';
 import { BlockDetails } from '../../../src/orm/model/block-details';
+import { Application } from 'express';
 
-const app = new InversifyExpressServer(testContainer).build()
-const testAgent = agent(app)
+let app: Application
+let testAgent: SuperAgentTest
 
-const axios:Axios = testContainer.get(IDS.NODE_MODULES.axios)
+let axios:Axios 
+let axiosGetStub: Sinon.SinonStub
 
-const axiosGetStub = Sinon.stub(axios, 'get')
-const axiosHeadStub = Sinon.stub(axios, 'head')
-const getCacheTokenDetailsStub = Sinon.stub(NftTokenDetails, 'findOne')
-const saveTokenStub = Sinon.stub(NftTokenDetails, 'create')
-const getBlockDetailsStub = Sinon.stub(BlockDetails, 'findOne')
-const saveBlockDetailsStub = Sinon.stub(BlockDetails, 'create')
+let axiosHeadStub: SinonStub
+let getCacheTokenDetailsStub: SinonStub
+let saveTokenStub: SinonStub 
+let getBlockDetailsStub: SinonStub
+let saveBlockDetailsStub: SinonStub
 
 describe('test nfts api endpoints', ()=>{
+    before(async ()=>{
+        await import ('../../../src/controller/nft-controller')
+        app = new InversifyExpressServer(testContainer).build()
+        testAgent = agent(app)
+
+        axios = testContainer.get(IDS.NODE_MODULES.axios)
+        axiosGetStub = Sinon.stub(axios,'get')
+        axiosHeadStub = Sinon.stub(axios, 'head')
+        getCacheTokenDetailsStub = Sinon.stub(NftTokenDetails, 'findOne')
+        saveTokenStub = Sinon.stub(NftTokenDetails, 'create')
+        getBlockDetailsStub = Sinon.stub(BlockDetails, 'findOne')
+        saveBlockDetailsStub = Sinon.stub(BlockDetails, 'create')
+    })
+    after(()=>{
+        cleanUpMetadata()
+        Sinon.restore()
+    })
     beforeEach(()=>{
         testContainer.snapshot()
     })

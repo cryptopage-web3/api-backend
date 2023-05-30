@@ -2,10 +2,6 @@ import { Container, interfaces } from "inversify"
 import { IDS } from './types/index';
 import { envToString } from './util/env-util';
 import { EtherscanApi } from './services/etherscan/etherscan-api';
-
-//autoload controllers
-import './controller/autoload'
-
 import { EthTransactionManager } from './modules/transactions/eth';
 import { ChainId } from './modules/transactions/types';
 import { UnmarshalTransactionsManager } from './modules/transactions/UnmarshalTransactionsManager';

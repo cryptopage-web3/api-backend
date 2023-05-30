@@ -4,6 +4,8 @@ initEnvVariables()
 
 import 'reflect-metadata'
 
+import './controller/autoload'
+
 import { InversifyExpressServer } from 'inversify-express-utils';
 
 import { container } from './ioc'
