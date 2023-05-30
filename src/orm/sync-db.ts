@@ -7,6 +7,7 @@ import { resolve } from "path";
 import { db } from "./sequelize";
 
 const stringFilter = process.argv[2];
+const isDryRun = process.env['DB_SYNC'] !== 'exec'
 
 function allowExecSql(sql:string){
     const allow = ['SET','SELECT','SHOW']
@@ -22,8 +23,8 @@ function allowStr(sql:string){
     return !stringFilter || sql.indexOf(stringFilter) !== -1
 }
 
-(async ()=>{
-    /*const dbLink = db as any
+function initDryRun(){
+    const dbLink = db as any
     const origdbQuery = db.query as any
 
     dbLink.query = function(...opts){
@@ -53,7 +54,13 @@ function allowStr(sql:string){
         }
 
         return conn
-    }*/
+    }
+}
+
+(async ()=>{
+    if(isDryRun){
+        initDryRun()
+    }
 
     const dir = resolve(__dirname,'model');
 
@@ -69,9 +76,13 @@ function allowStr(sql:string){
     });
 
     await db.sync({ alter: true }).then(()=>{
-        console.log('db updated')
+        if(isDryRun){
+            console.log('this is "SQL DISPLAY ONLY MODE", databse was not updated')
+        } else {
+            console.log('db updated')
+        }
+        
         process.exit(0)
-        //console.log('this is "SQL DISPLAY ONLY" command, databse was not updated')
     })
 })() 
 

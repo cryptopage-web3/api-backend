@@ -63,8 +63,7 @@ npm t 2>&1
 
 exit_if_error "integration tests failed"
 
-#npx sequelize-cli db:migrate
-npm run db:sync 2>&1
+npm run db:up 2>&1
 
 exit_if_error "database update failed"
 
@@ -107,8 +106,7 @@ echo "git pull $run_dir"
 
 git pull 2>&1
 
-#npx sequelize-cli db:migrate
-npm run db:sync 2>&1
+npm run db:up 2>&1
 
 exit_if_error "database update failed"
 
