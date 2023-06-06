@@ -38,6 +38,7 @@ import { ErrorLogRepo } from './orm/repo/error-log-repo';
 import { BlockDetailsRepo } from './orm/repo/block-details-repo';
 import { getLogger } from "./util/logger";
 import { Web3Util } from './services/web3/web3-util';
+import { MumbaiTtransactionsManager } from "./modules/transactions/mumbai";
 
 export const container = new Container();
 
@@ -96,6 +97,7 @@ container.bind(IDS.SERVICE.WEB3.Web3Util).to(Web3Util)
 container.bind(IDS.CONFIG.EtherscanApiKey).toConstantValue(envToString('ETHERSCAN_API_KEY'))
 container.bind(IDS.CONFIG.GoerliApiKey).toConstantValue(envToString('GOERLI_API_KEY'))
 container.bind('ALCHEMY_API_KEY_GOERLI').toConstantValue(envToString('ALCHEMY_API_KEY_GOERLI'))
+container.bind('ALCHEMY_API_KEY_MUMBAI').toConstantValue(envToString('ALCHEMY_API_KEY_MUMBAI'))
 
 container.bind(IDS.CACHE.PriceCache).to(PriceCache)
 
@@ -151,6 +153,9 @@ container.bind(IDS.MODULES.TransactionManager)
 container.bind(IDS.MODULES.TransactionManager)
     .to(UnmarshalTransactionsManager).inSingletonScope()
     .whenTargetNamed(ChainId.matic)
+container.bind(IDS.MODULES.TransactionManager)
+    .to(MumbaiTtransactionsManager).inSingletonScope()
+    .whenTargetNamed(ChainId.mumbai)
 container.bind(IDS.MODULES.TransactionManager)
     .to(SolscanTtransactionsManager).inSingletonScope()
     .whenTargetNamed(ChainId.sol)

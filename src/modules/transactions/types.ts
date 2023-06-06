@@ -2,6 +2,7 @@ export enum ChainId {
     eth='eth',
     bsc='bsc',
     matic='matic',
+    mumbai='mumbai',
     sol='sol',
     tron='tron',
     goerli='goerli'
@@ -19,14 +20,16 @@ export interface ITransactionsPagination {
     page:number,
     pageSize: number,
     fingerprint?: string,
-    beforeHash?: string
+    beforeHash?: string,
+    pageKey?: string
 }
 
 export interface ITransactionsNexPagePagination {
     tx?: number,
     erc20?: number,
     fingerprint?: string,
-    beforeHash?: string
+    beforeHash?: string,
+    pageKey?: string
 }
 
 export interface Paginator {

@@ -1,110 +1,110 @@
 paths:  
-  /transactions/eth/{address}:
-    get:
-      summary: Get transactions from eth address.
-      description: Get paginated transactions from eth address.
-      tags: [Transactions]
-      parameters:
-        - $ref: '#/parameters/path/address'
-        - $ref: '#/parameters/pagination/pageSize'
-        - $ref: '#/parameters/pagination/eth/continueTx'
-        - $ref: '#/parameters/pagination/eth/continueErc20'
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  transactions:
-                    type: array
-                    items:
-                      anyOf:
-                        - $ref: '#/components/schemas/EthTransaction'
-                        - $ref: '#/components/schemas/Erc20Transaction'
-                  continue:
-                    type: object
-                    properties:
-                      tx:
-                        type: number
-                      erc20:
-                        type: number
-              examples:
-                EthTransactionExample:
-                  $ref: '#/responses/examples/EthTransactionExample'
-        "400":
-          $ref: '#/components/responses/NotFound'
-  /transactions/goerli/{address}:
-    get:
-      summary: Get paginated goerli transactions from address.
-      description: Get goerli transactions from address.
-      tags: [Transactions]
-      parameters:
-        - $ref: '#/parameters/path/address'
-        - $ref: '#/parameters/pagination/page'
-        - $ref: '#/parameters/pagination/pageSize'
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              examples:
-                GoerliTransactionsExample:
-                  $ref: '#/responses/examples/GoerliTransactionExample'
-        "400":
-          $ref: '#/responses/PaginationError'
-  /transactions/tron/{address}:
-    get:
-      summary: Get paginated tron transactions from address.
-      description: Get tron transactions from address.
-      tags: [Transactions]
-      parameters:
-        - $ref: '#/parameters/path/address'
-        - $ref: '#/parameters/pagination/pageSize'
-        - in: query
-          name: continue[fingerprint]
-          schema:
-            type: string
-            required: false
-          description: Continue pagination token, `pageSize` should be the same as in previous request
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                  $ref: '#/components/schemas/Transactions'
-              examples:
-                TronTransactionsExample:
-                  $ref: '#/responses/examples/TronTransactionsExample'
-        "400":
-          $ref: '#/responses/PaginationError'
-  /transactions/sol/{address}:
-    get:
-      summary: Get paginated solana transactions from address.
-      tags: [Transactions]
-      parameters:
-        - $ref: '#/parameters/path/address'
-        - $ref: '#/parameters/pagination/pageSize'
-        - in: query
-          name: continue[beforeHash]
-          schema:
-            type: string
-            required: false
-          description: Continue pagination token, `pageSize` should be the same as in previous request
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                  $ref: '#/components/schemas/Transactions'
-              examples:
-                CommonTransactionsExample:
-                  $ref: '#/responses/examples/CommonTransactionsExample'
-        "400":
-          $ref: '#/responses/PaginationError'
+  # /transactions/eth/{address}:
+  #   get:
+  #     summary: Get transactions from eth address.
+  #     description: Get paginated transactions from eth address.
+  #     tags: [Transactions]
+  #     parameters:
+  #       - $ref: '#/parameters/path/address'
+  #       - $ref: '#/parameters/pagination/pageSize'
+  #       - $ref: '#/parameters/pagination/eth/continueTx'
+  #       - $ref: '#/parameters/pagination/eth/continueErc20'
+  #     responses:
+  #       "200":
+  #         description: OK
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: object
+  #               properties:
+  #                 transactions:
+  #                   type: array
+  #                   items:
+  #                     anyOf:
+  #                       - $ref: '#/components/schemas/EthTransaction'
+  #                       - $ref: '#/components/schemas/Erc20Transaction'
+  #                 continue:
+  #                   type: object
+  #                   properties:
+  #                     tx:
+  #                       type: number
+  #                     erc20:
+  #                       type: number
+  #             examples:
+  #               EthTransactionExample:
+  #                 $ref: '#/responses/examples/EthTransactionExample'
+  #       "400":
+  #         $ref: '#/components/responses/NotFound'
+  # /transactions/goerli/{address}:
+  #   get:
+  #     summary: Get paginated goerli transactions from address.
+  #     description: Get goerli transactions from address.
+  #     tags: [Transactions]
+  #     parameters:
+  #       - $ref: '#/parameters/path/address'
+  #       - $ref: '#/parameters/pagination/page'
+  #       - $ref: '#/parameters/pagination/pageSize'
+  #     responses:
+  #       "200":
+  #         description: OK
+  #         content:
+  #           application/json:
+  #             examples:
+  #               GoerliTransactionsExample:
+  #                 $ref: '#/responses/examples/GoerliTransactionExample'
+  #       "400":
+  #         $ref: '#/responses/PaginationError'
+  # /transactions/tron/{address}:
+  #   get:
+  #     summary: Get paginated tron transactions from address.
+  #     description: Get tron transactions from address.
+  #     tags: [Transactions]
+  #     parameters:
+  #       - $ref: '#/parameters/path/address'
+  #       - $ref: '#/parameters/pagination/pageSize'
+  #       - in: query
+  #         name: continue[fingerprint]
+  #         schema:
+  #           type: string
+  #           required: false
+  #         description: Continue pagination token, `pageSize` should be the same as in previous request
+  #     responses:
+  #       "200":
+  #         description: OK
+  #         content:
+  #           application/json:
+  #             schema:
+  #                 $ref: '#/components/schemas/Transactions'
+  #             examples:
+  #               TronTransactionsExample:
+  #                 $ref: '#/responses/examples/TronTransactionsExample'
+  #       "400":
+  #         $ref: '#/responses/PaginationError'
+  # /transactions/sol/{address}:
+  #   get:
+  #     summary: Get paginated solana transactions from address.
+  #     tags: [Transactions]
+  #     parameters:
+  #       - $ref: '#/parameters/path/address'
+  #       - $ref: '#/parameters/pagination/pageSize'
+  #       - in: query
+  #         name: continue[beforeHash]
+  #         schema:
+  #           type: string
+  #           required: false
+  #         description: Continue pagination token, `pageSize` should be the same as in previous request
+  #     responses:
+  #       "200":
+  #         description: OK
+  #         content:
+  #           application/json:
+  #             schema:
+  #                 $ref: '#/components/schemas/Transactions'
+  #             examples:
+  #               CommonTransactionsExample:
+  #                 $ref: '#/responses/examples/CommonTransactionsExample'
+  #       "400":
+  #         $ref: '#/responses/PaginationError'
   /transactions/{chain}/{address}:
     get:
       summary: Get transactions from address.
@@ -116,8 +116,8 @@ paths:
           required: true
           schema:
             type: string
-            enum: [bsc, matic]
-            default: eth
+            enum: [mumbai, matic]
+            default: mumbai
           description: chain name
         - $ref: '#/parameters/path/address'
         - $ref: '#/parameters/pagination/page'
@@ -130,8 +130,8 @@ paths:
               schema:
                   $ref: '#/components/schemas/Transactions'
               examples:
-                CommonTransactionsExample:
-                  $ref: '#/responses/examples/CommonTransactionsExample'
+                MumbaiTransactionExample:
+                  $ref: '#/responses/examples/MumbaiTransactionExample'
         "400":
           $ref: '#/responses/PaginationError'
   /transactions/detail/{chain}/{txHash}:
@@ -153,6 +153,9 @@ paths:
             application/json:
               schema:
                   $ref: '#/components/schemas/Transaction'
+              examples:
+                MumbaiTransactionDetailsExample:
+                  $ref: '#/responses/examples/MumbaiTransactionDetailsExample'
         "400":
           $ref: '#/components/responses/NotFound'
   /transactions/transfers/{chain}/{address}:
@@ -166,8 +169,8 @@ paths:
           required: true
           schema:
             type: string
-            enum: [eth, bsc, matic, sol, tron, goerli]
-            default: eth
+            enum: [mumbai, matic]
+            default: mumbai
           description: chain name
         - in: path
           name: address

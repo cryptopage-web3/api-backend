@@ -7,7 +7,7 @@ import { errorHandler } from "./decorator/error-handler";
 import { getTransactionsValidator } from './validator/get-transactions-validator';
 import { paginationValidator } from './validator/pagination-validator';
 
-const chainValidator = [ChainId.bsc,ChainId.eth,ChainId.matic,ChainId.sol,ChainId.tron, ChainId.goerli].join('|')
+const chainValidator = [ChainId.matic,ChainId.mumbai].join('|')
 
 @controller('/transactions')
 export class TransactionsController implements interfaces.Controller {

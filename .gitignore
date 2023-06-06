@@ -55,3 +55,4 @@ Thumbs.db
 /data
 /src/services/rarible/nft-items-info.ts
 /.env.local
+/test.js

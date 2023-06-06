@@ -22,6 +22,7 @@ export interface Env {
     PREVENT_LOG_ERRORS: 'yes' | 'no' | undefined
 
     ALCHEMY_API_KEY_GOERLI: string
+    ALCHEMY_API_KEY_MUMBAI: string
 
     API_RATE_LIMIT: string
 

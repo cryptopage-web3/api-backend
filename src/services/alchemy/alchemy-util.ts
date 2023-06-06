@@ -4,6 +4,8 @@ import { ChainId } from '../../modules/transactions/types';
 export function getAlchemyNetwork(chain:ChainId):Network{
     if(chain == ChainId.goerli){
         return Network.ETH_GOERLI
+    } else if(ChainId.mumbai){
+        return Network.MATIC_MUMBAI
     }
 
     throw new Error(`Network not found for chain '${chain}'`)
