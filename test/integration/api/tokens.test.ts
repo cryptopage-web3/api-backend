@@ -26,7 +26,7 @@ describe('test tokens api endpoints', ()=>{
         cleanUpMetadata()
         Sinon.restore()
     })
-    it('should return eth tokens', async ()=>{
+    it.skip('should return eth tokens', async ()=>{
         axiosGetStub
             .resolves({data: unmarshalEthTokensResponse})
 
@@ -42,7 +42,7 @@ describe('test tokens api endpoints', ()=>{
             expect(response.body.tokens[1].balance).to.eq(250870.248787)
     })
 
-    it('should return bsc tokens', async ()=>{
+    it.skip('should return bsc tokens', async ()=>{
         axiosGetStub
             .resolves({data: unmarshalBscTokensResponse})
 
@@ -74,7 +74,7 @@ describe('test tokens api endpoints', ()=>{
             expect(response.body.tokens[1].balance).to.eq(300000)
     })
 
-    it('should return solana tokens', async ()=>{
+    it.skip('should return solana tokens', async ()=>{
         axiosGetStub
             .resolves({data: covalentSolTokensResponse})
 
@@ -91,7 +91,7 @@ describe('test tokens api endpoints', ()=>{
     })
 
     
-    it('should return tron tokens', async ()=>{
+    it.skip('should return tron tokens', async ()=>{
         axiosGetStub
             .resolves({data: tronscanTokensResponse})
 

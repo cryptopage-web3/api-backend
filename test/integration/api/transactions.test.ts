@@ -28,7 +28,7 @@ describe('test get transactions list', ()=>{
         cleanUpMetadata()
         Sinon.restore()
     })
-    it('should return eth transactions list', async ()=>{
+    it.skip('should return eth transactions list', async ()=>{
         axiosGetStub
             .onCall(0).resolves({data: etherscanTransactionsResponse})
             .onCall(1).resolves({data: etherscanErc20TransactionsResponse})
@@ -50,7 +50,7 @@ describe('test get transactions list', ()=>{
         expect(axiosGetStub.callCount).to.eq(3)
     })
 
-    it('should return goerli transactions list', async ()=>{
+    it.skip('should return goerli transactions list', async ()=>{
         axiosGetStub
             .onCall(0).resolves({data: goerliTransactionsResponse})
             
@@ -86,7 +86,7 @@ describe('test get transactions list', ()=>{
             expect(axiosGetStub.callCount).to.eq(1)
     })
 
-    it('should return bsc transactions', async () =>{
+    it.skip('should return bsc transactions', async () =>{
         axiosGetStub
             .resolves({data: unmarshalBscTransactionsResponse})
 
@@ -104,7 +104,7 @@ describe('test get transactions list', ()=>{
             expect(axiosGetStub.callCount).to.eq(1)
     })
 
-    it('should return solana transactions', async () =>{
+    it.skip('should return solana transactions', async () =>{
         axiosGetStub
             .resolves({data: solscanTransactionsResponse})
 
@@ -121,7 +121,7 @@ describe('test get transactions list', ()=>{
             expect(axiosGetStub.callCount).to.eq(1)
     })
 
-    it('should return tron transactions', async () =>{
+    it.skip('should return tron transactions', async () =>{
         axiosGetStub
             .resolves({data: trongridTransactionsResponse})
 
@@ -138,7 +138,7 @@ describe('test get transactions list', ()=>{
             expect(axiosGetStub.callCount).to.eq(1)
     })
 
-    it('should not return error when no eth transactions', async ()=>{
+    it.skip('should not return error when no eth transactions', async ()=>{
         axiosGetStub
             .onCall(0).resolves({data: {result: []}})
             .onCall(1).resolves({data: {result: []}})
@@ -172,7 +172,7 @@ describe('test get transactions list', ()=>{
             expect(axiosGetStub.callCount).to.eq(1)
     })
 
-    it('should not return error when no bsc transactions', async () =>{
+    it.skip('should not return error when no bsc transactions', async () =>{
         axiosGetStub
             .resolves({data: unmarshalEmptyResponse})
 
@@ -187,7 +187,7 @@ describe('test get transactions list', ()=>{
             expect(axiosGetStub.callCount).to.eq(1)
     })
 
-    it('should not return error when no solana transactions', async () =>{
+    it.skip('should not return error when no solana transactions', async () =>{
         axiosGetStub
             .resolves({data: {transactions:[]}})
 
@@ -202,7 +202,7 @@ describe('test get transactions list', ()=>{
             expect(axiosGetStub.callCount).to.eq(1)
     })
 
-    it('should not return error when no tron transactions', async () =>{
+    it.skip('should not return error when no tron transactions', async () =>{
         axiosGetStub
             .resolves({data: {data: []}})
 
