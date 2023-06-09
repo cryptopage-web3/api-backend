@@ -158,40 +158,40 @@ paths:
                   $ref: '#/responses/examples/MumbaiTransactionDetailsExample'
         "400":
           $ref: '#/components/responses/NotFound'
-  /transactions/transfers/{chain}/{address}:
-    get:
-      summary: Get transactions from address.
-      description: Get transactions from address.
-      tags: [Transactions]
-      parameters:
-        - in: path
-          name: chain
-          required: true
-          schema:
-            type: string
-            enum: [mumbai, matic]
-            default: mumbai
-          description: chain name
-        - in: path
-          name: address
-          required: true
-          schema:
-            type: string
-        - in: query
-          name: skip
-          schema:
-            type: number
-        - in: query
-          name: limit
-          schema:
-            type: number
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                  $ref: '#/components/schemas/Transactions'
-        "400":
-          $ref: '#/components/responses/NotFound'
+  # /transactions/transfers/{chain}/{address}:
+  #   get:
+  #     summary: Get transactions from address.
+  #     description: Get transactions from address.
+  #     tags: [Transactions]
+  #     parameters:
+  #       - in: path
+  #         name: chain
+  #         required: true
+  #         schema:
+  #           type: string
+  #           enum: [mumbai, matic]
+  #           default: mumbai
+  #         description: chain name
+  #       - in: path
+  #         name: address
+  #         required: true
+  #         schema:
+  #           type: string
+  #       - in: query
+  #         name: skip
+  #         schema:
+  #           type: number
+  #       - in: query
+  #         name: limit
+  #         schema:
+  #           type: number
+  #     responses:
+  #       "200":
+  #         description: OK
+  #         content:
+  #           application/json:
+  #             schema:
+  #                 $ref: '#/components/schemas/Transactions'
+  #       "400":
+  #         $ref: '#/components/responses/NotFound'
     

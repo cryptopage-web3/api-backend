@@ -38,6 +38,9 @@ export const chainConfig = {
         rpc: 'https://polygon-rpc.com',
         nativeCoinId: 'matic-network'
     },
+    [ChainId.mumbai]:{
+        rpc: envToString('WEB3_RPC_URL_MUMBAI')
+    },
     [ChainId.sol]: {
         evm: false,
         chainId: 1399811149,

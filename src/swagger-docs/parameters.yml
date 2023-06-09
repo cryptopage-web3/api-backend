@@ -29,6 +29,13 @@ parameters:
         type: integer
         minimum: 1
       description: Items per pege (min=1)
+    pageKey:
+      in: query
+      name: continue[pageKey]
+      schema:
+        type: string
+        required: false
+      description: Continue pagination token, `pageSize` should be the same as in previous request
   path:
     address:
       in: path

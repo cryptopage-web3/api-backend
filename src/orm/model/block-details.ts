@@ -13,7 +13,7 @@ export class BlockDetails extends Model<BlockDetailsInferAttr, InferCreationAttr
 BlockDetails.init({
     blockNumber: DataTypes.INTEGER,
     blockDate: DataTypes.DATE,
-    chain: DataTypes.ENUM(ChainId.eth, ChainId.bsc, ChainId.matic, ChainId.sol, ChainId.tron, ChainId.goerli),
+    chain: DataTypes.ENUM(ChainId.eth, ChainId.bsc, ChainId.matic, ChainId.mumbai, ChainId.sol, ChainId.tron, ChainId.goerli),
 },{
     sequelize: db
 })

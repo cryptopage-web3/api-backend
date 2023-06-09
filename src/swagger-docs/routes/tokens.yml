@@ -10,8 +10,8 @@ paths:
           required: true
           schema:
             type: string
-            enum: [eth, bsc, matic, sol, tron, goerli]
-            default: eth
+            enum: [mumbai, matic]
+            default: mumbai
           description: chain name
         - in: path
           name: address

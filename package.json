@@ -7,7 +7,7 @@
     "start": "npm run build & node dist/index.js",
     "build:dev": "tsc -w --pretty",
     "build": "tsc --pretty",
-    "server:dev": "nodemon -L",
+    "server:dev": "nodemon -L src/index.ts",
     "db:sync": "node dist/orm/sync-db.js",
     "db:gen": "npx sequelize-cli migration:generate --name",
     "db:up": "npx sequelize-cli db:migrate",

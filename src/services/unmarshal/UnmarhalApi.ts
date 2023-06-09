@@ -4,7 +4,7 @@ import { inject, injectable } from 'inversify';
 import { IDS } from '../../types/index';
 import { Axios } from 'axios';
 import { ContractDetailsRepo } from '../../orm/repo/contract-details-repo';
-import { INftItem, INftsList } from '../../modules/nfts/types';
+import { INftItem, INftsList, Web3NftTokenData } from '../../modules/nfts/types';
 import { IUnmarshanNftItem, IUnmarshalNftResponse, UnmarshalNftDetails, IUnmarshalNtfTxsResponse } from './types';
 import { UnmarshalApiHelper } from './helper';
 import { PriceCache } from '../../cache/coins';
@@ -281,7 +281,7 @@ export class UnmarshalApi {
         }*/
     }
 
-    async getNFTDetailsFromApi(contractAddress, tokenId): Promise<UnmarshalNftDetails> {
+    async getNFTDetailsFromApi(contractAddress, tokenId): Promise<Web3NftTokenData> {
         const apiUrl = `${this.baseUrl}/v2/${this.chainName}/address/${contractAddress}/details?page=1&pageSize=1&tokenId=${tokenId}&auth_key=${this.apiKey}`
         const { data } = await this._axios.get(apiUrl).catch(err =>{
             this._errorLogRepo.log('unmarshal_get_nft_details', err.message, `/v2/${this.chainName}/address/${contractAddress}/details`)
@@ -292,7 +292,7 @@ export class UnmarshalApi {
 
         const url = normalizeUrl(info.image_url)
         const result = {
-            url,
+            contentUrl: url,
             name: info.name,
             price: info.price,
             description: info.description,
@@ -307,7 +307,7 @@ export class UnmarshalApi {
             const metadata = await this._web3Util.loadTokenMetadata(info.token_uri)
             
             return {
-                url: normalizeUrl(metadata?.url),
+                contentUrl: normalizeUrl(metadata?.contentUrl),
                 name: info.name || metadata?.name,
                 price: info.price,
                 description: info.description || metadata?.description,

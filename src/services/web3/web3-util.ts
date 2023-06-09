@@ -26,7 +26,7 @@ export class Web3Util {
                 return Promise.reject(err)
             });
             return {
-                url: data.image || data.animation_url,
+                contentUrl: data.image || data.animation_url,
                 //type: data.image ? 'image' : '721',
                 name: data.name,
                 description: data.description,

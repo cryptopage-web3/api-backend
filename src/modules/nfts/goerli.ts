@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { INftsManager, INftsList, INftTransaction, NftTxType, INftItem, INftTransactionsPagination } from './types';
+import { INftsManager, INftsList, INftTransaction, NftTxType, INftItem, INftPagination } from './types';
 import { GoerliScanApi } from './../../services/etherscan/goerliscan-api';
 import { ChainId } from "modules/transactions/types";
 import { IDS } from '../../types/index';
@@ -18,7 +18,7 @@ export class GoerliNFTsManager implements INftsManager {
 
     _chain: ChainId;
 
-    async getWalletAllNFTs(address, page, pageSize):Promise<INftsList> {
+    async getWalletAllNFTs(address, {page, pageSize}):Promise<INftsList> {
         const response = await this._alchemy.nft.getNftsForOwner(address, {pageSize: 100})
         
         const list: any[] = [];
@@ -49,7 +49,7 @@ export class GoerliNFTsManager implements INftsManager {
         }
     }
 
-    async getWalletNFTTransactions(address: string, opts: INftTransactionsPagination) {
+    async getWalletNFTTransactions(address: string, opts: INftPagination) {
         const response = await this._alchemy.core.getAssetTransfers({
             toAddress: address,
             category: [AssetTransfersCategory.ERC721, AssetTransfersCategory.ERC1155],

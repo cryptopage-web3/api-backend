@@ -1,5 +1,5 @@
 import { controller, httpGet, interfaces, queryParam, requestParam, response } from "inversify-express-utils";
-import { INftsManager, INftTransactionsPagination } from '../modules/nfts/types';
+import { INftsManager, INftPagination } from '../modules/nfts/types';
 import { errorHandler } from "./decorator/error-handler";
 import { ChainId } from '../modules/transactions/types';
 import { paginationValidator } from "./validator/pagination-validator";
@@ -7,7 +7,7 @@ import * as express from 'express';
 import { inject } from "inversify";
 import { IDS } from '../types/index';
 
-const chainValidator = [ChainId.bsc,ChainId.eth,ChainId.matic, ChainId.goerli].join('|')
+const chainValidator = [ChainId.mumbai, ChainId.matic].join('|')
 
 @controller('/nfts')
 export class NftsController implements interfaces.Controller {
@@ -18,12 +18,13 @@ export class NftsController implements interfaces.Controller {
     async getAddressNfts(
         @requestParam('chain') chain: ChainId,
         @requestParam('address') address: string,
+        @queryParam('continue') paginator:INftPagination,
         @queryParam('page') page: number = 1,
         @queryParam('pageSize') pageSize: number = 10,
         @response() res: express.Response
     ){
         const manager = this._nftManagerFactory(chain)
-        const result = await manager.getWalletAllNFTs(address, page, pageSize)
+        const result = await manager.getWalletAllNFTs(address, Object.assign({},{page, pageSize}, paginator))
 
         res.json(result)
     }
@@ -33,7 +34,7 @@ export class NftsController implements interfaces.Controller {
     async getAddressNftTransactions(
         @requestParam('chain') chain: ChainId,
         @requestParam('address') address: string,
-        @queryParam('continue') paginator:INftTransactionsPagination,
+        @queryParam('continue') paginator:INftPagination,
         @queryParam('page') page: number = 1,
         @queryParam('pageSize') pageSize: number = 10,
         @response() res: express.Response

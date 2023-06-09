@@ -18,7 +18,7 @@ ContractDetails.init({
     symbol: DataTypes.STRING(25),
     name: DataTypes.STRING(255),
     description: DataTypes.STRING(2000),
-    chain: DataTypes.ENUM(ChainId.eth, ChainId.bsc, ChainId.matic, ChainId.sol, ChainId.tron),
+    chain: DataTypes.ENUM(ChainId.eth, ChainId.bsc, ChainId.matic, ChainId.mumbai, ChainId.sol, ChainId.tron),
     url: DataTypes.STRING(400)
 },{
     sequelize: db

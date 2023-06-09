@@ -38,7 +38,9 @@ import { ErrorLogRepo } from './orm/repo/error-log-repo';
 import { BlockDetailsRepo } from './orm/repo/block-details-repo';
 import { getLogger } from "./util/logger";
 import { Web3Util } from './services/web3/web3-util';
-import { MumbaiTtransactionsManager } from "./modules/transactions/mumbai";
+import { AlchemyTransactionsManager } from "./modules/transactions/AlchemyTransactionsManager";
+import { AlchemyNftsManager } from "./modules/nfts/AlchemyNftsManager";
+import { AlchemyTokenManager } from "./modules/tokens/AlchemyTokenManager";
 
 export const container = new Container();
 
@@ -61,16 +63,13 @@ container.bind(IDS.NODE_MODULES.web3).toDynamicValue(context => {
 
 container.bind(IDS.SERVICE.WEB3.Web3Manager)
     .to(EthWeb3Manager)
-    .inSingletonScope().whenAnyAncestorNamed(ChainId.eth)
-container.bind(IDS.SERVICE.WEB3.Web3Manager)
-    .to(EthWeb3Manager)
-    .inSingletonScope().whenAnyAncestorNamed(ChainId.goerli)
-container.bind(IDS.SERVICE.WEB3.Web3Manager)
-    .to(EthWeb3Manager)
-    .inSingletonScope().whenAnyAncestorNamed(ChainId.matic)
-container.bind(IDS.SERVICE.WEB3.Web3Manager)
-    .to(EthWeb3Manager)
-    .inSingletonScope().whenAnyAncestorNamed(ChainId.bsc)
+    .when(request =>{
+        const chain = getChainIdFromAncestor(request),
+            allowedChains = [ChainId.matic, ChainId.mumbai];
+
+        return !!chain && allowedChains.indexOf(chain) !== -1;
+    })
+
 container.onActivation(IDS.SERVICE.WEB3.Web3Manager, injectChainDecorator)
     /*
 container.bind(IDS.SERVICE.WEB3.Web3Manager)
@@ -120,7 +119,7 @@ container.bind(IDS.SERVICE.TronscanApi).to(TronscanTokenManager)
 
 container.bind(IDS.SERVICE.SocialSmartContract)
     .to(GoerliSocialSmartContract)
-    .inSingletonScope()
+    
     .whenAnyAncestorNamed(ChainId.goerli)
 container.bind(IDS.SERVICE.SocialSmartContract)
     .to(DefaultSocialSmartContract)
@@ -145,25 +144,25 @@ container.bind(IDS.SERVICE.AlchemySdk).toDynamicValue(context =>{
 container.bind(IDS.MODULES.NftCache).to(NftCache)
 
 container.bind(IDS.MODULES.TransactionManager)
-    .to(EthTransactionManager).inSingletonScope()
+    .to(EthTransactionManager)
     .whenTargetNamed(ChainId.eth)
 container.bind(IDS.MODULES.TransactionManager)
-    .to(UnmarshalTransactionsManager).inSingletonScope()
+    .to(UnmarshalTransactionsManager)
     .whenTargetNamed(ChainId.bsc)
 container.bind(IDS.MODULES.TransactionManager)
-    .to(UnmarshalTransactionsManager).inSingletonScope()
+    .to(UnmarshalTransactionsManager)
     .whenTargetNamed(ChainId.matic)
 container.bind(IDS.MODULES.TransactionManager)
-    .to(MumbaiTtransactionsManager).inSingletonScope()
+    .to(AlchemyTransactionsManager)
     .whenTargetNamed(ChainId.mumbai)
 container.bind(IDS.MODULES.TransactionManager)
-    .to(SolscanTtransactionsManager).inSingletonScope()
+    .to(SolscanTtransactionsManager)
     .whenTargetNamed(ChainId.sol)
 container.bind(IDS.MODULES.TransactionManager)
-    .to(TronGridApiTransactionsManager).inSingletonScope()
+    .to(TronGridApiTransactionsManager)
     .whenTargetNamed(ChainId.tron)
 container.bind(IDS.MODULES.TransactionManager)
-    .to(GoerliscanTtransactionsManager).inSingletonScope()
+    .to(GoerliscanTtransactionsManager)
     .whenTargetNamed(ChainId.goerli)
 container.bind(IDS.MODULES.TransactionManagerFactory)
     .toAutoNamedFactory(IDS.MODULES.TransactionManager)
@@ -180,41 +179,48 @@ function nftManagerDecorator(context: interfaces.Context, instance:INftsManager)
 
 
 container.bind(IDS.MODULES.NftsManager)
-    .to(UnmarshalNftsManager).inSingletonScope()
+    .to(UnmarshalNftsManager)
     .whenTargetNamed(ChainId.bsc)
     .onActivation(nftManagerDecorator)
 container.bind(IDS.MODULES.NftsManager)
-    .to(UnmarshalNftsManager).inSingletonScope()
+    .to(UnmarshalNftsManager)
     .whenTargetNamed(ChainId.matic)
     .onActivation(nftManagerDecorator)
 container.bind(IDS.MODULES.NftsManager)
-    .to(UnmarshalNftsManager).inSingletonScope()
+    .to(AlchemyNftsManager)
+    .whenTargetNamed(ChainId.mumbai)
+    .onActivation(nftManagerDecorator)
+container.bind(IDS.MODULES.NftsManager)
+    .to(UnmarshalNftsManager)
     .whenTargetNamed(ChainId.eth)
     .onActivation(nftManagerDecorator)
 container.bind(IDS.MODULES.NftsManager)
-    .to(GoerliNFTsManager).inSingletonScope()
+    .to(GoerliNFTsManager)
     .whenTargetNamed(ChainId.goerli)
     .onActivation(nftManagerDecorator)
 container.bind(IDS.MODULES.NftsManagerFactory)
     .toAutoNamedFactory(IDS.MODULES.NftsManager)
 
 container.bind(IDS.MODULES.TokenManager)
-    .to(UnmarshalTokenManager).inSingletonScope()
+    .to(UnmarshalTokenManager)
     .whenTargetNamed(ChainId.eth)
 container.bind(IDS.MODULES.TokenManager)
-    .to(UnmarshalTokenManager).inSingletonScope()
+    .to(UnmarshalTokenManager)
     .whenTargetNamed(ChainId.bsc)
 container.bind(IDS.MODULES.TokenManager)
-    .to(UnmarshalTokenManager).inSingletonScope()
+    .to(UnmarshalTokenManager)
     .whenTargetNamed(ChainId.matic)
 container.bind(IDS.MODULES.TokenManager)
-    .to(CovalentTokenManager).inSingletonScope()
+    .to(AlchemyTokenManager)
+    .whenTargetNamed(ChainId.mumbai)
+container.bind(IDS.MODULES.TokenManager)
+    .to(CovalentTokenManager)
     .whenTargetNamed(ChainId.sol)
 container.bind(IDS.MODULES.TokenManager)
-    .to(TronscanTokenManager).inSingletonScope()
+    .to(TronscanTokenManager)
     .whenTargetNamed(ChainId.tron)
 container.bind(IDS.MODULES.TokenManager)
-    .to(GoerliScanTokenManager).inSingletonScope()
+    .to(GoerliScanTokenManager)
     .whenTargetNamed(ChainId.goerli)
 container.bind(IDS.MODULES.TokenManagerFactory)
     .toAutoNamedFactory(IDS.MODULES.TokenManager)

@@ -4,7 +4,7 @@ import { IDS } from '../../types/index';
 import { Alchemy, AssetTransfersCategory, AssetTransfersWithMetadataResult } from 'alchemy-sdk';
 
 @injectable()
-export class MumbaiTtransactionsManager implements ITransactionManager {
+export class AlchemyTransactionsManager implements ITransactionManager {
     @inject(IDS.SERVICE.AlchemySdk) _alchemy:Alchemy
 
     async getWalletAllTransactions(address: string, opts: ITransactionsPagination): Promise<Paginator> {

@@ -4,13 +4,13 @@ import { ISocialComment } from '../../services/web3/social-smart-contract/types'
 export interface INftsManager {
     _chain: ChainId
     
-    getWalletAllNFTs(address: string, page: number, pageSize: number): Promise<INftsList>
-    getWalletNFTTransactions(address: string, opts: INftTransactionsPagination)
+    getWalletAllNFTs(address: string, opts: INftPagination): Promise<INftsList>
+    getWalletNFTTransactions(address: string, opts: INftPagination)
     getNftTransactionDetails(contractAddress: string, tokenId: string, blockNumber:number | null)
     getNftDetails(contractAddress: string, tokenId: string)
 }
 
-export interface INftTransactionsPagination {
+export interface INftPagination {
     pageSize: number
     page?:number,
     pageKey?: string
@@ -74,9 +74,9 @@ export interface INftTxList {
 }
 
 export interface Web3NftTokenData {
-    url: string,
+    contentUrl: string,
     name: string,
-    price: string,
+    price?: string,
     description: string,
     attributes: any[],
     isEncrypted?: boolean,

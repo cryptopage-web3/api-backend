@@ -19,7 +19,7 @@ export class NftTokenDetails extends Model<NftTokenDetailsInferAttr, InferCreati
 
 NftTokenDetails.init({
     tokenId: DataTypes.STRING(255),
-    chain: DataTypes.ENUM(ChainId.eth, ChainId.bsc, ChainId.matic, ChainId.sol, ChainId.tron, ChainId.goerli),
+    chain: DataTypes.ENUM(ChainId.eth, ChainId.bsc, ChainId.matic, ChainId.mumbai, ChainId.sol, ChainId.tron, ChainId.goerli),
     contractAddress: DataTypes.STRING(255),
     name: DataTypes.STRING(255),
     description: DataTypes.STRING(2000),

@@ -10,12 +10,10 @@ paths:
           required: true
           schema:
             type: string
-            enum: [eth, bsc, matic, goerli]
-            default: eth
+            enum: [mumbai, matic]
+            default: mumbai
           description: chain name
         - $ref: '#/parameters/path/address'
-        - $ref: '#/parameters/pagination/page'
-        - $ref: '#/parameters/pagination/pageSize'
       responses:
         "200":
           description: OK
@@ -28,32 +26,32 @@ paths:
           $ref: '#/responses/PaginationError'
         "429":
           $ref: '#/responses/RateLimit'
-  /nfts/transactions/goerli/{address}:
-    get:
-      summary: Get goerli nft transactions
-      description: Get goerli nft transactions for owner address.
-      tags: [NFT]
-      parameters:
-        - $ref: '#/parameters/path/address'
-        - $ref: '#/parameters/pagination/pageSize'
-        - in: query
-          name: continue[pageKey]
-          schema:
-            type: string
-            required: false
-          description: Continue pagination token, `pageSize` should be the same as in previous request
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              examples:
-                GoerliNftTransactionsExample:
-                  $ref: '#/responses/examples/GoerliNftTransactionsExample'
-        "400":
-          $ref: '#/responses/PaginationError'
-        "429":
-          $ref: '#/responses/RateLimit'
+  # /nfts/transactions/goerli/{address}:
+  #   get:
+  #     summary: Get goerli nft transactions
+  #     description: Get goerli nft transactions for owner address.
+  #     tags: [NFT]
+  #     parameters:
+  #       - $ref: '#/parameters/path/address'
+  #       - $ref: '#/parameters/pagination/pageSize'
+  #       - in: query
+  #         name: continue[pageKey]
+  #         schema:
+  #           type: string
+  #           required: false
+  #         description: Continue pagination token, `pageSize` should be the same as in previous request
+  #     responses:
+  #       "200":
+  #         description: OK
+  #         content:
+  #           application/json:
+  #             examples:
+  #               GoerliNftTransactionsExample:
+  #                 $ref: '#/responses/examples/GoerliNftTransactionsExample'
+  #       "400":
+  #         $ref: '#/responses/PaginationError'
+  #       "429":
+  #         $ref: '#/responses/RateLimit'
   /nfts/transactions/{chain}/{address}:
     get:
       summary: Get nft transactions from address.
@@ -65,27 +63,69 @@ paths:
           required: true
           schema:
             type: string
-            enum: [eth, bsc, matic, goerli]
-            default: eth
+            enum: [mumbai, matic]
+            default: mumbai
           description: chain name
         - $ref: '#/parameters/path/address'
-        - $ref: '#/parameters/pagination/page'
         - $ref: '#/parameters/pagination/pageSize'
+        - $ref: '#/parameters/pagination/pageKey'
       responses:
         "200":
           description: OK
           content:
             application/json:
+              examples:
+                MumbaiAddressNftTransactionsExample:
+                  $ref: '#/responses/examples/MumbaiAddressNftTransactionsExample'
         "400":
           $ref: '#/responses/PaginationError'
         "429":
           $ref: '#/responses/RateLimit'
 
-  /nfts/transaction/goerli/details/{contractAddress}/{tokenId}/{blockNumber}:
+  # /nfts/transaction/goerli/details/{contractAddress}/{tokenId}/{blockNumber}:
+  #   get:
+  #     summary: Get goerli nft transaction details.
+  #     tags: [NFT]
+  #     parameters:
+  #       - in: path
+  #         name: contractAddress
+  #         required: true
+  #         schema:
+  #           type: string
+  #       - in: path
+  #         name: tokenId
+  #         required: true
+  #         schema:
+  #           type: string
+  #       - in: path
+  #         name: blockNumber
+  #         required: true
+  #         schema:
+  #           type: number
+  #     responses:
+  #       "200":
+  #         description: OK
+  #         content:
+  #           application/json:
+  #             examples:
+  #               GoerliNftTransactionExample:
+  #                 $ref: '#/responses/examples/GoerliNftTransactionExample'
+  #       "429":
+  #         $ref: '#/responses/RateLimit'
+
+  /nfts/transaction/{chain}/details/{contractAddress}/{tokenId}/{blockNumber}:
     get:
-      summary: Get goerli nft transaction details.
+      summary: Get nft transaction details.
       tags: [NFT]
       parameters:
+        - in: path
+          name: chain
+          required: true
+          schema:
+            type: string
+            enum: [mumbai, matic]
+            default: mumbai
+          description: chain name
         - in: path
           name: contractAddress
           required: true
@@ -107,44 +147,13 @@ paths:
           content:
             application/json:
               examples:
-                GoerliNftTransactionExample:
-                  $ref: '#/responses/examples/GoerliNftTransactionExample'
-        "429":
-          $ref: '#/responses/RateLimit'
-
-  /nfts/transaction/{chain}/details/{contractAddress}/{tokenId}/{blockNumber}:
-    get:
-      summary: Get nft transaction details.
-      tags: [NFT]
-      parameters:
-        - in: path
-          name: chain
-          required: true
-          schema:
-            type: string
-            enum: [eth, bsc, matic]
-            default: eth
-          description: chain name
-        - in: path
-          name: contractAddress
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: tokenId
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: blockNumber
-          required: true
-          schema:
-            type: number
-      responses:
+                MumbaiNftTransactionDetailsExample:
+                  $ref: '#/responses/examples/MumbaiNftTransactionDetailsExample'
         "400":
           $ref: '#/responses/PaginationError'
         "429":
           $ref: '#/responses/RateLimit'
+
   /nfts/token-details/{chain}/contract/{contractAddress}/token/{tokenId}:
     get:
       summary: Get single nft details.
@@ -155,8 +164,8 @@ paths:
           required: true
           schema:
             type: string
-            enum: [goerli]
-            default: goerli
+            enum: [mumbai,matic]
+            default: mumbai
           description: chain name
         - $ref: '#/parameters/path/contractAddress'
         - in: path
@@ -170,7 +179,7 @@ paths:
           content:
             application/json:
               examples:
-                GoerliSingleNftDetailsExample:
-                  $ref: '#/responses/examples/GoerliSingleNftDetailsExample'
+                MumbaiNftDetailsExample:
+                  $ref: '#/responses/examples/MumbaiNftDetailsExample'
         "429":
           $ref: '#/responses/RateLimit'
