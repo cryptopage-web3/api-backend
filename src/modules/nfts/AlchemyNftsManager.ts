@@ -110,9 +110,9 @@ export class AlchemyNftsManager implements INftsManager {
         return {
             tokenId,
             contractAddress,
-            contentUrl: nftMeta.media[0].gateway,
-            name: nftMeta.title,
-            description: nftMeta.description,
+            contentUrl: nftMeta.media?.[0]?.gateway,
+            name: nftMeta.title || nftMeta.contract.symbol || '',
+            description: nftMeta.description || nftMeta.contract.name || '',
             attributes: nftMeta.rawMetadata?.attributes || [],
         }
     }
