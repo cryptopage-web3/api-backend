@@ -26,6 +26,7 @@ export class AlchemyTokenManager implements ITokenManager {
             balances.push({
                 name: meta.name,
                 symbol: meta.symbol,
+                address: t.contractAddress,
                 logo: meta.logo,
                 balance: t.tokenBalance 
                     ? parseInt(t.tokenBalance)/Math.pow(10, meta.decimals || 0)

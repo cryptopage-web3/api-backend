@@ -120,8 +120,8 @@ paths:
             default: mumbai
           description: chain name
         - $ref: '#/parameters/path/address'
-        - $ref: '#/parameters/pagination/page'
         - $ref: '#/parameters/pagination/pageSize'
+        - $ref: '#/parameters/pagination/pageKey'
       responses:
         "200":
           description: OK

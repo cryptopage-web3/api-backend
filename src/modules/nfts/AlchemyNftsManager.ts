@@ -71,7 +71,7 @@ export class AlchemyNftsManager implements INftsManager {
         }
 
         return {
-            type: NftTxType.baseInfo,
+            type: NftTxType.fullInfo,
             txHash: data.hash,
             blockNumber: parseInt(data.blockNum),
             contract_address: data.rawContract.address || '',
