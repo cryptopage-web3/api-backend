@@ -1,13 +1,14 @@
 import { ChainId } from '../transactions/types';
 import { ISocialComment } from '../../services/web3/social-smart-contract/types';
+import { AssetTransfersCategory } from 'alchemy-sdk';
 
 export interface INftsManager {
     _chain: ChainId
     
     getWalletAllNFTs(address: string, opts: INftPagination): Promise<INftsList>
     getWalletNFTTransactions(address: string, opts: INftPagination)
-    getNftTransactionDetails(contractAddress: string, tokenId: string, blockNumber:number | null)
-    getNftDetails(contractAddress: string, tokenId: string)
+    getNftTransactionDetails(contractAddress: string, tokenId: string, blockNumber:number | null, tokenCategory?: AssetTransfersCategory)
+    getNftDetails(contractAddress: string, tokenId: string, tokenCategory?: AssetTransfersCategory)
 }
 
 export interface INftPagination {

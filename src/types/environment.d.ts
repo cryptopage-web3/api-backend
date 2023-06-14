@@ -38,6 +38,8 @@ export interface Env {
     COVALENT_API_KEY: string
 
     UNMARSHAL_API_KEY: string
+
+    ENABLE_NFT_CACHE: string | undefined
 }
 
 export type EnvVarName = keyof Env

@@ -11,6 +11,7 @@ import { ISocialSmartContract } from '../../services/web3/social-smart-contract/
 export class NftCache {
     @inject(IDS.ORM.REPO.NftTokenDetailsRepo) private _nftTokenRepo: NftTokenDetailsRepo
     @inject(IDS.SERVICE.SocialSmartContract) private _socialSmartContract: ISocialSmartContract
+    @inject(IDS.CONFIG.EnableNftCache) _isCacheEnabled: boolean
 
     async getNftTransactionDetails(web3Manager:IWeb3Manager,chain:ChainId, contractAddress: string, tokenId: string, blockNumber:number | null,getTokenFromApi: GetTokenFromApiCallback) {
         const [tokenDetails, blockDate, comments] = await Promise.all([
@@ -26,19 +27,22 @@ export class NftCache {
     }
 
     async _getTokenDetails(chain: ChainId, contractAddress: string, tokenId: string, getTokenFromApi: GetTokenFromApiCallback ){
-        const dbToken = await this._nftTokenRepo.getToken(chain, contractAddress, tokenId)
+        if(this._isCacheEnabled){
+            const dbToken = await this._nftTokenRepo.getToken(chain, contractAddress, tokenId)
 
-        if(dbToken){
-            const result = dbToken.get({plain: true})
-            
-            const removeFields = ['id','createdAt','updatedAt']
+            if(dbToken){
+                const result = dbToken.get({plain: true})
+                
+                const removeFields = ['id','createdAt','updatedAt']
 
-            removeFields.forEach((key)=>{
-                delete result[key]
-            })
+                removeFields.forEach((key)=>{
+                    delete result[key]
+                })
 
-            return result
+                return result
+            }
         }
+        
 
         const apiToken = await getTokenFromApi()
 

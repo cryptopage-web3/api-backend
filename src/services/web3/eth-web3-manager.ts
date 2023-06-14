@@ -2,11 +2,12 @@ import { inject, injectable } from 'inversify';
 import { IWeb3Manager } from './types';
 import { IDS } from '../../types/index';
 import Web3 from 'web3';
-import { Web3NftTokenData } from 'modules/nfts/types';
+import { Web3NftTokenData } from '../../modules/nfts/types';
 import { ErrorLogRepo } from '../../orm/repo/error-log-repo';
 import { ChainId } from '../../modules/transactions/types';
 import { BlockDetailsRepo } from '../../orm/repo/block-details-repo';
 import { Web3Util } from './web3-util';
+import { AssetTransfersCategory } from 'alchemy-sdk';
 
 @injectable()
 export class EthWeb3Manager implements IWeb3Manager {
@@ -60,18 +61,25 @@ export class EthWeb3Manager implements IWeb3Manager {
         return contract.methods[key]().call();
     }
 
-    async getTokenData(contrctAddress: string, tokenId: string):Promise<Web3NftTokenData> {
-        const meta = await this.getTokenMetadata(contrctAddress, tokenId)
+    async getTokenData(contrctAddress: string, tokenId: string, tokenCategory:AssetTransfersCategory = AssetTransfersCategory.ERC721):Promise<Web3NftTokenData> {
+        const meta = await this.getTokenMetadata(contrctAddress, tokenId, tokenCategory)
 
         return Object.assign({}, meta,{price: '0'})
     }
 
-    async getTokenMetadata(contrctAddress: string, tokenId: string){
+    async getTokenMetadata(contrctAddress: string, tokenId: string, category: AssetTransfersCategory){
+        const methodName = category == AssetTransfersCategory.ERC1155 ? 'uri' : 'tokenURI';
+
         const minABI:any[] = [
-            { "inputs": [{ "internalType": "uint256", "name": "tokenId", "type": "uint256" }], "name": "tokenURI", "outputs": [{ "internalType": "string", "name": "", "type": "string" }], "stateMutability": "view", "type": "function" }
+            { "inputs": [{ "internalType": "uint256", "name": "tokenId", "type": "uint256" }], "name": methodName, "outputs": [{ "internalType": "string", "name": "", "type": "string" }], "stateMutability": "view", "type": "function" }
         ];
         const contract = this._ethContractFactory(minABI, contrctAddress);
-        const metadataUri = await contract.methods.tokenURI(tokenId).call().catch(err =>{
+
+        const method  = category == AssetTransfersCategory.ERC1155 
+            ? contract.methods.uri(tokenId) 
+            : contract.methods.tokenURI(tokenId) 
+
+        const metadataUri = await method.call().catch(err =>{
             this._errorLogRepo.log('web3_contract_call_get_token_uri', err.message, {contrctAddress, tokenId})
 			if(!process.env.PREVENT_LOG_ERRORS){
                 console.error(`Failed to get tokenURI, contract: ${contrctAddress}, tokenId: ${tokenId}`, err.message)

@@ -1,6 +1,6 @@
 import { Container, interfaces } from "inversify"
 import { IDS } from './types/index';
-import { envToString } from './util/env-util';
+import { envToBool, envToString } from './util/env-util';
 import { EtherscanApi } from './services/etherscan/etherscan-api';
 import { EthTransactionManager } from './modules/transactions/eth';
 import { ChainId } from './modules/transactions/types';
@@ -97,6 +97,7 @@ container.bind(IDS.CONFIG.EtherscanApiKey).toConstantValue(envToString('ETHERSCA
 container.bind(IDS.CONFIG.GoerliApiKey).toConstantValue(envToString('GOERLI_API_KEY'))
 container.bind('ALCHEMY_API_KEY_GOERLI').toConstantValue(envToString('ALCHEMY_API_KEY_GOERLI'))
 container.bind('ALCHEMY_API_KEY_MUMBAI').toConstantValue(envToString('ALCHEMY_API_KEY_MUMBAI'))
+container.bind(IDS.CONFIG.EnableNftCache).toConstantValue(envToBool('ENABLE_NFT_CACHE', true))
 
 container.bind(IDS.CACHE.PriceCache).to(PriceCache)
 

@@ -69,11 +69,12 @@ export class NftsController implements interfaces.Controller {
         @requestParam('chain') chain: ChainId,
         @requestParam('contractAddress') contractAddress: string,
         @requestParam('tokenId') tokenId: string,
+        @queryParam('category') category,
         @response() res: express.Response
     ){
         const manager = this._nftManagerFactory(chain)
 
-        const result = await manager.getNftDetails(contractAddress, tokenId)
+        const result = await manager.getNftDetails(contractAddress, tokenId, category)
 
         res.json(result)
     }

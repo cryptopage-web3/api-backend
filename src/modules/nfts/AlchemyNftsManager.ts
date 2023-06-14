@@ -82,32 +82,32 @@ export class AlchemyNftsManager implements INftsManager {
         }
     }
 
-    getNftTransactionDetails(contractAddress: string, tokenId: string, blockNumber: number | null) {
+    getNftTransactionDetails(contractAddress: string, tokenId: string, blockNumber: number | null, tokenCategory?: AssetTransfersCategory) {
         return this._nftCache.getNftTransactionDetails(
             this._web3Manager,
             this._chain,
             contractAddress,
             tokenId,
             blockNumber,
-            ()=> this._getTokenData(contractAddress, tokenId)
+            ()=> this._getTokenData(contractAddress, tokenId, tokenCategory)
         )
     }
 
-    getNftDetails(contractAddress: string, tokenId: string) {
+    getNftDetails(contractAddress: string, tokenId: string, tokenCategory?: AssetTransfersCategory) {
         return this._nftCache.getNftTransactionDetails(
             this._web3Manager,
             this._chain,
             contractAddress,
             tokenId,
             null,
-            ()=> this._getTokenData(contractAddress, tokenId)
+            ()=> this._getTokenData(contractAddress, tokenId, tokenCategory)
         )
     }
 
-    async _getTokenData(contractAddress: string, tokenId: string):Promise<Web3NftTokenData>{
+    async _getTokenData(contractAddress: string, tokenId: string, tokenCategory?:AssetTransfersCategory):Promise<Web3NftTokenData>{
         const nftMeta = await this._alchemy.nft.getNftMetadata(contractAddress, tokenId)
 
-        return {
+        const nftItem = {
             tokenId,
             contractAddress,
             contentUrl: nftMeta.media?.[0]?.gateway,
@@ -115,5 +115,14 @@ export class AlchemyNftsManager implements INftsManager {
             description: nftMeta.description || nftMeta.contract.name || '',
             attributes: nftMeta.rawMetadata?.attributes || [],
         }
+
+        if(!nftItem.contentUrl){
+            console.debug('try to load nft metadata from blockchain')
+            const secondNftItem = await this._web3Manager.getTokenData(contractAddress, tokenId, tokenCategory)
+
+            return secondNftItem;
+        }
+
+        return nftItem
     }
 }

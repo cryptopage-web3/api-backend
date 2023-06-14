@@ -4,6 +4,7 @@ export const IDS = {
         EtherscanApiKey:Symbol('EtherscanApiKey'),
         GoerliApiKey:Symbol('GoerliApiKey'),
         Web3RpcFactory: Symbol('Web3RpcFactory'),
+        EnableNftCache: Symbol('EnableNftCache')
     },
     UTIL:{
         Logger:Symbol('logger')
