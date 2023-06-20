@@ -10,11 +10,17 @@ export class PriceCache {
 
     async updateCoinsCache() {
         try {
-            const { data } = await this._axios.get('https://api.coingecko.com/api/v3/simple/price?ids=ethereum%2Cbinancecoin%2Cmatic-network%2Csolana%2Ctron&vs_currencies=usd');
+            const { data } = await this._axios.get('https://api.coingecko.com/api/v3/simple/price?ids=ethereum,binancecoin,matic-network,solana,tron&vs_currencies=usd');
             this.coins = data;
         } catch (err){
+            this.coins = {}
+
             console.log('Failed to load coins prices', err)
         }
+
+        setTimeout(() => {
+            this.updateCoinsCache()
+        }, 120000);
     }
 
     getCoinPrice(id) {

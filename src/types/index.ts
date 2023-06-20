@@ -4,7 +4,8 @@ export const IDS = {
         EtherscanApiKey:Symbol('EtherscanApiKey'),
         GoerliApiKey:Symbol('GoerliApiKey'),
         Web3RpcFactory: Symbol('Web3RpcFactory'),
-        EnableNftCache: Symbol('EnableNftCache')
+        EnableNftCache: Symbol('EnableNftCache'),
+        PageTokenAddress: Symbol('PageTokenAddress')
     },
     UTIL:{
         Logger:Symbol('logger')
@@ -38,7 +39,9 @@ export const IDS = {
             EthContractFactory: Symbol('EthContractFactory'),
             Web3Util: Symbol('Web3Util')
         },
-        SocialSmartContract: Symbol('SocialSmartContract')
+        SocialSmartContract: Symbol('SocialSmartContract'),
+        CoingeckoApi: Symbol('CoingeckoApi'),
+        CoingeckoPriceCache: Symbol('CoingeckoPriceCache'),
 
     },
     NODE_MODULES:{

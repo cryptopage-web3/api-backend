@@ -47,6 +47,4 @@ let server = new InversifyExpressServer(container, null, null, app);
 
 server.build().listen(port, host, function () {
     console.log(`app listening to ${host? host+':': ''} ${port}`);
-
-    container.get<PriceCache>(IDS.CACHE.PriceCache).updateCoinsCache()
 })

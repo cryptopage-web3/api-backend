@@ -41,6 +41,7 @@ import { Web3Util } from './services/web3/web3-util';
 import { AlchemyTransactionsManager } from "./modules/transactions/AlchemyTransactionsManager";
 import { AlchemyNftsManager } from "./modules/nfts/AlchemyNftsManager";
 import { AlchemyTokenManager } from "./modules/tokens/AlchemyTokenManager";
+import { pageTokenMumbai } from "./modules/tokens/types";
 
 export const container = new Container();
 
@@ -98,6 +99,8 @@ container.bind(IDS.CONFIG.GoerliApiKey).toConstantValue(envToString('GOERLI_API_
 container.bind('ALCHEMY_API_KEY_GOERLI').toConstantValue(envToString('ALCHEMY_API_KEY_GOERLI'))
 container.bind('ALCHEMY_API_KEY_MUMBAI').toConstantValue(envToString('ALCHEMY_API_KEY_MUMBAI'))
 container.bind(IDS.CONFIG.EnableNftCache).toConstantValue(envToBool('ENABLE_NFT_CACHE', true))
+
+container.bind(IDS.CONFIG.PageTokenAddress).toConstantValue(pageTokenMumbai).whenAnyAncestorNamed(ChainId.mumbai)
 
 container.bind(IDS.CACHE.PriceCache).to(PriceCache)
 

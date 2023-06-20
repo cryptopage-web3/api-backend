@@ -71,7 +71,7 @@ export class AlchemyNftsManager implements INftsManager {
         }
 
         return {
-            type: NftTxType.fullInfo,
+            type: NftTxType.baseInfo,
             txHash: data.hash,
             blockNumber: parseInt(data.blockNum),
             contract_address: data.rawContract.address || '',
@@ -89,7 +89,7 @@ export class AlchemyNftsManager implements INftsManager {
             contractAddress,
             tokenId,
             blockNumber,
-            ()=> this._getTokenData(contractAddress, tokenId, tokenCategory)
+            ()=> this._getTokenData(contractAddress, tokenId)
         )
     }
 
@@ -100,11 +100,11 @@ export class AlchemyNftsManager implements INftsManager {
             contractAddress,
             tokenId,
             null,
-            ()=> this._getTokenData(contractAddress, tokenId, tokenCategory)
+            ()=> this._getTokenData(contractAddress, tokenId)
         )
     }
 
-    async _getTokenData(contractAddress: string, tokenId: string, tokenCategory?:AssetTransfersCategory):Promise<Web3NftTokenData>{
+    async _getTokenData(contractAddress: string, tokenId: string):Promise<Web3NftTokenData>{
         const nftMeta = await this._alchemy.nft.getNftMetadata(contractAddress, tokenId)
 
         const nftItem = {
@@ -116,12 +116,12 @@ export class AlchemyNftsManager implements INftsManager {
             attributes: nftMeta.rawMetadata?.attributes || [],
         }
 
-        if(!nftItem.contentUrl){
+        /*if(!nftItem.contentUrl){
             console.debug('try to load nft metadata from blockchain')
             const secondNftItem = await this._web3Manager.getTokenData(contractAddress, tokenId, tokenCategory)
 
             return secondNftItem;
-        }
+        }*/
 
         return nftItem
     }
