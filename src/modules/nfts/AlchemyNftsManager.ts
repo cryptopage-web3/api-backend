@@ -1,4 +1,4 @@
-import { Alchemy, AssetTransfersCategory, AssetTransfersWithMetadataResult, OwnedNft } from 'alchemy-sdk';
+import { Alchemy, AssetTransfersCategory, AssetTransfersOrder, AssetTransfersWithMetadataResult, OwnedNft } from 'alchemy-sdk';
 import { inject, injectable } from 'inversify';
 import { IWeb3Manager } from '../../services/web3/types';
 import { IDS } from '../../types';
@@ -16,11 +16,15 @@ export class AlchemyNftsManager implements INftsManager {
 
     async getWalletAllNFTs(address: string, opts: INftPagination): Promise<INftsList> {
         const addressNfts = await this._alchemy.nft.getNftsForOwner(address, {
-            pageSize: 100
+            pageSize: opts.pageSize,
+            pageKey: opts.pageKey
         })
 
         return {
             list: addressNfts.ownedNfts.map(n => this.buildNftData(n)),
+            continue: {
+                pageKey: addressNfts.pageKey
+            },
             count: addressNfts.totalCount
         }
     }
@@ -45,6 +49,7 @@ export class AlchemyNftsManager implements INftsManager {
     async getWalletNFTTransactions(address: string, opts: INftPagination) {
         const response = await this._alchemy.core.getAssetTransfers({
             toAddress: address,
+            order: AssetTransfersOrder.DESCENDING,
             category: [AssetTransfersCategory.ERC721, AssetTransfersCategory.ERC1155],
             withMetadata: true,
             maxCount: opts.pageSize,
