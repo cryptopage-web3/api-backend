@@ -100,7 +100,7 @@ container.bind('ALCHEMY_API_KEY_GOERLI').toConstantValue(envToString('ALCHEMY_AP
 container.bind('ALCHEMY_API_KEY_MUMBAI').toConstantValue(envToString('ALCHEMY_API_KEY_MUMBAI'))
 container.bind(IDS.CONFIG.EnableNftCache).toConstantValue(envToBool('ENABLE_NFT_CACHE', true))
 
-container.bind(IDS.CONFIG.PageTokenAddress).toConstantValue(pageTokenMumbai).whenAnyAncestorNamed(ChainId.mumbai)
+container.bind(IDS.CONFIG.PageToken).toConstantValue(pageTokenMumbai).whenAnyAncestorNamed(ChainId.mumbai)
 
 container.bind(IDS.CACHE.PriceCache).to(PriceCache)
 

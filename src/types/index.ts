@@ -5,7 +5,7 @@ export const IDS = {
         GoerliApiKey:Symbol('GoerliApiKey'),
         Web3RpcFactory: Symbol('Web3RpcFactory'),
         EnableNftCache: Symbol('EnableNftCache'),
-        PageTokenAddress: Symbol('PageTokenAddress')
+        PageToken: Symbol('PageToken')
     },
     UTIL:{
         Logger:Symbol('logger')

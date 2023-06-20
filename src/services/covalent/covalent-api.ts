@@ -6,11 +6,13 @@ import { IDS } from '../../types/index';
 import { Axios } from 'axios';
 import { PriceCache } from '../../cache/coins';
 import { envToString } from '../../util/env-util';
+import { IToken } from '../../modules/tokens/types';
 
 @injectable()
 export class CovalentApi {
     @inject(IDS.NODE_MODULES.axios) _axios:Axios
     @inject(IDS.CACHE.PriceCache) _priceCache: PriceCache
+    @inject(IDS.CONFIG.PageToken) _pageToken: IToken
 
     chainId: string
     chainName: string
@@ -29,19 +31,7 @@ export class CovalentApi {
     apiKey = envToString('COVALENT_API_KEY');
     baseUrl = 'https://api.covalenthq.com/v1';
 
-    get getPageToken() {
-        return {
-            name: 'Page',
-            symbol: 'PAGE',
-            logo: 'https://crypto-page-app.herokuapp.com/page.png',
-            balance: 0,
-            percentChange: 0,
-            price: 0,
-            balancePrice: 0
-        }
-    }
-
-    getTokenDataFromItem(item) {
+    getTokenDataFromItem(item):IToken {
         const balance = (item.balance / 10 ** item.contract_decimals) || 0;
         return {
             name: item.contract_name,
@@ -50,7 +40,8 @@ export class CovalentApi {
             balance,
             percentChange: 0,
             price: item.quote_rate || 0,
-            balancePrice: (item.quote_rate * balance) || 0
+            balancePrice: (item.quote_rate * balance) || 0,
+            address: ''
         }
     }
 
@@ -67,7 +58,7 @@ export class CovalentApi {
     async getWalletTokens(address) {
         const data = await this.getTokensFromApi(address);
 
-        const items = [this.getPageToken];
+        const items:IToken[] = [this._pageToken];
         for (const item of data) {
             const token = this.getTokenDataFromItem(item);
             items.push(token);

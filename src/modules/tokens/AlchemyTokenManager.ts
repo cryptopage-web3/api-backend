@@ -6,7 +6,7 @@ import { IToken, ITokenManager, ITokensResponse } from "./types";
 @injectable()
 export class AlchemyTokenManager implements ITokenManager {
     @inject(IDS.SERVICE.AlchemySdk) _alchemy:Alchemy
-    @inject(IDS.CONFIG.PageTokenAddress) _pageToken: IToken
+    @inject(IDS.CONFIG.PageToken) _pageToken: IToken
 
     async getWalletTokens(address: string):Promise<ITokensResponse> {
         const addressTokens = await this._alchemy.core.getTokenBalances(address)
