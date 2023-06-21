@@ -2,7 +2,7 @@ import { inject, injectable } from "inversify";
 import { IDS } from "../../types";
 import { Axios } from 'axios';
 import { toUrlQueryParams } from '../../util/url-util';
-import { ICoingeckoCoin } from "./types";
+import { ICoingeckoCoin, ICoingeckoMarket } from "./types";
 
 @injectable()
 export class CoinGeckoApi {
@@ -15,8 +15,8 @@ export class CoinGeckoApi {
         return response.data
     }
 
-    async getMarkets(ids: string[]){
-        const query = toUrlQueryParams({vs_currency:'usd', ids: ids.join(',')}),
+    async getMarkets(ids: string[]):Promise<ICoingeckoMarket[]>{
+        const query = toUrlQueryParams({vs_currency:'usd', ids: ids.join(','), page: 1, per_page: 100}),
             url = this._buildUrl(`/coins/markets?${query}`)
         
         const response = await this._axios.get(url)

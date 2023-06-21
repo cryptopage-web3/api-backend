@@ -42,6 +42,8 @@ import { AlchemyTransactionsManager } from "./modules/transactions/AlchemyTransa
 import { AlchemyNftsManager } from "./modules/nfts/AlchemyNftsManager";
 import { AlchemyTokenManager } from "./modules/tokens/AlchemyTokenManager";
 import { pageTokenMumbai } from "./modules/tokens/types";
+import { CoinGeckoApi } from "./services/coingecko/coingecko-api";
+import { CoingeckoPriceCache } from "./services/coingecko/price-cache";
 
 export const container = new Container();
 
@@ -120,6 +122,8 @@ container.bind(IDS.SERVICE.UnmarshalApi).to(UnmarshalApi).onActivation((context,
 container.bind(IDS.SERVICE.UnmarshalApiHelper).to(UnmarshalApiHelper)
 container.bind(IDS.SERVICE.CovalentApi).to(CovalentApi)
 container.bind(IDS.SERVICE.TronscanApi).to(TronscanTokenManager)
+container.bind(IDS.SERVICE.CoingeckoApi).to(CoinGeckoApi).inSingletonScope()
+container.bind(IDS.SERVICE.CoingeckoPriceCache).to(CoingeckoPriceCache).inSingletonScope()
 
 container.bind(IDS.SERVICE.SocialSmartContract)
     .to(GoerliSocialSmartContract)

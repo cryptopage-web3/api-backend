@@ -1,5 +1,7 @@
 import { Alchemy, TokenBalancesResponseErc20 } from "alchemy-sdk";
 import { inject, injectable } from "inversify";
+import { CoingeckoPriceCache } from "../../services/coingecko/price-cache";
+import { IPriceInfoMap } from "../../services/coingecko/types";
 import { IDS } from "../../types";
 import { IToken, ITokenManager, ITokensResponse } from "./types";
 
@@ -7,19 +9,38 @@ import { IToken, ITokenManager, ITokensResponse } from "./types";
 export class AlchemyTokenManager implements ITokenManager {
     @inject(IDS.SERVICE.AlchemySdk) _alchemy:Alchemy
     @inject(IDS.CONFIG.PageToken) _pageToken: IToken
+    @inject(IDS.SERVICE.CoingeckoPriceCache) _priceCache:CoingeckoPriceCache
 
     async getWalletTokens(address: string):Promise<ITokensResponse> {
         const addressTokens = await this._alchemy.core.getTokenBalances(address)
-
-        const tokensWithbalances = await this._loadTokensMeta(addressTokens);
+        
+        const tokensWithbalances = await this._loadTokensMeta(addressTokens)
+        const tokenPriceMap = await this._loadTokenPrices(tokensWithbalances)
 
         if(this._hasPageToken(tokensWithbalances)){
             tokensWithbalances.unshift(this._pageToken)
         }
 
+        tokensWithbalances.forEach(t=>{
+            const price = tokenPriceMap[t.symbol.toLowerCase()]
+            if(price){
+                t.price = price.current_price
+                t.percentChange = price.price_change_percentage_24h
+                t.balancePrice = price.current_price * t.balance
+                if(!t.logo && price.image){
+                    t.logo = price.image
+                }
+            }   
+        })
+
         return {
             tokens: tokensWithbalances
         }
+    }
+
+    async _loadTokenPrices(tokens:IToken[]):Promise<IPriceInfoMap>{
+        const symbols = tokens.map(t => t.symbol.toLowerCase())
+        return this._priceCache.getPriceInfo(symbols)
     }
 
     async _loadTokensMeta(tokens:TokenBalancesResponseErc20):Promise<IToken[]>{
