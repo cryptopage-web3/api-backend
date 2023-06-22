@@ -29,6 +29,7 @@ export function rebindModules(container: Container){
     container.rebind(IDS.SERVICE.WEB3.EthContractFactory).toFactory(context => testEthContractFactory())
     container.rebind(IDS.SERVICE.AlchemySdkFactory).toFactory(context => testAlchemyMockFactory)
     container.rebind(IDS.ORM.REPO.ErrorLogRepo).to(TestErrorLogRepoMock)
+    container.rebind(IDS.CONFIG.EnableNftCache).toConstantValue(true);
 }
 
 export function resetWeb3MockInstances(){
