@@ -40,6 +40,9 @@ export interface Env {
     UNMARSHAL_API_KEY: string
 
     ENABLE_NFT_CACHE: string | undefined
+
+    COINGECKO_TOKEN_IDS_PATH: string | undefined
+    COINGECKO_PRICE_CACHE_TTL_IN_SECONDS: string | undefined
 }
 
 export type EnvVarName = keyof Env

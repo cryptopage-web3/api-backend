@@ -5,7 +5,8 @@ export const IDS = {
         GoerliApiKey:Symbol('GoerliApiKey'),
         Web3RpcFactory: Symbol('Web3RpcFactory'),
         EnableNftCache: Symbol('EnableNftCache'),
-        PageToken: Symbol('PageToken')
+        PageToken: Symbol('PageToken'),
+        COINGECKO_PRICE_CACHE_TTL_IN_SECONDS: Symbol('COINGECKO_PRICE_CACHE_TTL_IN_SECONDS')
     },
     UTIL:{
         Logger:Symbol('logger')

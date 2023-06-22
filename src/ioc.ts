@@ -1,6 +1,6 @@
 import { Container, interfaces } from "inversify"
 import { IDS } from './types/index';
-import { envToBool, envToString } from './util/env-util';
+import { envToBool, envToString, envToInt } from './util/env-util';
 import { EtherscanApi } from './services/etherscan/etherscan-api';
 import { EthTransactionManager } from './modules/transactions/eth';
 import { ChainId } from './modules/transactions/types';
@@ -103,6 +103,7 @@ container.bind('ALCHEMY_API_KEY_MUMBAI').toConstantValue(envToString('ALCHEMY_AP
 container.bind(IDS.CONFIG.EnableNftCache).toConstantValue(envToBool('ENABLE_NFT_CACHE', true))
 
 container.bind(IDS.CONFIG.PageToken).toConstantValue(pageTokenMumbai).whenAnyAncestorNamed(ChainId.mumbai)
+container.bind(IDS.CONFIG.COINGECKO_PRICE_CACHE_TTL_IN_SECONDS).toConstantValue(envToInt('COINGECKO_PRICE_CACHE_TTL_IN_SECONDS', 300))
 
 container.bind(IDS.CACHE.PriceCache).to(PriceCache)
 

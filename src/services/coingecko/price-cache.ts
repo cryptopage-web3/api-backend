@@ -1,5 +1,6 @@
 import { inject, injectable } from "inversify";
 import { IDS } from "../../types";
+import { safeStart } from "../../util/safe-start";
 import { CoinGeckoApi } from "./coingecko-api";
 import { CoingeckoCoinMap, ICoingeckoCoin, ICoingeckoMarketMap, IPriceInfoMap } from "./types";
 
@@ -8,6 +9,7 @@ export class CoingeckoPriceCache {
     _idsMap: CoingeckoCoinMap
     _idLoadPromise: Promise<ICoingeckoCoin[]>
     _marketsMap: ICoingeckoMarketMap = {}
+    @inject(IDS.CONFIG.COINGECKO_PRICE_CACHE_TTL_IN_SECONDS) _cacheTtl: number
 
     @inject(IDS.SERVICE.CoingeckoApi) _api: CoinGeckoApi
 
@@ -85,5 +87,24 @@ export class CoingeckoPriceCache {
         })
 
         return ids;
+    }
+
+    _cleanOldPrice(){
+        const nowTs = Date.now()
+
+        Object.keys(this._marketsMap).forEach(m =>{
+            const diffInSeconds = (nowTs - this._marketsMap[m].ts.getTime()) / 1000
+            if(diffInSeconds > this._cacheTtl){
+                delete this._marketsMap[m]
+
+                console.log(m, 'removed from price cache')
+            }
+        })
+    }
+
+    startPriceCleaner(){
+        safeStart(()=>{
+            return this._cleanOldPrice()
+        }, { intervalInSeconds: 60, descr: 'coingecko_price_cache_cleaner' })
     }
 }
