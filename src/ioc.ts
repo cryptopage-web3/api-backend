@@ -1,6 +1,6 @@
 import { Container, interfaces } from "inversify"
 import { IDS } from './types/index';
-import { envToBool, envToString } from './util/env-util';
+import { envToBool, envToString, envToInt } from './util/env-util';
 import { EtherscanApi } from './services/etherscan/etherscan-api';
 import { EthTransactionManager } from './modules/transactions/eth';
 import { ChainId } from './modules/transactions/types';
@@ -41,6 +41,9 @@ import { Web3Util } from './services/web3/web3-util';
 import { AlchemyTransactionsManager } from "./modules/transactions/AlchemyTransactionsManager";
 import { AlchemyNftsManager } from "./modules/nfts/AlchemyNftsManager";
 import { AlchemyTokenManager } from "./modules/tokens/AlchemyTokenManager";
+import { pageTokenMumbai } from "./modules/tokens/types";
+import { CoinGeckoApi } from "./services/coingecko/coingecko-api";
+import { CoingeckoPriceCache } from "./services/coingecko/price-cache";
 
 export const container = new Container();
 
@@ -99,6 +102,9 @@ container.bind('ALCHEMY_API_KEY_GOERLI').toConstantValue(envToString('ALCHEMY_AP
 container.bind('ALCHEMY_API_KEY_MUMBAI').toConstantValue(envToString('ALCHEMY_API_KEY_MUMBAI'))
 container.bind(IDS.CONFIG.EnableNftCache).toConstantValue(envToBool('ENABLE_NFT_CACHE', true))
 
+container.bind(IDS.CONFIG.PageToken).toConstantValue(pageTokenMumbai).whenAnyAncestorNamed(ChainId.mumbai)
+container.bind(IDS.CONFIG.COINGECKO_PRICE_CACHE_TTL_IN_SECONDS).toConstantValue(envToInt('COINGECKO_PRICE_CACHE_TTL_IN_SECONDS', 300))
+
 container.bind(IDS.CACHE.PriceCache).to(PriceCache)
 
 container.bind(IDS.SERVICE.EtherscanApi).to(EtherscanApi).inSingletonScope()
@@ -117,6 +123,8 @@ container.bind(IDS.SERVICE.UnmarshalApi).to(UnmarshalApi).onActivation((context,
 container.bind(IDS.SERVICE.UnmarshalApiHelper).to(UnmarshalApiHelper)
 container.bind(IDS.SERVICE.CovalentApi).to(CovalentApi)
 container.bind(IDS.SERVICE.TronscanApi).to(TronscanTokenManager)
+container.bind(IDS.SERVICE.CoingeckoApi).to(CoinGeckoApi).inSingletonScope()
+container.bind(IDS.SERVICE.CoingeckoPriceCache).to(CoingeckoPriceCache).inSingletonScope()
 
 container.bind(IDS.SERVICE.SocialSmartContract)
     .to(GoerliSocialSmartContract)

@@ -12,10 +12,10 @@ import { container } from './ioc'
 import { envToInt, envToString, isTest } from './util/env-util';
 import { swaggerRouter } from './swagger-docs/swagger.route';
 import { IDS } from './types/index';
-import { PriceCache } from './cache/coins';
 import rateLimit from 'express-rate-limit'
 import express from 'express';
 import cors from 'cors'
+import { CoingeckoPriceCache } from './services/coingecko/price-cache';
 
 const app = express();
 const port = envToInt('PORT', 3000);
@@ -48,5 +48,7 @@ let server = new InversifyExpressServer(container, null, null, app);
 server.build().listen(port, host, function () {
     console.log(`app listening to ${host? host+':': ''} ${port}`);
 
-    container.get<PriceCache>(IDS.CACHE.PriceCache).updateCoinsCache()
+    const priceCache:CoingeckoPriceCache = container.get(IDS.SERVICE.CoingeckoPriceCache)
+
+    priceCache.startPriceCleaner()
 })

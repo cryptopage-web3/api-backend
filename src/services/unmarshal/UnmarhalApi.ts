@@ -12,6 +12,7 @@ import { normalizeUrl } from '../../util/url-util';
 import { ErrorLogRepo } from '../../orm/repo/error-log-repo';
 import { envToString } from '../../util/env-util';
 import { Web3Util } from '../web3/web3-util';
+import { IToken, pageTokenMumbai } from '../../modules/tokens/types';
 
 @injectable()
 export class UnmarshalApi {
@@ -21,6 +22,7 @@ export class UnmarshalApi {
     @inject(IDS.CACHE.PriceCache) _priceCache: PriceCache
     @inject(IDS.ORM.REPO.ErrorLogRepo) _errorLogRepo: ErrorLogRepo
     @inject(IDS.SERVICE.WEB3.Web3Util) _web3Util: Web3Util
+    @inject(IDS.CONFIG.PageToken) _pageToken:IToken
 
     _chain: ChainId
 
@@ -49,20 +51,7 @@ export class UnmarshalApi {
         error: 'Fail'
     }
 
-    get getPageToken() {
-        return {
-            name: 'Page',
-            symbol: 'PAGE',
-            logo: 'https://crypto-page-app.herokuapp.com/page.png',
-            balance: 0,
-            percentChange: 0,
-            price: 0,
-            balancePrice: 0
-        }
-    }
-
-
-    getTokenDataFromItem(item) {
+    getTokenDataFromItem(item):IToken {
         const balance = (item.balance / 10 ** item.contract_decimals) || 0;
         return {
             name: item.contract_name,
@@ -92,12 +81,12 @@ export class UnmarshalApi {
     async getWalletTokens(address: string) {
         const data = await this.getTokensFromApi(address);
 
-        const items = [this.getPageToken];
+        const items:IToken[] = [this._pageToken];
         for (const item of data) {
             const token = this.getTokenDataFromItem(item);
             items.push(token);
         }
-        const tokens = items.filter(e => (e.balance || e.symbol === 'PAGE'));
+        const tokens:IToken[] = items.filter(e => (e.balance || e.symbol === 'PAGE'));
         return { tokens, count: items.length };
     }
 
