@@ -36,11 +36,11 @@ export const IDS = {
         AlchemySdk: Symbol('AlchemySdk'),
         WEB3:{
             Web3Manager: Symbol('Web3Manager'),
-            SocialEthSmartContract: Symbol('SocialEthSmartContract'),
+            CommunityWeb3SmartContract: Symbol('CommunityWeb3SmartContract'),
             EthContractFactory: Symbol('EthContractFactory'),
             Web3Util: Symbol('Web3Util')
         },
-        SocialSmartContract: Symbol('SocialSmartContract'),
+        CryptoPageCommunity: Symbol('SocialSmartContract'),
         CoingeckoApi: Symbol('CoingeckoApi'),
         CoingeckoPriceCache: Symbol('CoingeckoPriceCache'),
 

@@ -1,5 +1,7 @@
 import { Alchemy, AssetTransfersCategory, AssetTransfersOrder, AssetTransfersWithMetadataResult, OwnedNft } from 'alchemy-sdk';
+import BigNumber from 'bignumber.js';
 import { inject, injectable } from 'inversify';
+import { ICommunity } from '../../services/web3/social-smart-contract/types';
 import { IWeb3Manager } from '../../services/web3/types';
 import { IDS } from '../../types';
 import { ChainId } from '../transactions/types';
@@ -13,6 +15,7 @@ export class AlchemyNftsManager implements INftsManager {
     @inject(IDS.SERVICE.AlchemySdk) _alchemy:Alchemy
     @inject(IDS.SERVICE.WEB3.Web3Manager) private _web3Manager: IWeb3Manager
     @inject(IDS.MODULES.NftCache) _nftCache: NftCache
+    @inject(IDS.SERVICE.CryptoPageCommunity) _community: ICommunity
 
     async getWalletAllNFTs(address: string, opts: INftPagination): Promise<INftsList> {
         const addressNfts = await this._alchemy.nft.getNftsForOwner(address, {
@@ -56,34 +59,45 @@ export class AlchemyNftsManager implements INftsManager {
             pageKey: opts.pageKey
         })
 
+        const transactions = await Promise.all(response.transfers.map(i => this._normalizeNftTransactions(i)))
+
         return {
-            transactions: response.transfers.map(i => this._normalizeNftTransactions(i)),
+            transactions,
             continue: {
                 pageKey: response.pageKey
             }
         }
     }
 
-    _normalizeNftTransactions(data:AssetTransfersWithMetadataResult):INftTransaction {
+    async _normalizeNftTransactions(data:AssetTransfersWithMetadataResult):Promise<INftTransaction> {
         let tokenId: string = ''
         
         if(data.erc1155Metadata){
-            tokenId = parseInt(data.erc1155Metadata[0].tokenId).toString()
+            tokenId = data.erc1155Metadata[0].tokenId
         } else if(data.tokenId){
             tokenId = data.tokenId
         } else if(data.erc721TokenId){
             tokenId = data.erc721TokenId
         }
 
+        tokenId = tokenId ? BigNumber(tokenId).toString() : ''
+
+        const contractAddress = data.rawContract.address || '',
+            comments = await this._community.getComments(contractAddress, tokenId),
+            post = await this._community.readPostForContract(contractAddress, tokenId)
+
+        console.log(tokenId, post)
+
         return {
             type: NftTxType.baseInfo,
             txHash: data.hash,
             blockNumber: parseInt(data.blockNum),
-            contract_address: data.rawContract.address || '',
+            contract_address: contractAddress,
             category: data.category,
-            tokenId: tokenId,
+            tokenId,
             to: data.to || '',
             from: data.from,
+            comments
         }
     }
 

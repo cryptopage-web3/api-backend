@@ -5,19 +5,19 @@ import { IWeb3Manager } from '../../services/web3/types';
 import { ChainId } from '../transactions/types';
 
 import { GetTokenFromApiCallback } from './types';
-import { ISocialSmartContract } from '../../services/web3/social-smart-contract/types';
+import { ICommunity } from '../../services/web3/social-smart-contract/types';
 
 @injectable()
 export class NftCache {
     @inject(IDS.ORM.REPO.NftTokenDetailsRepo) private _nftTokenRepo: NftTokenDetailsRepo
-    @inject(IDS.SERVICE.SocialSmartContract) private _socialSmartContract: ISocialSmartContract
+    @inject(IDS.SERVICE.CryptoPageCommunity) private _socialSmartContract: ICommunity
     @inject(IDS.CONFIG.EnableNftCache) _isCacheEnabled: boolean
 
     async getNftTransactionDetails(web3Manager:IWeb3Manager,chain:ChainId, contractAddress: string, tokenId: string, blockNumber:number | null,getTokenFromApi: GetTokenFromApiCallback) {
         const [tokenDetails, blockDate, comments] = await Promise.all([
             this._getTokenDetails(chain, contractAddress, tokenId, getTokenFromApi),
             !!blockNumber ? web3Manager.getDateFromBlock(blockNumber) : undefined,
-            this._socialSmartContract.getComments(tokenId)
+            this._socialSmartContract.getComments(contractAddress, tokenId)
         ])
 
         return Object.assign({},

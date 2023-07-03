@@ -1,6 +1,6 @@
-export interface ISocialSmartContract {
+export interface ICommunity {
     getCommentCount(tokenId: string):Promise<number>
-    getComments(tokenId: string):Promise<ISocialComment[]>
+    getComments(contractAddress:string, tokenId: string):Promise<ISocialComment[]>
     readPostForContract(contractAddress:string, tokenId:string): Promise<ISocialPost>
 }
 

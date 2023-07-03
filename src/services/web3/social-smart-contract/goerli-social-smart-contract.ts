@@ -1,15 +1,15 @@
 import { inject, injectable } from "inversify";
-import { ISocialComment, ISocialSmartContract, IBaseSocialPost, ISocialPost } from './types';
+import { ISocialComment, ICommunity, IBaseSocialPost, ISocialPost } from './types';
 import { IDS } from '../../../types/index';
 import Web3 from 'web3';
 
 @injectable()
-export class GoerliSocialSmartContract implements ISocialSmartContract {
+export class GoerliSocialSmartContract implements ICommunity {
     static communityContractAddress = '0x2d722a9853ac048ce220fadbf3cab45146d76af6'
     static cryptoPageNftContractAddress = '0x19962298f0b28be502ce83bd179eb212287ecb5d'
 
     @inject(IDS.NODE_MODULES.web3) _web3: Web3
-    @inject(IDS.SERVICE.WEB3.SocialEthSmartContract) private _web3CommunityContract
+    @inject(IDS.SERVICE.WEB3.CommunityWeb3SmartContract) private _web3CommunityContract
 
     async getCommentCount(tokenId: string): Promise<number> {
         const minABI:any[] = [
@@ -21,7 +21,7 @@ export class GoerliSocialSmartContract implements ISocialSmartContract {
         return parseInt(count)
     }
 
-    async getComments(tokenId: string): Promise<ISocialComment[]> {
+    async getComments(contractAddress: string, tokenId: string): Promise<ISocialComment[]> {
         const count = await this.getCommentCount(tokenId)
 
         if(count === 0){

@@ -5,14 +5,14 @@ import { ChainId } from "modules/transactions/types";
 import { IDS } from '../../types/index';
 import { IWeb3Manager } from '../../services/web3/types';
 import { NftCache } from './NftCache';
-import { ISocialSmartContract, ISocialComment } from '../../services/web3/social-smart-contract/types';
+import { ICommunity, ISocialComment } from '../../services/web3/social-smart-contract/types';
 import { Alchemy, AssetTransfersCategory, AssetTransfersWithMetadataResult, OwnedNft } from 'alchemy-sdk';
 
 @injectable()
 export class GoerliNFTsManager implements INftsManager {
     @inject(IDS.SERVICE.GoerliScanApi) _goerli:GoerliScanApi
     @inject(IDS.SERVICE.WEB3.Web3Manager) private _web3Manager: IWeb3Manager
-    @inject(IDS.SERVICE.SocialSmartContract) private _socialSmartContract: ISocialSmartContract
+    @inject(IDS.SERVICE.CryptoPageCommunity) private _socialSmartContract: ICommunity
     @inject(IDS.MODULES.NftCache) _nftCache: NftCache
     @inject(IDS.SERVICE.AlchemySdk) _alchemy:Alchemy
 
@@ -31,7 +31,7 @@ export class GoerliNFTsManager implements INftsManager {
     }
     
     async buildNftData(data:OwnedNft):Promise<INftItem> {
-        const comments = await this._socialSmartContract.getComments(data.tokenId)
+        const comments = await this._socialSmartContract.getComments(data.contract.address, data.tokenId)
 
         return {
             name: data.title,
@@ -76,7 +76,7 @@ export class GoerliNFTsManager implements INftsManager {
         let comments: ISocialComment[] = []
         
         if(tokenId){
-            comments = await this._socialSmartContract.getComments(tokenId)
+            comments = await this._socialSmartContract.getComments(data.rawContract.address as string, tokenId)
         }
 
         return {

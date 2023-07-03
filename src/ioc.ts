@@ -44,6 +44,7 @@ import { AlchemyTokenManager } from "./modules/tokens/AlchemyTokenManager";
 import { pageTokenMumbai } from "./modules/tokens/types";
 import { CoinGeckoApi } from "./services/coingecko/coingecko-api";
 import { CoingeckoPriceCache } from "./services/coingecko/price-cache";
+import { MumbaiCommunity } from "./services/web3/social-smart-contract/mumbai/mumbai-commynity";
 
 export const container = new Container();
 
@@ -89,11 +90,19 @@ container.bind(IDS.SERVICE.WEB3.EthContractFactory).toFactory(context => (abi: a
     return new web3.eth.Contract(abi, contractAddress)
 })
 
-container.bind(IDS.SERVICE.WEB3.SocialEthSmartContract).toDynamicValue((context) => {
+container.bind(IDS.SERVICE.WEB3.CommunityWeb3SmartContract).toDynamicValue((context) => {
     const contractFactory:Function = context.container.get(IDS.SERVICE.WEB3.EthContractFactory)
     
     return contractFactory(goerliSocialAbi as any[], GoerliSocialSmartContract.communityContractAddress, ChainId.goerli)
 }).whenAnyAncestorNamed(ChainId.goerli)
+
+
+container.bind(IDS.SERVICE.WEB3.CommunityWeb3SmartContract).toDynamicValue((context) => {
+    const contractFactory:Function = context.container.get(IDS.SERVICE.WEB3.EthContractFactory)
+    
+    return contractFactory(goerliSocialAbi as any[], MumbaiCommunity.communityContractAddress, ChainId.mumbai)
+}).whenAnyAncestorNamed(ChainId.mumbai)
+
 container.bind(IDS.SERVICE.WEB3.Web3Util).to(Web3Util)
 
 container.bind(IDS.CONFIG.EtherscanApiKey).toConstantValue(envToString('ETHERSCAN_API_KEY'))
@@ -127,13 +136,19 @@ container.bind(IDS.SERVICE.TronscanApi).to(TronscanTokenManager)
 container.bind(IDS.SERVICE.CoingeckoApi).to(CoinGeckoApi).inSingletonScope()
 container.bind(IDS.SERVICE.CoingeckoPriceCache).to(CoingeckoPriceCache).inSingletonScope()
 
-container.bind(IDS.SERVICE.SocialSmartContract)
+container.bind(IDS.SERVICE.CryptoPageCommunity)
     .to(GoerliSocialSmartContract)
-    
     .whenAnyAncestorNamed(ChainId.goerli)
-container.bind(IDS.SERVICE.SocialSmartContract)
+container.bind(IDS.SERVICE.CryptoPageCommunity)
+    .to(MumbaiCommunity)
+    .whenAnyAncestorNamed(ChainId.mumbai)
+container.bind(IDS.SERVICE.CryptoPageCommunity)
     .to(DefaultSocialSmartContract)
-    .whenNoAncestorNamed(ChainId.goerli)
+    .whenNoAncestorMatches(request =>{ 
+        const excludeChains = [ChainId.goerli, ChainId.mumbai]
+
+        return excludeChains.indexOf(getChainIdFromAncestor(request) as ChainId) === -1
+    })
 
 container.bind(IDS.SERVICE.AlchemySdkFactory).toFactory(context => (chain:ChainId) =>{
     const network = getAlchemyNetwork(chain)
