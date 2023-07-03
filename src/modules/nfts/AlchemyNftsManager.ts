@@ -23,8 +23,10 @@ export class AlchemyNftsManager implements INftsManager {
             pageKey: opts.pageKey
         })
 
+        const list = await Promise.all(addressNfts.ownedNfts.map(n => this.buildNftData(n)))
+
         return {
-            list: addressNfts.ownedNfts.map(n => this.buildNftData(n)),
+            list,
             continue: {
                 pageKey: addressNfts.pageKey
             },
@@ -32,7 +34,10 @@ export class AlchemyNftsManager implements INftsManager {
         }
     }
 
-    buildNftData(data:OwnedNft):INftItem {
+    async buildNftData(data:OwnedNft):Promise<INftItem> {
+        const tokenId = data.tokenId ? BigNumber(data.tokenId).toString() : '',
+            comments = await this._community.getComments(data.contract.address, tokenId)
+
         return {
             name: data.title,
             symbol: data.contract.symbol,
@@ -44,7 +49,7 @@ export class AlchemyNftsManager implements INftsManager {
             attributes: data.rawMetadata?.attributes as any[],
             likes: 0,
             dislikes: 0,
-            comments:[],
+            comments,
             date: data.timeLastUpdated,
         }
     }
@@ -82,11 +87,8 @@ export class AlchemyNftsManager implements INftsManager {
 
         tokenId = tokenId ? BigNumber(tokenId).toString() : ''
 
-        const contractAddress = data.rawContract.address || '',
-            comments = await this._community.getComments(contractAddress, tokenId),
-            post = await this._community.readPostForContract(contractAddress, tokenId)
-
-        console.log(tokenId, post)
+        const contractAddress = data.rawContract.address || ''/*,
+            comments = await this._community.getComments(contractAddress, tokenId)*/
 
         return {
             type: NftTxType.baseInfo,
@@ -96,8 +98,7 @@ export class AlchemyNftsManager implements INftsManager {
             category: data.category,
             tokenId,
             to: data.to || '',
-            from: data.from,
-            comments
+            from: data.from
         }
     }
 

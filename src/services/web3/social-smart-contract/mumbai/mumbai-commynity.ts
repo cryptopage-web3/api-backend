@@ -6,8 +6,8 @@ import { mumbaiSingleReadAllCommentsAbi, mumbaiSingleReadPostAbi } from "./abi";
 
 @injectable()
 export class MumbaiCommunity implements ICommunity {
-    static communityContractAddress = '0x7E754F7D127eea39a3F7078ad4a8e9c61D6cD534'
-    static cryptoPageNftContractAddress = '0xc0FC66bA41BEa0A1266C681bbC781014E7c67612'
+    static communityContractAddress = '0x7e754f7d127eea39a3f7078ad4a8e9c61d6cd534'
+    static cryptoPageNftContractAddress = '0xc0fc66ba41bea0a1266c681bbc781014e7c67612'
     
     static plugins = {
         singleReadPost: '0x9e5224d23f22a6d0daa46d942305d0c94d3739ee0bd58cb2725e2f7f71c2ff73',
@@ -22,7 +22,7 @@ export class MumbaiCommunity implements ICommunity {
     }
 
     async readPostForContract(contractAddress: string, tokenId: string): Promise<ISocialPost>{
-        if(contractAddress != MumbaiCommunity.cryptoPageNftContractAddress){
+        if(contractAddress.toLowerCase() != MumbaiCommunity.cryptoPageNftContractAddress){
             return {} as ISocialPost
         }
 
@@ -48,6 +48,12 @@ export class MumbaiCommunity implements ICommunity {
             mumbaiSingleReadAllCommentsAbi, pluginAddress, ChainId.mumbai
         )
 
-        return readCommentsWeb3Contract.methods.read(tokenId).call()
+        const comments = await readCommentsWeb3Contract.methods.read(tokenId).call()
+
+        return comments.map((
+            [ creator, _owner, communityId,timestamp,gasConsumption,isUp,isDown, isView,isEncrypted,isGasCompensation,ipfsHash]
+            ) => (
+            { creator, _owner,timestamp, isUp, isDown, isView, isEncrypted, ipfsHash }
+        ))
     }
 }

@@ -45,6 +45,7 @@ import { pageTokenMumbai } from "./modules/tokens/types";
 import { CoinGeckoApi } from "./services/coingecko/coingecko-api";
 import { CoingeckoPriceCache } from "./services/coingecko/price-cache";
 import { MumbaiCommunity } from "./services/web3/social-smart-contract/mumbai/mumbai-commynity";
+import { mumbaiCommunityAbi } from "./services/web3/social-smart-contract/mumbai/abi";
 
 export const container = new Container();
 
@@ -100,7 +101,7 @@ container.bind(IDS.SERVICE.WEB3.CommunityWeb3SmartContract).toDynamicValue((cont
 container.bind(IDS.SERVICE.WEB3.CommunityWeb3SmartContract).toDynamicValue((context) => {
     const contractFactory:Function = context.container.get(IDS.SERVICE.WEB3.EthContractFactory)
     
-    return contractFactory(goerliSocialAbi as any[], MumbaiCommunity.communityContractAddress, ChainId.mumbai)
+    return contractFactory(mumbaiCommunityAbi as any[], MumbaiCommunity.communityContractAddress, ChainId.mumbai)
 }).whenAnyAncestorNamed(ChainId.mumbai)
 
 container.bind(IDS.SERVICE.WEB3.Web3Util).to(Web3Util)
