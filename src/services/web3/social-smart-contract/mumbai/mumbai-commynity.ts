@@ -51,9 +51,9 @@ export class MumbaiCommunity implements ICommunity {
         const comments = await readCommentsWeb3Contract.methods.read(tokenId).call()
 
         return comments.map((
-            [ creator, _owner, communityId,timestamp,gasConsumption,isUp,isDown, isView,isEncrypted,isGasCompensation,ipfsHash]
+            [ creator, owner, communityId,timestamp,gasConsumption,isUp,isDown, isView,isEncrypted,isGasCompensation,ipfsHash]
             ) => (
-            { creator, _owner,timestamp, isUp, isDown, isView, isEncrypted, ipfsHash }
+            { creator, owner,timestamp, isUp, isDown, isView, isEncrypted, ipfsHash }
         ))
     }
 }

@@ -145,10 +145,17 @@ container.bind(IDS.SERVICE.CryptoPageCommunity)
     .whenAnyAncestorNamed(ChainId.mumbai)
 container.bind(IDS.SERVICE.CryptoPageCommunity)
     .to(DefaultSocialSmartContract)
-    .whenNoAncestorMatches(request =>{ 
-        const excludeChains = [ChainId.goerli, ChainId.mumbai]
+    .whenAnyAncestorMatches(request =>{
+        const excludeChains = [ChainId.goerli, ChainId.mumbai],
+            chainId = getChainIdFromAncestor(request)
 
-        return excludeChains.indexOf(getChainIdFromAncestor(request) as ChainId) === -1
+        if(!chainId){
+            return false
+        }
+
+        const hasExcludedChain = excludeChains.indexOf(chainId) >= 0
+
+        return !hasExcludedChain
     })
 
 container.bind(IDS.SERVICE.AlchemySdkFactory).toFactory(context => (chain:ChainId) =>{

@@ -19,12 +19,12 @@ describe('test goerli social smart contract', ()=>{
         readCommentMethodStub = Sinon.stub()
         readCommentCallStub = Sinon.stub()
 
-        container.bind(IDS.SERVICE.WEB3.SocialEthSmartContract)
+        container.bind(IDS.SERVICE.WEB3.CommunityWeb3SmartContract)
             .toDynamicValue(context => ({ methods:{
                 getCommentCount: getCommentsCountMethodStub,
                 readComment: readCommentMethodStub
             }}))
-        container.bind(IDS.SERVICE.SocialSmartContract).to(GoerliSocialSmartContract);
+        container.bind(IDS.SERVICE.CryptoPageCommunity).to(GoerliSocialSmartContract);
         container.bind(IDS.NODE_MODULES.web3).toConstantValue({eth:{Contract:function(){}}})
     })
     beforeEach(()=>{
@@ -40,9 +40,9 @@ describe('test goerli social smart contract', ()=>{
         const tokenId = 'test_token_id'
         getCommentsCountCallStub.returns(0)
         
-        const socialSmartContract:GoerliSocialSmartContract = container.get(IDS.SERVICE.SocialSmartContract);
+        const socialSmartContract:GoerliSocialSmartContract = container.get(IDS.SERVICE.CryptoPageCommunity);
 
-        const comments = await socialSmartContract.getComments(tokenId)
+        const comments = await socialSmartContract.getComments('', tokenId)
 
         expect(comments).to.be.a('array')
         expect(comments.length).to.be.eq(0)
@@ -70,9 +70,9 @@ describe('test goerli social smart contract', ()=>{
             .onCall(0).returns(commentGenerator(0))
             .onCall(1).returns(commentGenerator(1))
         
-        const socialSmartContract:GoerliSocialSmartContract = container.get(IDS.SERVICE.SocialSmartContract);
+        const socialSmartContract:GoerliSocialSmartContract = container.get(IDS.SERVICE.CryptoPageCommunity);
 
-        const comments = await socialSmartContract.getComments(tokenId)
+        const comments = await socialSmartContract.getComments('', tokenId)
         
         expect(comments).to.be.a('array')
         expect(comments.length).to.be.eq(2)

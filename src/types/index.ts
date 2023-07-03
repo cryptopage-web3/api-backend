@@ -40,7 +40,7 @@ export const IDS = {
             EthContractFactory: Symbol('EthContractFactory'),
             Web3Util: Symbol('Web3Util')
         },
-        CryptoPageCommunity: Symbol('SocialSmartContract'),
+        CryptoPageCommunity: Symbol('CryptoPageCommunity'),
         CoingeckoApi: Symbol('CoingeckoApi'),
         CoingeckoPriceCache: Symbol('CoingeckoPriceCache'),
 
