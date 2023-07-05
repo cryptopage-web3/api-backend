@@ -15,7 +15,7 @@ export class MumbaiCommunity implements ICommunity {
     }
 
     @inject(IDS.SERVICE.WEB3.CommunityWeb3SmartContract) _web3CommunityContract
-    @inject(IDS.SERVICE.WEB3.EthContractFactory) _web3ContractFactory: Function
+    @inject(IDS.SERVICE.WEB3.ContractFactory) _web3ContractFactory: Function
 
     async getCommentCount(tokenId: string): Promise<number> {
         throw new Error('method deprecated')

@@ -37,7 +37,7 @@ export const IDS = {
         WEB3:{
             Web3Manager: Symbol('Web3Manager'),
             CommunityWeb3SmartContract: Symbol('CommunityWeb3SmartContract'),
-            EthContractFactory: Symbol('EthContractFactory'),
+            ContractFactory: Symbol('Web3ContractFactory'),
             Web3Util: Symbol('Web3Util')
         },
         CryptoPageCommunity: Symbol('CryptoPageCommunity'),

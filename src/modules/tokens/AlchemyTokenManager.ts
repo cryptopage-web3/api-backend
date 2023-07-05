@@ -17,7 +17,7 @@ export class AlchemyTokenManager implements ITokenManager {
         const tokensWithbalances = await this._loadTokensMeta(addressTokens)
         const tokenPriceMap = await this._loadTokenPrices(tokensWithbalances)
 
-        if(this._hasPageToken(tokensWithbalances)){
+        if(!this._hasPageToken(tokensWithbalances)){
             tokensWithbalances.unshift(this._pageToken)
         }
 
@@ -72,6 +72,6 @@ export class AlchemyTokenManager implements ITokenManager {
     }
 
     _hasPageToken(balances:IToken[]){
-        return !!balances.find(t => t.address == this._pageToken.address)
+        return balances.find(t => t.address == this._pageToken.address) !== undefined
     }
 }

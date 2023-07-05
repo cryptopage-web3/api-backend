@@ -53,7 +53,7 @@ export class GoerliSocialSmartContract implements ICommunity {
         }
 
         const post = await this._web3CommunityContract.methods.readPost(tokenId).call().catch(err => {
-            if (!process.env.PREVENT_LOG_ERRORS) {
+            if (process.env.PREVENT_LOG_ERRORS !== 'yes') {
                 console.error(`Failed to get readPost, contract: ${GoerliSocialSmartContract.communityContractAddress}, tokenId: ${tokenId}`, err.message)
             }
 

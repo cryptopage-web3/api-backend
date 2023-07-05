@@ -2,11 +2,13 @@ import { cleanUpMetadata, InversifyExpressServer } from 'inversify-express-utils
 import { agent, SuperAgentTest } from "supertest";
 import { Axios } from 'axios';
 import { IDS } from '../../../src/types/index';
-import { unmarshalEthTokensResponse, unmarshalBscTokensResponse, unmarshalPolygonTokensResponse, covalentSolTokensResponse, tronscanTokensResponse } from './tokens-response';
+import { unmarshalEthTokensResponse, unmarshalBscTokensResponse, unmarshalPolygonTokensResponse, covalentSolTokensResponse, tronscanTokensResponse, mumbaiAlchemyTokensResponse, mumbaiTokensCoingeckoMarkets, mumbaiTokenMetaResponses, coingeckoLinkId } from './tokens-response';
 import Sinon from 'sinon';
 import { expect } from 'chai';
 import { Application } from 'express';
 import { testContainer } from '../../ioc/test-container';
+import { TestAlchemyMock } from '../../mock/test-alchemy-mock';
+import { ChainId } from '../../../src/modules/transactions/types';
 
 let app: Application
 let testAgent: SuperAgentTest
@@ -72,6 +74,45 @@ describe('test tokens api endpoints', ()=>{
             expect(response.body.tokens[1].symbol).to.eq('MNEP')
             expect(response.body.tokens[1].address).to.eq('0x0b91b07beb67333225a5ba0259d55aee10e3a578')
             expect(response.body.tokens[1].balance).to.eq(300000)
+    })
+
+    it('should return mumbai tokens', async () => {
+        const alchemy:TestAlchemyMock = testContainer.get<Function>(IDS.SERVICE.AlchemySdkFactory)(ChainId.mumbai)
+        
+        const getTokenbalancesStub = Sinon.stub(alchemy.core, 'getTokenBalances')
+        const getTokenMetaStub = Sinon.stub(alchemy.core, 'getTokenMetadata')
+
+        getTokenbalancesStub.resolves(mumbaiAlchemyTokensResponse)
+        getTokenMetaStub
+            .onCall(0).resolves(mumbaiTokenMetaResponses[0])
+            .onCall(1).resolves(mumbaiTokenMetaResponses[1])
+
+        axiosGetStub
+            .onCall(0).resolves({data: [coingeckoLinkId]})
+            .onCall(1).resolves({data: mumbaiTokensCoingeckoMarkets})
+
+        const walletAddress = '0x7E3353a9f992431059D7F340EF4c77016F9be8aB'
+
+        const response = await testAgent
+            .get(`/tokens/mumbai/${walletAddress}`)
+            .expect('Content-Type',/json/)
+
+        expect(response.body.tokens).to.be.an('array')
+        expect(response.body.tokens.length).to.eq(3)
+        expect(response.body.tokens[1]).to.contain(({
+            name: 'ChainLink Token',
+            symbol: 'LINK',
+            address: '0x326c977e6efc84e512bb9c30f76e30c160ed06fb',
+            logo: "https://assets.coingecko.com/coins/images/877/large/chainlink-new-logo.png?1547034700",
+            balance: 1,
+            percentChange: -4.77824,
+            price: 6.1,
+            balancePrice: 6.1
+        }))
+
+        expect(getTokenbalancesStub.calledOnce).to.eq(true)
+        expect(getTokenMetaStub.calledTwice).to.eq(true)
+        expect(axiosGetStub.calledTwice).to.eq(true)
     })
 
     it.skip('should return solana tokens', async ()=>{

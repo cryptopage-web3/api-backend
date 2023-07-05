@@ -19,7 +19,7 @@ export class Web3Util {
             }).catch(err => {
                 this._errorLogRepo.log('external_url_get_token_json', err.message, urlNormalized)
 
-                if(!process.env.PREVENT_LOG_ERRORS){
+                if(process.env.PREVENT_LOG_ERRORS !== 'yes'){
                     console.error(`Failed to getNft data tokenID: ${tokenId}`, jsonUrl, urlNormalized, err.message)
                 }
                 

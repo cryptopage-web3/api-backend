@@ -44,8 +44,9 @@ import { AlchemyTokenManager } from "./modules/tokens/AlchemyTokenManager";
 import { pageTokenMumbai } from "./modules/tokens/types";
 import { CoinGeckoApi } from "./services/coingecko/coingecko-api";
 import { CoingeckoPriceCache } from "./services/coingecko/price-cache";
-import { MumbaiCommunity } from "./services/web3/social-smart-contract/mumbai/mumbai-commynity";
+import { MumbaiCommunity } from "./services/web3/social-smart-contract/mumbai/mumbai-community";
 import { mumbaiCommunityAbi } from "./services/web3/social-smart-contract/mumbai/abi";
+import { getChainIdFromAncestor, injectChainDecorator } from "./ioc-util";
 
 export const container = new Container();
 
@@ -84,7 +85,7 @@ container.bind(IDS.SERVICE.WEB3.Web3Manager)
         
         return implementedChains.indexOf(name) === -1
     })*/
-container.bind(IDS.SERVICE.WEB3.EthContractFactory).toFactory(context => (abi: any[], contractAddress: string, chain?:ChainId) =>{
+container.bind(IDS.SERVICE.WEB3.ContractFactory).toFactory(context => (abi: any[], contractAddress: string, chain?:ChainId) =>{
     const web3Factory:Function = context.container.get(IDS.NODE_MODULES.web3Factory)
     const web3:Web3 = web3Factory(chain || getChainIdFromAncestor(context.currentRequest))
 
@@ -92,14 +93,14 @@ container.bind(IDS.SERVICE.WEB3.EthContractFactory).toFactory(context => (abi: a
 })
 
 container.bind(IDS.SERVICE.WEB3.CommunityWeb3SmartContract).toDynamicValue((context) => {
-    const contractFactory:Function = context.container.get(IDS.SERVICE.WEB3.EthContractFactory)
+    const contractFactory:Function = context.container.get(IDS.SERVICE.WEB3.ContractFactory)
     
     return contractFactory(goerliSocialAbi as any[], GoerliSocialSmartContract.communityContractAddress, ChainId.goerli)
 }).whenAnyAncestorNamed(ChainId.goerli)
 
 
 container.bind(IDS.SERVICE.WEB3.CommunityWeb3SmartContract).toDynamicValue((context) => {
-    const contractFactory:Function = context.container.get(IDS.SERVICE.WEB3.EthContractFactory)
+    const contractFactory:Function = context.container.get(IDS.SERVICE.WEB3.ContractFactory)
     
     return contractFactory(mumbaiCommunityAbi as any[], MumbaiCommunity.communityContractAddress, ChainId.mumbai)
 }).whenAnyAncestorNamed(ChainId.mumbai)
@@ -262,36 +263,3 @@ container.bind(IDS.ORM.REPO.ContractDetailsRepo).to(ContractDetailsRepo)
 container.bind(IDS.ORM.REPO.NftTokenDetailsRepo).to(NftTokenDetailsRepo)
 container.bind(IDS.ORM.REPO.ErrorLogRepo).to(ErrorLogRepo)
 container.bind(IDS.ORM.REPO.BlockDetailsRepo).to(BlockDetailsRepo)
-
-function getChainIdFromAncestor(request: interfaces.Request):ChainId | undefined {
-    const parent = request.parentRequest
-
-    if(parent == null){
-        return
-    }
-
-    const name = parent.target.getNamedTag()?.value
-
-    if(name !== undefined && name in ChainId){
-        return name as ChainId
-    }
-
-    return getChainIdFromAncestor(parent)
-}
-
-function injectChainDecorator(context: interfaces.Context, instance): interfaces.Next {
-    if(typeof instance['setChainId'] !== 'function'){
-        throw new Error(`${instance.constructor.name} does not have implemented method 'setChainId'`)
-    }
-
-    const chainId = getChainIdFromAncestor(context.currentRequest)
-    //console.log('set chain id', chainId, context.currentRequest.serviceIdentifier)
-    if(!chainId){
-        throw new Error(`Failed to find chainId for ${instance.constructor.name}`)
-    }
-
-    instance.setChainId(chainId)
-
-    return instance
-    
-}

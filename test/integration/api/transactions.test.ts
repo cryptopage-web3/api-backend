@@ -1,13 +1,15 @@
 import { cleanUpMetadata, InversifyExpressServer } from 'inversify-express-utils';
 import { agent, SuperAgentTest } from "supertest";
 import { Axios } from 'axios';
-import { etherscanTransactionsResponse, etherscanErc20TransactionsResponse, unmarshalBscTransactionsResponse, solscanTransactionsResponse, trongridTransactionsResponse, unmarshalEmptyResponse, goerliTransactionsResponse } from './transactions-response';
+import { etherscanTransactionsResponse, etherscanErc20TransactionsResponse, unmarshalBscTransactionsResponse, solscanTransactionsResponse, trongridTransactionsResponse, unmarshalEmptyResponse, goerliTransactionsResponse, mumbaiAlchemyAddrestransactionsResponse } from './transactions-response';
 import { IDS } from '../../../src/types/index';
 import { unmarshalPolygonTransactionResponse } from './transactions-response';
 import Sinon, { SinonStub } from 'sinon';
 import { expect } from 'chai';
 import { Application } from 'express';
 import { testContainer } from '../../ioc/test-container';
+import { TestAlchemyMock } from '../../mock/test-alchemy-mock';
+import { ChainId } from '../../../src/modules/transactions/types';
 
 let app: Application
 let testAgent: SuperAgentTest
@@ -84,6 +86,38 @@ describe('test get transactions list', ()=>{
             expect(response.body.transactions[0].type).to.eq('send')
 
             expect(axiosGetStub.callCount).to.eq(1)
+    })
+
+    it('should return mumbai transactions', async () => {
+        const alchemy:TestAlchemyMock = testContainer.get<Function>(IDS.SERVICE.AlchemySdkFactory)(ChainId.mumbai)
+        
+        const getAssettransfersStub = Sinon.stub(alchemy.core, 'getAssetTransfers')
+
+        getAssettransfersStub.resolves(mumbaiAlchemyAddrestransactionsResponse)
+
+        const walletAddress = '0x36925EedB4ffa635E34CA6469e4Fc2eDaD885376'
+
+        const response = await testAgent
+            .get(`/transactions/mumbai/${walletAddress}`)
+            .expect('Content-Type',/json/)
+
+        expect(response.body.transactions).to.be.an('array')
+        expect(response.body.transactions.length).to.eq(10)
+        expect(response.body.transactions[0]).to.contain(({
+            hash: "0x4c4a3248f9c2feae486a99f37b518f705901e6f93f27fc82f8f4891f87f9e6ba",
+            blockNum: 35822644,
+            from: "0x358cb02bebe8a7c36755639f55567ce8fc637bd7",
+            to: "0x36925eedb4ffa635e34ca6469e4fc2edad885376",
+            value: 188.36907000000002,
+            asset: "MATIC",
+            category: "external",
+            date: "2023-05-20T10:44:56.000Z"
+        }))
+        expect(response.body.continue).to.contain({    
+            pageKey: "005f49fe-a628-4cd4-8976-d2da48b2e06c"
+        })
+
+        expect(getAssettransfersStub.calledOnce).to.eq(true)
     })
 
     it.skip('should return bsc transactions', async () =>{

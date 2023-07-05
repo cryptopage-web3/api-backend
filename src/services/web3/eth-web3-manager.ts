@@ -12,7 +12,7 @@ import { AssetTransfersCategory } from 'alchemy-sdk';
 @injectable()
 export class EthWeb3Manager implements IWeb3Manager {
     @inject(IDS.NODE_MODULES.web3) _web3: Web3
-    @inject(IDS.SERVICE.WEB3.EthContractFactory) _ethContractFactory: Function
+    @inject(IDS.SERVICE.WEB3.ContractFactory) _ethContractFactory: Function
     @inject(IDS.ORM.REPO.ErrorLogRepo) _errorLogRepo: ErrorLogRepo
     @inject(IDS.ORM.REPO.BlockDetailsRepo) _blockDetailsRepo: BlockDetailsRepo
     @inject(IDS.SERVICE.WEB3.Web3Util) _web3Util: Web3Util
@@ -81,7 +81,7 @@ export class EthWeb3Manager implements IWeb3Manager {
 
         const metadataUri = await method.call().catch(err =>{
             this._errorLogRepo.log('web3_contract_call_get_token_uri', err.message, {contrctAddress, tokenId})
-			if(!process.env.PREVENT_LOG_ERRORS){
+			if(process.env.PREVENT_LOG_ERRORS !== 'yes'){
                 console.error(`Failed to get tokenURI, contract: ${contrctAddress}, tokenId: ${tokenId}`, err.message)
 			}
             

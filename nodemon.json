@@ -1,7 +1,7 @@
 {
     "delay": 2500,
     "watch":[
-        "src/*",
+        "dist/*",
         ".env"
     ],
     "ext":".ts, .js, .json, .ejs, .env, .yml",

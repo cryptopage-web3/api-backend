@@ -27,4 +27,4 @@ const pageToken = {
     balancePrice: 0
 };
 
-export const pageTokenMumbai:IToken = Object.assign({}, pageToken,{address:'0xc0FC66bA41BEa0A1266C681bbC781014E7c67612'})
+export const pageTokenMumbai:IToken = Object.assign({}, pageToken,{address:'0xc0fc66ba41bea0a1266c681bbc781014e7c67612'})
