@@ -45,7 +45,7 @@ export class AlchemyNftsManager implements INftsManager {
             contract_address: data.contract.address,
             tokenId: data.tokenId,
             collectionName: data.contract?.name,
-            contentUrl: data.media?.[0]?.gateway,
+            contentUrl: data.media?.[0]?.gateway || data.tokenUri?.gateway || data.tokenUri?.raw,
             attributes: data.rawMetadata?.attributes as any[],
             likes: 0,
             dislikes: 0,
