@@ -130,7 +130,7 @@ export class AlchemyNftsManager implements INftsManager {
         const nftItem = {
             tokenId,
             contractAddress,
-            contentUrl: nftMeta.media?.[0]?.gateway,
+            contentUrl: nftMeta.media?.[0]?.gateway || nftMeta.tokenUri?.raw,
             name: nftMeta.title || nftMeta.contract.symbol || '',
             description: nftMeta.description || nftMeta.contract.name || '',
             attributes: nftMeta.rawMetadata?.attributes || [],

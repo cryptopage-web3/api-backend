@@ -10,7 +10,7 @@ export class NftTokenDetails extends Model<NftTokenDetailsInferAttr, InferCreati
     declare contractAddress: string
     declare name: string
     declare description: string
-    declare contentUrl: string
+    declare contentUrl: string | undefined
     declare attributes: any[]
     declare isEncrypted: boolean
     declare accessPrice: string | undefined
