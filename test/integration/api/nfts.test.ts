@@ -137,7 +137,7 @@ describe('test nfts api endpoints', ()=>{
             symbol: mumbaiAlchemyAddressNftsResponse.ownedNfts[1].contract.symbol,
             contract_address: mumbaiAlchemyAddressNftsResponse.ownedNfts[1].contract.address,
             tokenId: mumbaiAlchemyAddressNftsResponse.ownedNfts[1].tokenId,
-            contentUrl: mumbaiAlchemyAddressNftsResponse.ownedNfts[1].media[0].gateway,
+            contentUrl: mumbaiAlchemyAddressNftsResponse.ownedNfts[1].tokenUri.raw,
         }))
         expect(response.body.list[1].comments).to.be.a('array')
         expect(response.body.list[1].comments.length).to.eq(0)
