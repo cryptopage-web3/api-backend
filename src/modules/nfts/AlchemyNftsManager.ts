@@ -45,7 +45,7 @@ export class AlchemyNftsManager implements INftsManager {
             contract_address: data.contract.address,
             tokenId: data.tokenId,
             collectionName: data.contract?.name,
-            contentUrl: data.tokenUri?.raw || data.media?.[0]?.gateway || data.tokenUri?.gateway,
+            contentUrl: data.media?.[0]?.raw || data.media?.[0]?.gateway,
             attributes: data.rawMetadata?.attributes as any[],
             likes: 0,
             dislikes: 0,
@@ -130,7 +130,7 @@ export class AlchemyNftsManager implements INftsManager {
         const nftItem = {
             tokenId,
             contractAddress,
-            contentUrl: nftMeta.tokenUri?.raw || nftMeta.media?.[0]?.gateway,
+            contentUrl: nftMeta.media?.[0]?.raw || nftMeta.media?.[0]?.gateway,
             name: nftMeta.title || nftMeta.contract.symbol || '',
             description: nftMeta.description || nftMeta.contract.name || '',
             attributes: nftMeta.rawMetadata?.attributes || [],
