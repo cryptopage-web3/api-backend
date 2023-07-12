@@ -58,7 +58,7 @@ export class MumbaiCommunity implements ICommunity {
 
         const comments = await readCommentsWeb3Contract.methods.read(tokenId).call().catch(err =>{
             this._errorLogRepo.log('mumbai_community_read_all_comments', err.message,{
-                contractAddress: mumbaiSingleReadAllCommentsAbi,
+                contractAddress: pluginAddress,
                 tokenId,
                 method: 'read'
             })
