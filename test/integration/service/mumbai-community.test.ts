@@ -4,6 +4,7 @@ import { IDS } from "../../../src/types"
 import { MumbaiCommunity } from '../../../src/services/web3/social-smart-contract/mumbai/mumbai-community';
 import { testWeb3ContractFactory, TestWeb3Mock } from '../../mock/test-web3-mock';
 import { expect } from "chai";
+import { TestErrorLogRepoMock } from '../../mock/test-error-log-repo-mock';
 
 describe('polygon mumbai community',()=>{
     const container = new Container()
@@ -21,6 +22,7 @@ describe('polygon mumbai community',()=>{
         readCommentMethodStub = Sinon.stub()
         readCommentCallStub = Sinon.stub()
 
+        container.bind(IDS.ORM.REPO.ErrorLogRepo).to(TestErrorLogRepoMock)
         container.bind(IDS.SERVICE.CryptoPageCommunity).to(MumbaiCommunity)
         
         container.bind(IDS.SERVICE.WEB3.CommunityWeb3SmartContract).toConstantValue({

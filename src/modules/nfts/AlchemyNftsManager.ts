@@ -36,7 +36,7 @@ export class AlchemyNftsManager implements INftsManager {
 
     async buildNftData(data:OwnedNft):Promise<INftItem> {
         const tokenId = data.tokenId ? BigNumber(data.tokenId).toString() : '',
-            comments = await this._community.getComments(data.contract.address, tokenId)
+            comments = await this._community.getComments(data.contract.address, tokenId).catch(err => [])
 
         return {
             name: data.title,
