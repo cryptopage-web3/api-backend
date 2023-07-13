@@ -9,6 +9,7 @@ import { ChainId } from '../transactions/types';
 import { NftCache } from './NftCache';
 import { INftsList, INftsManager, INftTransaction, INftPagination, NftTxType, Web3NftTokenData, INftItem } from './types';
 import { Web3Util } from '../../services/web3/web3-util';
+import { normalizeUrl } from '../../util/url-util';
 
 @injectable()
 export class AlchemyNftsManager implements INftsManager {
@@ -49,7 +50,7 @@ export class AlchemyNftsManager implements INftsManager {
             contract_address: data.contract.address,
             tokenId: data.tokenId,
             collectionName: data.contract?.name,
-            contentUrl: data.media?.[0]?.raw || data.media?.[0]?.gateway,
+            contentUrl: normalizeUrl(data.media?.[0]?.raw || data.media?.[0]?.gateway),
             attributes: data.rawMetadata?.attributes as any[],
             likes: 0,
             dislikes: 0,
@@ -134,7 +135,7 @@ export class AlchemyNftsManager implements INftsManager {
         const nftItem = {
             tokenId,
             contractAddress,
-            contentUrl: alchemyResponse.media?.[0]?.raw || alchemyResponse.media?.[0]?.gateway,
+            contentUrl: normalizeUrl(alchemyResponse.media?.[0]?.raw || alchemyResponse.media?.[0]?.gateway),
             name: alchemyResponse.title || alchemyResponse.contract.symbol || '',
             description: alchemyResponse.description || alchemyResponse.contract.name || '',
             attributes: alchemyResponse.rawMetadata?.attributes || [],
@@ -145,7 +146,7 @@ export class AlchemyNftsManager implements INftsManager {
                 this._web3Util.loadTokenMetadata(alchemyResponse.tokenUri?.raw),
                 this._community.readPostForContract(contractAddress, tokenId)
             ])
-            nftItem.contentUrl = meta?.contentUrl
+            nftItem.contentUrl = normalizeUrl(meta?.contentUrl)
             nftItem.description = meta?.description
             const {
                 isEncrypted,payAmount,accessDuration, commentCount, upCount, downCount
