@@ -631,8 +631,10 @@ describe('test nfts api endpoints', ()=>{
         const web3: TestWeb3Mock = web3Factory(ChainId.mumbai)
         const web3GetBlockStub:SinonStub = Sinon.stub(web3.eth, 'getBlock')
     
-        web3GetBlockStub.resolves({timestamp: 1659520065})
+        const tokenMetaResponse = {data: {image: 'image_content_or_url'}}
 
+        web3GetBlockStub.resolves({timestamp: 1659520065})
+        axiosGetStub.resolves(tokenMetaResponse)
         getNftMetadata.resolves(mumbaiAlchemyNftMetadataResponse)
         getPluginContractCall.resolves(readCommentsContractAddress)
         readCommentsCall.resolves([])
@@ -651,6 +653,7 @@ describe('test nfts api endpoints', ()=>{
             contractAddress,
             name: 'PAGE.NFT',
             description: "Crypto.Page NFT",
+            contentUrl: tokenMetaResponse.data.image,
             isEncrypted: false,
             date: '2022-08-03T09:47:45.000Z'
         })

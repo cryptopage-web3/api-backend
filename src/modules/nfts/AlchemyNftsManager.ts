@@ -4,9 +4,11 @@ import { inject, injectable } from 'inversify';
 import { ICommunity } from '../../services/web3/social-smart-contract/types';
 import { IWeb3Manager } from '../../services/web3/types';
 import { IDS } from '../../types';
+import { IToken } from '../tokens/types';
 import { ChainId } from '../transactions/types';
 import { NftCache } from './NftCache';
 import { INftsList, INftsManager, INftTransaction, INftPagination, NftTxType, Web3NftTokenData, INftItem } from './types';
+import { Web3Util } from '../../services/web3/web3-util';
 
 @injectable()
 export class AlchemyNftsManager implements INftsManager {
@@ -16,6 +18,8 @@ export class AlchemyNftsManager implements INftsManager {
     @inject(IDS.SERVICE.WEB3.Web3Manager) private _web3Manager: IWeb3Manager
     @inject(IDS.MODULES.NftCache) _nftCache: NftCache
     @inject(IDS.SERVICE.CryptoPageCommunity) _community: ICommunity
+    @inject(IDS.CONFIG.PageToken) _pageToken: IToken
+    @inject(IDS.SERVICE.WEB3.Web3Util) _web3Util: Web3Util
 
     async getWalletAllNFTs(address: string, opts: INftPagination): Promise<INftsList> {
         const addressNfts = await this._alchemy.nft.getNftsForOwner(address, {
@@ -125,23 +129,21 @@ export class AlchemyNftsManager implements INftsManager {
     }
 
     async _getTokenData(contractAddress: string, tokenId: string):Promise<Web3NftTokenData>{
-        const nftMeta = await this._alchemy.nft.getNftMetadata(contractAddress, tokenId)
+        const alchemyResponse = await this._alchemy.nft.getNftMetadata(contractAddress, tokenId)
 
         const nftItem = {
             tokenId,
             contractAddress,
-            contentUrl: nftMeta.media?.[0]?.raw || nftMeta.media?.[0]?.gateway,
-            name: nftMeta.title || nftMeta.contract.symbol || '',
-            description: nftMeta.description || nftMeta.contract.name || '',
-            attributes: nftMeta.rawMetadata?.attributes || [],
+            contentUrl: alchemyResponse.media?.[0]?.raw || alchemyResponse.media?.[0]?.gateway,
+            name: alchemyResponse.title || alchemyResponse.contract.symbol || '',
+            description: alchemyResponse.description || alchemyResponse.contract.name || '',
+            attributes: alchemyResponse.rawMetadata?.attributes || [],
         }
 
-        /*if(!nftItem.contentUrl){
-            console.debug('try to load nft metadata from blockchain')
-            const secondNftItem = await this._web3Manager.getTokenData(contractAddress, tokenId, tokenCategory)
-
-            return secondNftItem;
-        }*/
+        if(!nftItem.contentUrl && alchemyResponse.tokenUri?.raw && contractAddress == this._pageToken.address){
+            const meta = await this._web3Util.loadTokenMetadata(alchemyResponse.tokenUri?.raw)
+            nftItem.contentUrl = meta?.contentUrl
+        }
 
         return nftItem
     }
