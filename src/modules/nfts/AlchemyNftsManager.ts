@@ -141,8 +141,17 @@ export class AlchemyNftsManager implements INftsManager {
         }
 
         if(!nftItem.contentUrl && alchemyResponse.tokenUri?.raw && contractAddress == this._pageToken.address){
-            const meta = await this._web3Util.loadTokenMetadata(alchemyResponse.tokenUri?.raw)
+            const [meta, post] = await Promise.all([
+                this._web3Util.loadTokenMetadata(alchemyResponse.tokenUri?.raw),
+                this._community.readPostForContract(contractAddress, tokenId)
+            ])
             nftItem.contentUrl = meta?.contentUrl
+            nftItem.description = meta?.description
+            const {
+                isEncrypted,payAmount,accessDuration, commentCount, upCount, downCount
+            } = post
+
+            return Object.assign({}, nftItem, {isEncrypted,payAmount,accessDuration, commentCount, upCount, downCount}) as Web3NftTokenData
         }
 
         return nftItem

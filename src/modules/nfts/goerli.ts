@@ -119,8 +119,8 @@ export class GoerliNFTsManager implements INftsManager {
             this._socialSmartContract.readPostForContract(contractAddress, tokenId)
         ])
 
-        const {isEncrypted,accessPrice,accessDuration} = postInfo
+        const {isEncrypted,payAmount,accessDuration} = postInfo
 
-        return Object.assign({}, tokenData,{isEncrypted, accessPrice, accessDuration})
+        return Object.assign({}, tokenData,{isEncrypted, payAmount, accessDuration})
     }
 }

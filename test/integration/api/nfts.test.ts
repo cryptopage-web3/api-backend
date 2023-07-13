@@ -611,8 +611,11 @@ describe('test nfts api endpoints', ()=>{
         const getPluginContractMethodStub = Sinon.stub(),
             getPluginContractCall = Sinon.stub(),
             readCommentsContractAddress = 'read_comments_address',
+            readPostAddress = 'read_post_address',
             readCommentsMethod = Sinon.stub(),
-            readCommentsCall = Sinon.stub()
+            readCommentsCall = Sinon.stub(),
+            readPostMethod = Sinon.stub(),
+            readPostCall = Sinon.stub()
 
         testContainer.rebind(IDS.SERVICE.WEB3.ContractFactory).toFactory(context => testWeb3ContractFactory({
             [MumbaiCommunity.communityContractAddress]:{
@@ -620,6 +623,9 @@ describe('test nfts api endpoints', ()=>{
             },
             [readCommentsContractAddress]:{
                 read:{method:readCommentsMethod, call: readCommentsCall}
+            },
+            [readPostAddress]:{
+                read: {method: readPostMethod, call: readPostCall }
             }
         }))
 
@@ -631,13 +637,18 @@ describe('test nfts api endpoints', ()=>{
         const web3: TestWeb3Mock = web3Factory(ChainId.mumbai)
         const web3GetBlockStub:SinonStub = Sinon.stub(web3.eth, 'getBlock')
     
-        const tokenMetaResponse = {data: {image: 'image_content_or_url'}}
+        const tokenMetaResponse = {data: {image: 'image_content_or_url', description:'Crypto.Page NFT'}}
 
         web3GetBlockStub.resolves({timestamp: 1659520065})
         axiosGetStub.resolves(tokenMetaResponse)
         getNftMetadata.resolves(mumbaiAlchemyNftMetadataResponse)
-        getPluginContractCall.resolves(readCommentsContractAddress)
-        readCommentsCall.resolves([])
+        getPluginContractMethodStub
+        getPluginContractCall
+            .onCall(0).resolves(readCommentsContractAddress)
+            .onCall(1).resolves(readPostAddress)
+
+        readCommentsCall.onCall(0).resolves([]).onCall(1).throws('unexpeted call')
+        readPostCall.resolves({isEncrypted:true})
         saveTokenStub.resolves()
 
         const contractAddress = '0xc0fc66ba41bea0a1266c681bbc781014e7c67612',
@@ -652,18 +663,19 @@ describe('test nfts api endpoints', ()=>{
             tokenId,
             contractAddress,
             name: 'PAGE.NFT',
-            description: "Crypto.Page NFT",
+            description: tokenMetaResponse.data.description,
             contentUrl: tokenMetaResponse.data.image,
-            isEncrypted: false,
+            isEncrypted: true,
             date: '2022-08-03T09:47:45.000Z'
         })
 
         expect(getNftMetadata.calledOnce).to.eq(true)
         expect(getNftMetadata.getCall(0).args).deep.equal([contractAddress, tokenId])
-        expect(readCommentsCall.calledOnce).to.be.true
+        expect(readCommentsCall.callCount).to.be.eq(1)
+        expect(readPostCall.callCount).to.be.eq(1)
         expect(saveTokenStub.calledOnce).to.be.true
         expect(web3GetBlockStub.calledOnce).to.be.true
-        expect(getPluginContractCall.calledOnce).to.be.true
+        expect(getPluginContractCall.calledTwice).to.be.true
     })
 
     it.skip('should return bsc nft token details', async ()=>{
