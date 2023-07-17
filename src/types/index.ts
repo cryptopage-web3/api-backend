@@ -36,6 +36,7 @@ export const IDS = {
         AlchemySdk: Symbol('AlchemySdk'),
         WEB3:{
             Web3Manager: Symbol('Web3Manager'),
+            Web3ManagerFactory: Symbol('Web3ManagerFactory'),
             CommunityWeb3SmartContract: Symbol('CommunityWeb3SmartContract'),
             ContractFactory: Symbol('Web3ContractFactory'),
             Web3Util: Symbol('Web3Util')

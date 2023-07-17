@@ -8,6 +8,7 @@ import { ChainId } from '../../modules/transactions/types';
 import { BlockDetailsRepo } from '../../orm/repo/block-details-repo';
 import { Web3Util } from './web3-util';
 import { AssetTransfersCategory } from 'alchemy-sdk';
+import { ICommunity, ISocialComment } from './social-smart-contract/types';
 
 @injectable()
 export class EthWeb3Manager implements IWeb3Manager {
@@ -16,6 +17,7 @@ export class EthWeb3Manager implements IWeb3Manager {
     @inject(IDS.ORM.REPO.ErrorLogRepo) _errorLogRepo: ErrorLogRepo
     @inject(IDS.ORM.REPO.BlockDetailsRepo) _blockDetailsRepo: BlockDetailsRepo
     @inject(IDS.SERVICE.WEB3.Web3Util) _web3Util: Web3Util
+    @inject(IDS.SERVICE.CryptoPageCommunity) _community: ICommunity
 
     _chainId:ChainId
 
@@ -90,5 +92,9 @@ export class EthWeb3Manager implements IWeb3Manager {
         
         
         return this._web3Util.loadTokenMetadata(metadataUri, tokenId)
+    }
+
+    getComments(contrctAddress: string, tokenId: string): Promise<ISocialComment[]> {
+        return this._community.getComments(contrctAddress, tokenId)
     }
 }

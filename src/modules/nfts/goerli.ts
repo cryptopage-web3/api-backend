@@ -90,7 +90,7 @@ export class GoerliNFTsManager implements INftsManager {
             comments
         }
     }
-
+/*
     getNftTransactionDetails(contractAddress: string, tokenId: string, blockNumber: number) {
         return this._nftCache.getNftTransactionDetails(
             this._web3Manager,
@@ -100,8 +100,8 @@ export class GoerliNFTsManager implements INftsManager {
             blockNumber,
             ()=> this._getTokenData(contractAddress, tokenId)
         )
-    }
-
+    }*/
+/*
     getNftDetails(contractAddress: string, tokenId: string) {
         return this._nftCache.getNftTransactionDetails(
             this._web3Manager,
@@ -111,16 +111,16 @@ export class GoerliNFTsManager implements INftsManager {
             null,
             ()=> this._getTokenData(contractAddress, tokenId)
         )
-    }
+    }*/
 
-    async _getTokenData(contractAddress: string, tokenId: string){
+    async getNftDetails(contractAddress: string, tokenId: string){
         const [tokenData, postInfo] = await Promise.all([
             this._web3Manager.getTokenData(contractAddress, tokenId),
             this._socialSmartContract.readPostForContract(contractAddress, tokenId)
         ])
 
-        const {isEncrypted,payAmount,accessDuration} = postInfo
+        const {isEncrypted,payAmount} = postInfo
 
-        return Object.assign({}, tokenData,{isEncrypted, payAmount, accessDuration})
+        return Object.assign({}, tokenData,{isEncrypted, payAmount})
     }
 }

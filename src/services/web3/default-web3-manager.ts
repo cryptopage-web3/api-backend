@@ -3,6 +3,7 @@ import { ApiError } from '../../types/index';
 import { injectable } from 'inversify';
 import { Web3NftTokenData } from 'modules/nfts/types';
 import { ChainId } from '../../modules/transactions/types';
+import { ISocialComment } from './social-smart-contract/types';
 
 @injectable()
 export class DefaultWebManager implements IWeb3Manager {
@@ -17,5 +18,8 @@ export class DefaultWebManager implements IWeb3Manager {
     }
     getFieldFromContract(address: string, key: string) {
         throw new ApiError('Method not implemented.');
+    }
+    async getComments(contrctAddress: string, tokenId: string): Promise<ISocialComment[]> {
+        return [] as ISocialComment[]
     }
 }

@@ -16,8 +16,6 @@ export class AlchemyNftsManager implements INftsManager {
     _chain: ChainId;
 
     @inject(IDS.SERVICE.AlchemySdk) _alchemy:Alchemy
-    @inject(IDS.SERVICE.WEB3.Web3Manager) private _web3Manager: IWeb3Manager
-    @inject(IDS.MODULES.NftCache) _nftCache: NftCache
     @inject(IDS.SERVICE.CryptoPageCommunity) _community: ICommunity
     @inject(IDS.CONFIG.PageToken) _pageToken: IToken
     @inject(IDS.SERVICE.WEB3.Web3Util) _web3Util: Web3Util
@@ -106,7 +104,7 @@ export class AlchemyNftsManager implements INftsManager {
             from: data.from
         }
     }
-
+/*
     getNftTransactionDetails(contractAddress: string, tokenId: string, blockNumber: number | null, tokenCategory?: AssetTransfersCategory) {
         return this._nftCache.getNftTransactionDetails(
             this._web3Manager,
@@ -116,9 +114,9 @@ export class AlchemyNftsManager implements INftsManager {
             blockNumber,
             ()=> this._getTokenData(contractAddress, tokenId)
         )
-    }
+    }*/
 
-    getNftDetails(contractAddress: string, tokenId: string, tokenCategory?: AssetTransfersCategory) {
+    /*getNftDetails(contractAddress: string, tokenId: string, tokenCategory?: AssetTransfersCategory) {
         return this._nftCache.getNftTransactionDetails(
             this._web3Manager,
             this._chain,
@@ -127,18 +125,19 @@ export class AlchemyNftsManager implements INftsManager {
             null,
             ()=> this._getTokenData(contractAddress, tokenId)
         )
-    }
+    }*/
 
-    async _getTokenData(contractAddress: string, tokenId: string):Promise<Web3NftTokenData>{
+    async getNftDetails(contractAddress: string, tokenId: string):Promise<Web3NftTokenData>{
         const alchemyResponse = await this._alchemy.nft.getNftMetadata(contractAddress, tokenId)
 
         const nftItem = {
             tokenId,
             contractAddress,
             contentUrl: normalizeUrl(alchemyResponse.media?.[0]?.raw || alchemyResponse.media?.[0]?.gateway),
-            name: alchemyResponse.title || alchemyResponse.contract.symbol || '',
-            description: alchemyResponse.description || alchemyResponse.contract.name || '',
+            name: alchemyResponse.title || '',
+            description: alchemyResponse.description || '',
             attributes: alchemyResponse.rawMetadata?.attributes || [],
+            attachments: undefined
         }
 
         if(!nftItem.contentUrl && alchemyResponse.tokenUri?.raw && contractAddress == this._pageToken.address){
@@ -147,12 +146,15 @@ export class AlchemyNftsManager implements INftsManager {
                 this._community.readPostForContract(contractAddress, tokenId)
             ])
             nftItem.contentUrl = normalizeUrl(meta?.contentUrl)
+            nftItem.name = meta?.name
+            nftItem.attachments = meta.attachments
             nftItem.description = meta?.description
+            nftItem.attributes = meta?.attributes
             const {
-                isEncrypted,payAmount,accessDuration, commentCount, upCount, downCount
+                isEncrypted, payAmount, commentCount, upCount, downCount, paymentType
             } = post
 
-            return Object.assign({}, nftItem, {isEncrypted,payAmount,accessDuration, commentCount, upCount, downCount}) as Web3NftTokenData
+            return Object.assign({}, nftItem, {isEncrypted, payAmount, paymentType, commentCount, upCount, downCount})
         }
 
         return nftItem

@@ -281,6 +281,8 @@ export class UnmarshalApi {
 
         const url = normalizeUrl(info.image_url)
         const result = {
+            tokenId,
+            contractAddress,
             contentUrl: url,
             name: info.name,
             price: info.price,
@@ -296,6 +298,8 @@ export class UnmarshalApi {
             const metadata = await this._web3Util.loadTokenMetadata(info.token_uri)
             
             return {
+                tokenId,
+                contractAddress,
                 contentUrl: normalizeUrl(metadata?.contentUrl),
                 name: info.name || metadata?.name,
                 price: info.price,

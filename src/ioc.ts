@@ -70,10 +70,15 @@ container.bind(IDS.NODE_MODULES.web3).toDynamicValue(context => {
 container.bind(IDS.SERVICE.WEB3.Web3Manager)
     .to(EthWeb3Manager)
     .when(request =>{
-        const chain = getChainIdFromAncestor(request),
-            allowedChains = [ChainId.matic, ChainId.mumbai];
+        const chain = getChainIdFromAncestor(request) || request.target.getNamedTag()?.value,
+            allowedChains:string[] = [ChainId.matic, ChainId.mumbai];
 
         return !!chain && allowedChains.indexOf(chain) !== -1;
+    })
+
+container.bind(IDS.SERVICE.WEB3.Web3ManagerFactory)
+    .toFactory(context => (chain:ChainId) =>{ 
+        return container.getNamed(IDS.SERVICE.WEB3.Web3Manager, chain)
     })
 
 container.onActivation(IDS.SERVICE.WEB3.Web3Manager, injectChainDecorator)
@@ -147,8 +152,8 @@ container.bind(IDS.SERVICE.CryptoPageCommunity)
 container.bind(IDS.SERVICE.CryptoPageCommunity)
     .to(DefaultSocialSmartContract)
     .whenAnyAncestorMatches(request =>{
-        const excludeChains = [ChainId.goerli, ChainId.mumbai],
-            chainId = getChainIdFromAncestor(request)
+        const excludeChains:string[] = [ChainId.goerli, ChainId.mumbai],
+            chainId = getChainIdFromAncestor(request) || request.target.getNamedTag()?.value
 
         if(!chainId){
             return false

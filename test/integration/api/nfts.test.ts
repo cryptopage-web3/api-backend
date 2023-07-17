@@ -637,7 +637,7 @@ describe('test nfts api endpoints', ()=>{
         const web3: TestWeb3Mock = web3Factory(ChainId.mumbai)
         const web3GetBlockStub:SinonStub = Sinon.stub(web3.eth, 'getBlock')
     
-        const tokenMetaResponse = {data: {image: 'image_content_or_url', description:'Crypto.Page NFT'}}
+        const tokenMetaResponse = {data: {image: 'image_content_or_url', name: 'test token',description:'Crypto.Page NFT'}}
 
         web3GetBlockStub.resolves({timestamp: 1659520065})
         axiosGetStub.resolves(tokenMetaResponse)
@@ -662,7 +662,7 @@ describe('test nfts api endpoints', ()=>{
         expect(response.body).contain({
             tokenId,
             contractAddress,
-            name: 'PAGE.NFT',
+            name: tokenMetaResponse.data.name,
             description: tokenMetaResponse.data.description,
             contentUrl: tokenMetaResponse.data.image,
             isEncrypted: true,

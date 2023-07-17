@@ -1,18 +1,15 @@
 import { inject, injectable } from "inversify";
 import { IDS } from '../../types/index';
 import { NftTokenDetailsRepo } from '../../orm/repo/nft-token-details-repo';
-import { IWeb3Manager } from '../../services/web3/types';
 import { ChainId } from '../transactions/types';
 
-import { GetTokenFromApiCallback } from './types';
-import { ICommunity } from '../../services/web3/social-smart-contract/types';
+import { Web3NftTokenData } from './types';
 
 @injectable()
 export class NftCache {
     @inject(IDS.ORM.REPO.NftTokenDetailsRepo) private _nftTokenRepo: NftTokenDetailsRepo
-    @inject(IDS.SERVICE.CryptoPageCommunity) private _socialSmartContract: ICommunity
     @inject(IDS.CONFIG.EnableNftCache) _isCacheEnabled: boolean
-
+/*
     async getNftTransactionDetails(web3Manager:IWeb3Manager,chain:ChainId, contractAddress: string, tokenId: string, blockNumber:number | null,getTokenFromApi: GetTokenFromApiCallback) {
         const [tokenDetails, blockDate, comments] = await Promise.all([
             this._getTokenDetails(chain, contractAddress, tokenId, getTokenFromApi),
@@ -24,9 +21,9 @@ export class NftCache {
             tokenDetails,
             {date: blockDate, comments}
         )
-    }
+    }*/
 
-    async _getTokenDetails(chain: ChainId, contractAddress: string, tokenId: string, getTokenFromApi: GetTokenFromApiCallback ){
+    async getTokenDetails(chain: ChainId, contractAddress: string, tokenId: string ){
         if(this._isCacheEnabled){
             const dbToken = await this._nftTokenRepo.getToken(chain, contractAddress, tokenId)
 
@@ -43,27 +40,31 @@ export class NftCache {
             }
         }
         
+        return null
+    }
 
-        const apiToken = await getTokenFromApi()
+    async saveTokenData(chain:ChainId, token:Web3NftTokenData){
+        if(!this._isCacheEnabled){
+            return
+        }
 
         const tokenData = {
-            tokenId,
+            tokenId: token.tokenId,
             chain,
-            contractAddress,
-            contentUrl: apiToken.contentUrl,
-            name: apiToken.name,
-            description: apiToken.description,
-            attributes: apiToken.attributes,
-            isEncrypted: !!apiToken.isEncrypted,
-            accessPrice: apiToken.accessPrice?.toString(),
-            accessDuration: apiToken.accessDuration
+            contractAddress: token.contractAddress,
+            contentUrl: token.contentUrl,
+            name: token.name,
+            description: token.description,
+            attributes: token.attributes,
+            attachments: token.attachments,
+            isEncrypted: !!token.isEncrypted,
+            payAmount: token.payAmount?.toString(),
+            paymentType: token.paymentType || 0
         }
         
         this._nftTokenRepo.createToken(tokenData).catch(err =>{
             console.log('failed to save token data to database', err)
         })
-
-        return tokenData
     }
 
     /*async _getContrctDetails(chain: ChainId, contractAddress: string, tokenId: string, ){

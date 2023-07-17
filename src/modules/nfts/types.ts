@@ -7,8 +7,8 @@ export interface INftsManager {
     
     getWalletAllNFTs(address: string, opts: INftPagination): Promise<INftsList>
     getWalletNFTTransactions(address: string, opts: INftPagination)
-    getNftTransactionDetails(contractAddress: string, tokenId: string, blockNumber:number | null, tokenCategory?: AssetTransfersCategory)
-    getNftDetails(contractAddress: string, tokenId: string, tokenCategory?: AssetTransfersCategory)
+    //getNftTransactionDetails(contractAddress: string, tokenId: string, blockNumber:number | null, tokenCategory?: AssetTransfersCategory)
+    getNftDetails(contractAddress: string, tokenId: string):Promise<Web3NftTokenData>
 }
 
 export interface INftPagination {
@@ -75,14 +75,17 @@ export interface INftTxList {
 }
 
 export interface Web3NftTokenData {
-    contentUrl: string | undefined,
-    name: string,
-    price?: string,
-    description: string,
-    attributes: any[],
-    isEncrypted?: boolean,
-    accessPrice?: string,
-    accessDuration?: string
+    contentUrl: string | undefined
+    name: string
+    price?: string
+    description: string
+    tokenId: string
+    contractAddress: string
+    attributes: any[]
+    attachments?: any[]
+    isEncrypted?: boolean
+    payAmount?: string
+    paymentType?: number
 }
 
 export type GetTokenFromApiCallback = () => Promise<Web3NftTokenData>
