@@ -30,7 +30,7 @@ export interface INftItem {
     usdPrice?: number,
     contentUrl: string | undefined,
     image?: string,
-    contract_address: string,
+    contractAddress: string,
     tokenId: string,
     attributes: any[]
 }

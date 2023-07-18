@@ -91,7 +91,7 @@ describe('test nfts api endpoints', ()=>{
         expect(response.body.list).to.be.an('array')
         expect(response.body.list.length).to.eq(4)
         expect(response.body.list[0]).to.contain(({
-            contract_address: '0x2953399124f0cbb46d2cbacd8a89cf0599974963',
+            contractAddress: '0x2953399124f0cbb46d2cbacd8a89cf0599974963',
             from: '0xb7f8d0b571f9fc79e896c778ccdff2f92279ac21',
             to: '0xBA7089b207205c1B2282A18c1C80E856Fd424de0',
             tokenId: '1267276096787188443380565843485598748588859320258549594955629332512307718469',
@@ -135,7 +135,7 @@ describe('test nfts api endpoints', ()=>{
         expect(response.body.list[1]).to.contain(({
             name: mumbaiAlchemyAddressNftsResponse.ownedNfts[1].rawMetadata.name,
             symbol: mumbaiAlchemyAddressNftsResponse.ownedNfts[1].contract.symbol,
-            contract_address: mumbaiAlchemyAddressNftsResponse.ownedNfts[1].contract.address,
+            contractAddress: mumbaiAlchemyAddressNftsResponse.ownedNfts[1].contract.address,
             tokenId: mumbaiAlchemyAddressNftsResponse.ownedNfts[1].tokenId,
             contentUrl: mumbaiAlchemyAddressNftsResponse.ownedNfts[1].media[0].raw,
         }))
