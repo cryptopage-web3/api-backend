@@ -13,8 +13,10 @@ class Contract {
                 const conf = methods[methodName],
                     methodStub = conf.method
                 
-                methodStub.returns({call: conf.call})
-
+                if(conf.call){
+                    methodStub.returns({call: conf.call})    
+                }
+                
                 this.methods[methodName] = methodStub
             })
         }
@@ -42,7 +44,7 @@ export function testWeb3ContractFactory(opts?:FactoryParams){
 
 type ContractMethod = {
     method: SinonStub,
-    call: SinonStub
+    call?: SinonStub
 }
 
 type ContractParams = {

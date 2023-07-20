@@ -101,17 +101,24 @@ describe('test nfts api endpoints', ()=>{
 
     it('should return mumbai nfts', async () => {
         const getPluginContractMethodStub = Sinon.stub(),
-            getPluginContractCall = Sinon.stub(),
+            getPluginCommentsContractCall = Sinon.stub(),
+            getPluginPostContractCall = Sinon.stub(),
             readCommentsContractAddress = 'read_comments_address',
+            readPostContractAddress = 'read_post_contract_address',
             readCommentsMethod = Sinon.stub(),
-            readCommentsCall = Sinon.stub()
+            readCommentsCall = Sinon.stub(),
+            readPostMethod = Sinon.stub(),
+            readPostCall = Sinon.stub()
 
         testContainer.rebind(IDS.SERVICE.WEB3.ContractFactory).toFactory(context => testWeb3ContractFactory({
             [MumbaiCommunity.communityContractAddress]:{
-                getPluginContract:{ method: getPluginContractMethodStub, call: getPluginContractCall }
+                getPluginContract:{ method: getPluginContractMethodStub }
             },
             [readCommentsContractAddress]:{
                 read:{method:readCommentsMethod, call: readCommentsCall}
+            },
+            [readPostContractAddress]:{
+                read:{ method: readPostMethod, call: readPostCall}
             }
         }))
 
@@ -120,8 +127,15 @@ describe('test nfts api endpoints', ()=>{
         const getNftsForOwnerStub = Sinon.stub(alchemy.nft, 'getNftsForOwner')
 
         getNftsForOwnerStub.resolves(mumbaiAlchemyAddressNftsResponse)
-        getPluginContractCall.resolves(readCommentsContractAddress)
+        getPluginContractMethodStub
+            .withArgs(MumbaiCommunity.plugins.singleReadAllComments, 1).returns({call: getPluginCommentsContractCall})
+            .withArgs(MumbaiCommunity.plugins.singleReadPost, 1).returns({call: getPluginPostContractCall})
+        
+        getPluginCommentsContractCall.resolves(readCommentsContractAddress)
+        getPluginPostContractCall.resolves(readPostContractAddress)
+            
         readCommentsCall.resolves([])
+        readPostCall.resolves({ipfsHash:'test_hash'})
 
         const walletAddress = '0x7d9d209f124dffb488308a1350001c353ba04afb'
 
@@ -143,7 +157,8 @@ describe('test nfts api endpoints', ()=>{
         expect(response.body.list[1].comments.length).to.eq(0)
 
         expect(getNftsForOwnerStub.calledOnce).to.eq(true)
-        expect(getPluginContractCall.callCount).to.eq(5)
+        expect(getPluginContractMethodStub.callCount).to.eq(10)
+        expect(readPostCall.callCount).to.eq(5)
         expect(readCommentsCall.callCount).to.eq(5)
     })
 
@@ -609,7 +624,8 @@ describe('test nfts api endpoints', ()=>{
 
     it('should return mumbai nft token details', async () => {
         const getPluginContractMethodStub = Sinon.stub(),
-            getPluginContractCall = Sinon.stub(),
+            getPostContractAddressCall = Sinon.stub(),
+            getCommentsContractAddressCall = Sinon.stub(),
             readCommentsContractAddress = 'read_comments_address',
             readPostAddress = 'read_post_address',
             readCommentsMethod = Sinon.stub(),
@@ -619,7 +635,7 @@ describe('test nfts api endpoints', ()=>{
 
         testContainer.rebind(IDS.SERVICE.WEB3.ContractFactory).toFactory(context => testWeb3ContractFactory({
             [MumbaiCommunity.communityContractAddress]:{
-                getPluginContract:{ method: getPluginContractMethodStub, call: getPluginContractCall }
+                getPluginContract:{ method: getPluginContractMethodStub}
             },
             [readCommentsContractAddress]:{
                 read:{method:readCommentsMethod, call: readCommentsCall}
@@ -643,10 +659,11 @@ describe('test nfts api endpoints', ()=>{
         axiosGetStub.resolves(tokenMetaResponse)
         getNftMetadata.resolves(mumbaiAlchemyNftMetadataResponse)
         getPluginContractMethodStub
-        getPluginContractCall
-            .onCall(0).resolves(readCommentsContractAddress)
-            .onCall(1).resolves(readPostAddress)
-
+            .withArgs(MumbaiCommunity.plugins.singleReadPost, 1).returns({call: getPostContractAddressCall})
+            .withArgs(MumbaiCommunity.plugins.singleReadAllComments, 1).returns({call: getCommentsContractAddressCall})
+        
+        getPostContractAddressCall.resolves(readPostAddress)
+        getCommentsContractAddressCall.resolves(readCommentsContractAddress)
         readCommentsCall.onCall(0).resolves([]).onCall(1).throws('unexpeted call')
         readPostCall.resolves({isEncrypted:true})
         saveTokenStub.resolves()
@@ -675,7 +692,6 @@ describe('test nfts api endpoints', ()=>{
         expect(readPostCall.callCount).to.be.eq(1)
         expect(saveTokenStub.calledOnce).to.be.true
         expect(web3GetBlockStub.calledOnce).to.be.true
-        expect(getPluginContractCall.calledTwice).to.be.true
     })
 
     it.skip('should return bsc nft token details', async ()=>{

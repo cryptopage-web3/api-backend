@@ -51,21 +51,17 @@ export class AlchemyNftsManager implements INftsManager {
             collectionName: data.contract?.name,
             contentUrl: normalizeUrl(data.media?.[0]?.raw || data.media?.[0]?.gateway),
             attributes: data.rawMetadata?.attributes as any[],
-            likes: 0,
-            dislikes: 0,
             date: data.timeLastUpdated,
             comments: [] as ISocialComment[]
-        
         }
 
-        const [comments] = await Promise.all([
+        const [comments, post] = await Promise.all([
             await this._community.getComments(data.contract.address, tokenId).catch(err => []),
+            await this._community.readPostForContract(data.contract.address, tokenId),
             this._updateCryptoPageMeta(nftItem, data.tokenUri?.raw).catch(err => null)
         ])
 
-        nftItem.comments = comments 
-
-        return nftItem
+        return Object.assign({}, nftItem, {comments}, post)
     }
 
     async getWalletNFTTransactions(address: string, opts: INftPagination) {
@@ -156,12 +152,8 @@ export class AlchemyNftsManager implements INftsManager {
                 this._community.readPostForContract(contractAddress, tokenId),
                 this._updateCryptoPageMeta(nftItem, alchemyResponse.tokenUri?.raw)
             ])
-            
-            const {
-                isEncrypted, payAmount, commentCount, upCount, downCount, paymentType
-            } = post
 
-            return Object.assign({}, nftItem, {isEncrypted, payAmount, paymentType, commentCount, upCount, downCount})
+            return Object.assign({}, nftItem, post)
         }
 
         return nftItem

@@ -1,6 +1,5 @@
 import { ChainId } from '../transactions/types';
 import { ISocialComment } from '../../services/web3/social-smart-contract/types';
-import { AssetTransfersCategory } from 'alchemy-sdk';
 
 export interface INftsManager {
     _chain: ChainId
@@ -17,22 +16,8 @@ export interface INftPagination {
     pageKey?: string
 }
 
-export interface INftItem {
-    likes: number,
-    dislikes: number,
-    comments: ISocialComment[],
-    date: string | Date,
-    name: string,
-    symbol?: string
-    collectionName?: string,
-    description: string,
-    type?: string,
-    usdPrice?: number,
-    contentUrl: string | undefined,
-    image?: string,
-    contractAddress: string,
-    tokenId: string,
-    attributes: any[]
+export interface INftItem extends Web3NftTokenData {
+    
 }
 
 export interface INftsList {
@@ -86,6 +71,10 @@ export interface Web3NftTokenData {
     isEncrypted?: boolean
     payAmount?: string
     paymentType?: number
+    comments?: ISocialComment[]
+    date?: string | Date
+    type?: string
+    usdPrice?: number
 }
 
 export type GetTokenFromApiCallback = () => Promise<Web3NftTokenData>
