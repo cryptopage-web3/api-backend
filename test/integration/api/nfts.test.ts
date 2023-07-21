@@ -455,7 +455,7 @@ describe('test nfts api endpoints', ()=>{
             type: NftTxType.baseInfo,
             txHash: mumbaiAlchemyAddressNftTransactionsResponse.transfers[0].hash,
             blockNumber: parseInt(mumbaiAlchemyAddressNftTransactionsResponse.transfers[0].blockNum),
-            contract_address: mumbaiAlchemyAddressNftTransactionsResponse.transfers[0].rawContract.address,
+            contractAddress: mumbaiAlchemyAddressNftTransactionsResponse.transfers[0].rawContract.address,
             tokenId: '80001000000000052',
             to: mumbaiAlchemyAddressNftTransactionsResponse.transfers[0].to,
             from: mumbaiAlchemyAddressNftTransactionsResponse.transfers[0].from,

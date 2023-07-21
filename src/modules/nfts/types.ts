@@ -47,7 +47,7 @@ export interface INftTransaction {
     to: string
     txHash: string
     blockNumber: number
-    contract_address: string
+    contractAddress: string
     tokenId: string
     likes?: number
     dislikes?: number

@@ -36,7 +36,7 @@ export class UnmarshalNftsManager implements INftsManager {
             type: NftTxType.baseInfo,
             txHash: data.transaction_hash,
             blockNumber: data.block_number,
-            contract_address: data.contract_address,
+            contractAddress: data.contract_address,
             tokenId: data.token_id,
             to: data.to,
             from: data.sender,

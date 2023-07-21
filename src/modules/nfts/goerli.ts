@@ -83,7 +83,7 @@ export class GoerliNFTsManager implements INftsManager {
             type: NftTxType.baseInfo,
             txHash: data.hash,
             blockNumber: parseInt(data.blockNum, 16),
-            contract_address: data.rawContract.address as string,
+            contractAddress: data.rawContract.address as string,
             tokenId: parseInt(tokenId as string, 16).toString(),
             to: data.to as string,
             from: data.from,

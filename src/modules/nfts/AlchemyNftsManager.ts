@@ -104,7 +104,7 @@ export class AlchemyNftsManager implements INftsManager {
             type: NftTxType.baseInfo,
             txHash: data.hash,
             blockNumber: parseInt(data.blockNum),
-            contract_address: contractAddress,
+            contractAddress: contractAddress,
             category: data.category,
             tokenId,
             to: data.to || '',
