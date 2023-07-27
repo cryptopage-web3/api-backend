@@ -6,7 +6,8 @@ export const IDS = {
         Web3RpcFactory: Symbol('Web3RpcFactory'),
         EnableNftCache: Symbol('EnableNftCache'),
         PageToken: Symbol('PageToken'),
-        COINGECKO_PRICE_CACHE_TTL_IN_SECONDS: Symbol('COINGECKO_PRICE_CACHE_TTL_IN_SECONDS')
+        COINGECKO_PRICE_CACHE_TTL_IN_SECONDS: Symbol('COINGECKO_PRICE_CACHE_TTL_IN_SECONDS'),
+        PageNftContractAddress: Symbol('PageNftContractAddress')
     },
     UTIL:{
         Logger:Symbol('logger')

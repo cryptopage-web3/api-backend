@@ -676,6 +676,13 @@ describe('test nfts api endpoints', ()=>{
             .get(`/nfts/transaction/mumbai/details/${contractAddress}/${tokenId}/${blockNumber}`)
             .expect('Content-Type',/json/)
 
+        expect(getNftMetadata.calledOnce).to.eq(true)
+        expect(getNftMetadata.getCall(0).args).deep.equal([contractAddress, tokenId])
+        expect(readCommentsCall.callCount).to.be.eq(1)
+        expect(readPostCall.callCount).to.be.eq(1)
+        expect(saveTokenStub.calledOnce).to.be.true
+        expect(web3GetBlockStub.calledOnce).to.be.true
+
         expect(response.body).contain({
             tokenId,
             contractAddress,
@@ -685,13 +692,6 @@ describe('test nfts api endpoints', ()=>{
             isEncrypted: true,
             date: '2022-08-03T09:47:45.000Z'
         })
-
-        expect(getNftMetadata.calledOnce).to.eq(true)
-        expect(getNftMetadata.getCall(0).args).deep.equal([contractAddress, tokenId])
-        expect(readCommentsCall.callCount).to.be.eq(1)
-        expect(readPostCall.callCount).to.be.eq(1)
-        expect(saveTokenStub.calledOnce).to.be.true
-        expect(web3GetBlockStub.calledOnce).to.be.true
     })
 
     it.skip('should return bsc nft token details', async ()=>{

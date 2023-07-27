@@ -18,9 +18,9 @@ export class AlchemyNftsManager implements INftsManager {
 
     @inject(IDS.SERVICE.AlchemySdk) _alchemy:Alchemy
     @inject(IDS.SERVICE.CryptoPageCommunity) _community: ICommunity
-    @inject(IDS.CONFIG.PageToken) _pageToken: IToken
     @inject(IDS.SERVICE.WEB3.Web3Util) _web3Util: Web3Util
     @inject(IDS.ORM.REPO.ErrorLogRepo) _errorRepo: ErrorLogRepo
+    @inject(IDS.CONFIG.PageNftContractAddress) _pageNftContractAddress: string
 
     async getWalletAllNFTs(address: string, opts: INftPagination): Promise<INftsList> {
         const addressNfts = await this._alchemy.nft.getNftsForOwner(address, {
@@ -147,7 +147,7 @@ export class AlchemyNftsManager implements INftsManager {
             attachments: undefined
         }
 
-        if(!nftItem.contentUrl && alchemyResponse.tokenUri?.raw && contractAddress == this._pageToken.address){
+        if(!nftItem.contentUrl && alchemyResponse.tokenUri?.raw && contractAddress.toLowerCase() == this._pageNftContractAddress){
             const [post] = await Promise.all([
                 this._community.readPostForContract(contractAddress, tokenId),
                 this._updateCryptoPageMeta(nftItem, alchemyResponse.tokenUri?.raw)
@@ -160,7 +160,7 @@ export class AlchemyNftsManager implements INftsManager {
     }
 
     async _updateCryptoPageMeta(nftItem:Web3NftTokenData, tokenUri:string | undefined){
-        if(nftItem.contentUrl || nftItem.contractAddress !== this._pageToken.address || !tokenUri){
+        if(nftItem.contentUrl || nftItem.contractAddress !== this._pageNftContractAddress || !tokenUri){
             return
         }
 
