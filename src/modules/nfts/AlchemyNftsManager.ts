@@ -147,7 +147,7 @@ export class AlchemyNftsManager implements INftsManager {
             attachments: undefined
         }
 
-        if(!nftItem.contentUrl && alchemyResponse.tokenUri?.raw && contractAddress.toLowerCase() == this._pageNftContractAddress){
+        if(/*!nftItem.contentUrl && alchemyResponse.tokenUri?.raw &&*/ contractAddress.toLowerCase() == this._pageNftContractAddress){
             const [post] = await Promise.all([
                 this._community.readPostForContract(contractAddress, tokenId),
                 this._updateCryptoPageMeta(nftItem, alchemyResponse.tokenUri?.raw)
