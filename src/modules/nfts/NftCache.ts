@@ -59,7 +59,8 @@ export class NftCache {
             attachments: token.attachments,
             isEncrypted: !!token.isEncrypted,
             payAmount: token.payAmount?.toString(),
-            paymentType: token.paymentType || 0
+            paymentType: token.paymentType || 0,
+            minimalPeriod: token.minimalPeriod
         }
         
         this._nftTokenRepo.createToken(tokenData).catch(err =>{

@@ -665,7 +665,7 @@ describe('test nfts api endpoints', ()=>{
         getPostContractAddressCall.resolves(readPostAddress)
         getCommentsContractAddressCall.resolves(readCommentsContractAddress)
         readCommentsCall.onCall(0).resolves([]).onCall(1).throws('unexpeted call')
-        readPostCall.resolves({isEncrypted:true})
+        readPostCall.resolves({isEncrypted:true, payAmount: 10, paymentType: 1, minimalPeriod: 250 })
         saveTokenStub.resolves()
 
         const contractAddress = '0xc0fc66ba41bea0a1266c681bbc781014e7c67612',
@@ -682,6 +682,10 @@ describe('test nfts api endpoints', ()=>{
         expect(readPostCall.callCount).to.be.eq(1)
         expect(saveTokenStub.calledOnce).to.be.true
         expect(web3GetBlockStub.calledOnce).to.be.true
+        expect(getCacheTokenDetailsStub.calledOnce).to.be.true
+        expect(saveTokenStub.getCall(0).args[0]).contain({
+            minimalPeriod: 250
+        })
 
         expect(response.body).contain({
             tokenId,
@@ -690,6 +694,7 @@ describe('test nfts api endpoints', ()=>{
             description: tokenMetaResponse.data.description,
             contentUrl: tokenMetaResponse.data.image,
             isEncrypted: true,
+            minimalPeriod: 250,
             date: '2022-08-03T09:47:45.000Z'
         })
     })

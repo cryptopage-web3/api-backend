@@ -75,6 +75,7 @@ export interface Web3NftTokenData {
     date?: string | Date
     type?: string
     usdPrice?: number
+    minimalPeriod?: string
 }
 
 export type GetTokenFromApiCallback = () => Promise<Web3NftTokenData>
