@@ -160,7 +160,7 @@ export class AlchemyNftsManager implements INftsManager {
     }
 
     async _updateCryptoPageMeta(nftItem:Web3NftTokenData, tokenUri:string | undefined){
-        if(nftItem.contentUrl || nftItem.contractAddress !== this._pageNftContractAddress || !tokenUri){
+        if(/*nftItem.contentUrl ||*/ nftItem.contractAddress !== this._pageNftContractAddress || !tokenUri){
             return
         }
 
@@ -171,8 +171,8 @@ export class AlchemyNftsManager implements INftsManager {
             })
         })
 
-        nftItem.contentUrl = normalizeUrl(meta?.contentUrl)
-        nftItem.name = meta?.name
+        nftItem.contentUrl = normalizeUrl(meta?.contentUrl) || nftItem.contentUrl
+        nftItem.name = meta?.name || nftItem.name || ''
         nftItem.attachments = meta?.attachments
         nftItem.description = meta?.description
         nftItem.attributes = meta?.attributes

@@ -146,6 +146,10 @@ describe('test nfts api endpoints', ()=>{
         expect(response.body.count).to.eq(5)
         expect(response.body.list).to.be.an('array')
         expect(response.body.list.length).to.eq(5)
+        
+        expect(axiosGetStub.callCount).to.eq(5)
+
+        console.log(response.body.list[1])
         expect(response.body.list[1]).to.contain(({
             name: mumbaiAlchemyAddressNftsResponse.ownedNfts[1].rawMetadata.name,
             symbol: mumbaiAlchemyAddressNftsResponse.ownedNfts[1].contract.symbol,
