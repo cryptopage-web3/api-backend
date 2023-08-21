@@ -149,7 +149,6 @@ describe('test nfts api endpoints', ()=>{
         
         expect(axiosGetStub.callCount).to.eq(5)
 
-        console.log(response.body.list[1])
         expect(response.body.list[1]).to.contain(({
             name: mumbaiAlchemyAddressNftsResponse.ownedNfts[1].rawMetadata.name,
             symbol: mumbaiAlchemyAddressNftsResponse.ownedNfts[1].contract.symbol,
@@ -560,7 +559,7 @@ describe('test nfts api endpoints', ()=>{
         expect(axiosGetStub.calledOnce).to.eq(true)
     })
 
-    it.skip('should return eth nfts token details', async ()=>{
+    it.skip('should return eth nfts transaction details', async ()=>{
         const web3Factory: Function = container.get(IDS.NODE_MODULES.web3Factory)
         const web3: TestWeb3Mock = web3Factory(ChainId.eth)
         const web3GetBlockStub:SinonStub = Sinon.stub(web3.eth, 'getBlock')
@@ -593,7 +592,7 @@ describe('test nfts api endpoints', ()=>{
         expect(saveBlockDetailsStub.callCount).to.eq(1)
     })
 
-    it('should return matic nft token details', async ()=>{
+    it('should return matic nft transaction details', async ()=>{
         const web3Factory: Function = container.get(IDS.NODE_MODULES.web3Factory)
         const web3: TestWeb3Mock = web3Factory(ChainId.matic)
         const web3GetBlockStub:SinonStub = Sinon.stub(web3.eth, 'getBlock')
@@ -626,7 +625,7 @@ describe('test nfts api endpoints', ()=>{
         expect(saveBlockDetailsStub.callCount).to.eq(1)
     })
 
-    it('should return mumbai nft token details', async () => {
+    it('should return mumbai nft transaction details', async () => {
         const getPluginContractMethodStub = Sinon.stub(),
             getPostContractAddressCall = Sinon.stub(),
             getCommentsContractAddressCall = Sinon.stub(),
@@ -703,7 +702,7 @@ describe('test nfts api endpoints', ()=>{
         })
     })
 
-    it.skip('should return bsc nft token details', async ()=>{
+    it.skip('should return bsc nft transaction details', async ()=>{
         const web3Factory: Function = container.get(IDS.NODE_MODULES.web3Factory)
         const web3: TestWeb3Mock = web3Factory(ChainId.bsc)
         const web3GetBlockStub:SinonStub = Sinon.stub(web3.eth, 'getBlock')
@@ -739,7 +738,7 @@ describe('test nfts api endpoints', ()=>{
         expect(saveBlockDetailsStub.callCount).to.eq(1)
     })
 
-    it.skip('should return goerli nfts token details', async ()=>{
+    it.skip('should return goerli nfts transaction details', async ()=>{
         const contractAddress = GoerliSocialSmartContract.cryptoPageNftContractAddress,
             tokenId = '64',
             blockNumber = 15300497
@@ -828,7 +827,7 @@ describe('test nfts api endpoints', ()=>{
         expect(saveBlockDetailsStub.callCount).to.eq(1)
     })
 
-    it.skip('should return error goerli nfts token details', async ()=>{
+    it.skip('should return error goerli nfts transaction details', async ()=>{
         process.env.PREVENT_LOG_ERRORS = 'yes'
 
         const contractAddress = '0x495f947276749ce646f68ac8c248420045cb7b5e',
@@ -921,4 +920,74 @@ describe('test nfts api endpoints', ()=>{
         expect(getBlockDetailsStub.callCount).to.eq(2)
         expect(saveBlockDetailsStub.callCount).to.eq(1)
     })
+
+    it('should return mumbai nft token details', async () => {
+        const getPluginContractMethodStub = Sinon.stub(),
+            getPostContractAddressCall = Sinon.stub(),
+            getCommentsContractAddressCall = Sinon.stub(),
+            readCommentsContractAddress = 'read_comments_address',
+            readPostAddress = 'read_post_address',
+            readCommentsMethod = Sinon.stub(),
+            readCommentsCall = Sinon.stub(),
+            readPostMethod = Sinon.stub(),
+            readPostCall = Sinon.stub()
+
+        testContainer.rebind(IDS.SERVICE.WEB3.ContractFactory).toFactory(context => testWeb3ContractFactory({
+            [MumbaiCommunity.communityContractAddress]:{
+                getPluginContract:{ method: getPluginContractMethodStub}
+            },
+            [readCommentsContractAddress]:{
+                read:{method:readCommentsMethod, call: readCommentsCall}
+            },
+            [readPostAddress]:{
+                read: {method: readPostMethod, call: readPostCall }
+            }
+        }))
+
+        const alchemy:TestAlchemyMock = testContainer.get<Function>(IDS.SERVICE.AlchemySdkFactory)(ChainId.mumbai)
+             
+        const getNftMetadata = Sinon.stub(alchemy.nft, 'getNftMetadata')
+            
+        const tokenMetaResponse = {data: {image: 'image_content_or_url', name: 'test token',description:'Crypto.Page NFT'}}
+
+        axiosGetStub.resolves(tokenMetaResponse)
+        getNftMetadata.resolves(mumbaiAlchemyNftMetadataResponse)
+        getPluginContractMethodStub
+            .withArgs(MumbaiCommunity.plugins.singleReadPost, 1).returns({call: getPostContractAddressCall})
+            .withArgs(MumbaiCommunity.plugins.singleReadAllComments, 1).returns({call: getCommentsContractAddressCall})
+        
+        getPostContractAddressCall.resolves(readPostAddress)
+        getCommentsContractAddressCall.resolves(readCommentsContractAddress)
+        readCommentsCall.onCall(0).resolves([]).onCall(1).throws('unexpeted call')
+        readPostCall.resolves({isEncrypted:true, payAmount: 10, paymentType: 1, minimalPeriod: 250 })
+        saveTokenStub.resolves()
+
+        const contractAddress = '0xc0fc66ba41bea0a1266c681bbc781014e7c67612',
+            tokenId = '80001000000000151'
+
+        const response = await testAgent
+            .get(`/nfts/token-details/mumbai/contract/${contractAddress}/token/${tokenId}`)
+            .expect('Content-Type',/json/)
+
+        expect(getNftMetadata.calledOnce).to.eq(true)
+        expect(getNftMetadata.getCall(0).args).deep.equal([contractAddress, tokenId])
+        expect(readCommentsCall.callCount).to.be.eq(1)
+        expect(readPostCall.callCount).to.be.eq(1)
+        expect(saveTokenStub.calledOnce).to.be.true
+        expect(getCacheTokenDetailsStub.calledOnce).to.be.true
+        expect(saveTokenStub.getCall(0).args[0]).contain({
+            minimalPeriod: 250
+        })
+
+        expect(response.body).contain({
+            tokenId,
+            contractAddress,
+            name: tokenMetaResponse.data.name,
+            description: tokenMetaResponse.data.description,
+            contentUrl: tokenMetaResponse.data.image,
+            isEncrypted: true,
+            minimalPeriod: 250,
+        })
+    })
+
 })

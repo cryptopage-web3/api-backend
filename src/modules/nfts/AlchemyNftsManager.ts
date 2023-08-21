@@ -111,28 +111,6 @@ export class AlchemyNftsManager implements INftsManager {
             from: data.from
         }
     }
-/*
-    getNftTransactionDetails(contractAddress: string, tokenId: string, blockNumber: number | null, tokenCategory?: AssetTransfersCategory) {
-        return this._nftCache.getNftTransactionDetails(
-            this._web3Manager,
-            this._chain,
-            contractAddress,
-            tokenId,
-            blockNumber,
-            ()=> this._getTokenData(contractAddress, tokenId)
-        )
-    }*/
-
-    /*getNftDetails(contractAddress: string, tokenId: string, tokenCategory?: AssetTransfersCategory) {
-        return this._nftCache.getNftTransactionDetails(
-            this._web3Manager,
-            this._chain,
-            contractAddress,
-            tokenId,
-            null,
-            ()=> this._getTokenData(contractAddress, tokenId)
-        )
-    }*/
 
     async getNftDetails(contractAddress: string, tokenId: string):Promise<Web3NftTokenData>{
         const alchemyResponse = await this._alchemy.nft.getNftMetadata(contractAddress, tokenId)

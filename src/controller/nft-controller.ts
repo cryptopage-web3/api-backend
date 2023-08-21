@@ -86,7 +86,14 @@ export class NftsController implements interfaces.Controller {
         @queryParam('category') category,
         @response() res: express.Response
     ){
-        const result = await this.getTokenData(chain, contractAddress, tokenId)
+        const web3manager = this._web3ManagerFactory(chain)
+
+        const [token, comments] = await Promise.all([
+            this.getTokenData(chain, contractAddress, tokenId),
+            web3manager.getComments(contractAddress, tokenId)
+        ])
+        
+        const result = Object.assign({}, token,{ comments })
 
         res.json(result)
     }
