@@ -130,6 +130,6 @@ export class NftsController implements interfaces.Controller {
         const dashboard = this._nftDasboardFactory(chain),
             tokens = await dashboard.getLastTokenIds(count)
 
-        res.json(tokens)
+        res.json({tokens})
     }
 }

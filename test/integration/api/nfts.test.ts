@@ -990,4 +990,37 @@ describe('test nfts api endpoints', ()=>{
         })
     })
 
+    it('should return last nft tokens dashboard', async() =>{
+        const totalSupplyMethodStub = Sinon.stub(),
+            totalSupplyCallStub = Sinon.stub()
+
+        testContainer.rebind(IDS.SERVICE.WEB3.ContractFactory).toFactory(context => testWeb3ContractFactory({
+            [MumbaiCommunity.cryptoPageNftContractAddress]:{
+                totalSupply:{
+                    method: totalSupplyMethodStub,
+                    call: totalSupplyCallStub
+                }
+                
+            }
+        }))
+
+        totalSupplyCallStub.resolves('15')
+
+        const response = await testAgent
+            .get(`/nfts/dashboard/mumbai?count=2`)
+            .expect('Content-Type',/json/)
+
+        expect(response.body.tokens).to.be.an('array')
+        expect(response.body.tokens.length).to.eq(2)
+        expect(response.body.tokens[0]).to.contain({
+            tokenId: '80001000000000015'
+        })
+        expect(response.body.tokens[1]).to.contain({
+            tokenId: '80001000000000014'
+        })
+
+        expect(totalSupplyCallStub.calledOnce).to.be.true
+        expect(totalSupplyMethodStub.calledOnce).to.be.true
+    })
+
 })

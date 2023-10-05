@@ -15,4 +15,4 @@ responses:
     MumbaiNftdashboard:
       summary: A sample of crypto page nft dashboard response
       value:
-        [{"tokenId": "80001000000000180"},{"tokenId": "80001000000000179"},{"tokenId": "80001000000000178"}]
+        {tokens:[{"tokenId": "80001000000000180"},{"tokenId": "80001000000000179"},{"tokenId": "80001000000000178"}]}
