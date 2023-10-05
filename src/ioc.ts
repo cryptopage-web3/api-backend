@@ -45,8 +45,9 @@ import { pageTokenMumbai } from "./modules/tokens/types";
 import { CoinGeckoApi } from "./services/coingecko/coingecko-api";
 import { CoingeckoPriceCache } from "./services/coingecko/price-cache";
 import { MumbaiCommunity } from "./services/web3/social-smart-contract/mumbai/mumbai-community";
-import { mumbaiCommunityAbi } from "./services/web3/social-smart-contract/mumbai/abi";
+import { mumbaiCommunityAbi, mumbaiNFTReadASProxyAbi } from "./services/web3/social-smart-contract/mumbai/abi";
 import { getChainIdFromAncestor, injectChainDecorator } from "./ioc-util";
+import { NftDashboard } from "./modules/nfts/NftDashboard";
 
 export const container = new Container();
 
@@ -123,6 +124,9 @@ container.bind(IDS.CONFIG.PageToken).toConstantValue(pageTokenMumbai).whenAnyAnc
 
 container.bind(IDS.CONFIG.PageNftContractAddress).toConstantValue(MumbaiCommunity.cryptoPageNftContractAddress).whenAnyAncestorNamed(ChainId.mumbai)
 container.bind(IDS.CONFIG.PageNftContractAddress).toConstantValue('stub').whenAnyAncestorNamed(ChainId.matic)
+
+container.bind(IDS.CONFIG.NftReadAsProxy.ContractAddress).toConstantValue(MumbaiCommunity.cryptoPageNftContractAddress).whenAnyAncestorNamed(ChainId.mumbai)
+container.bind(IDS.CONFIG.NftReadAsProxy.Abi).toConstantValue(mumbaiNFTReadASProxyAbi).whenAnyAncestorNamed(ChainId.mumbai)
 
 container.bind(IDS.CONFIG.COINGECKO_PRICE_CACHE_TTL_IN_SECONDS).toConstantValue(envToInt('COINGECKO_PRICE_CACHE_TTL_IN_SECONDS', 300))
 
@@ -267,6 +271,12 @@ container.bind(IDS.MODULES.TokenManager)
     .whenTargetNamed(ChainId.goerli)
 container.bind(IDS.MODULES.TokenManagerFactory)
     .toAutoNamedFactory(IDS.MODULES.TokenManager)
+
+container.bind(IDS.MODULES.NftDashboard).to(NftDashboard)
+container.bind(IDS.MODULES.NftDashboardFactory)
+    .toAutoNamedFactory(IDS.MODULES.NftDashboard)
+
+
 
 container.bind(IDS.ORM.REPO.ContractDetailsRepo).to(ContractDetailsRepo)
 container.bind(IDS.ORM.REPO.NftTokenDetailsRepo).to(NftTokenDetailsRepo)

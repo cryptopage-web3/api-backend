@@ -8,6 +8,8 @@ import { inject } from "inversify";
 import { IDS } from '../types/index';
 import { NftCache } from "../modules/nfts/NftCache";
 import { IWeb3Manager } from "../services/web3/types";
+import { NftDashboard } from "../modules/nfts/NftDashboard";
+import { buildNftDashboardValidator } from "./validator/nft-dashboard-validator";
 
 const chainValidator = [ChainId.mumbai, ChainId.matic].join('|')
 
@@ -17,6 +19,7 @@ export class NftsController implements interfaces.Controller {
     @inject(IDS.SERVICE.WEB3.Web3ManagerFactory) private _web3ManagerFactory: (named:string) => IWeb3Manager
     @inject(IDS.CONFIG.EnableNftCache) _isNftCacheEnabled: boolean
     @inject(IDS.MODULES.NftCache) _nftCache: NftCache
+    @inject(IDS.MODULES.NftDashboardFactory) private _nftDasboardFactory: (named: string) => NftDashboard
 
     @httpGet(`/:chain(${chainValidator})/:address`, ...paginationValidator())
     @errorHandler()
@@ -115,5 +118,18 @@ export class NftsController implements interfaces.Controller {
         }
 
         return token
+    }
+
+    @httpGet(`/dashboard/:chain(${chainValidator})`, ...buildNftDashboardValidator())
+    @errorHandler()
+    async dashboard(
+        @requestParam('chain') chain: ChainId,
+        @queryParam('count') count: number = 10,
+        @response() res: express.Response
+    ){
+        const dashboard = this._nftDasboardFactory(chain),
+            tokens = await dashboard.getLastTokenIds(count)
+
+        res.json(tokens)
     }
 }

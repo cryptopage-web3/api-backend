@@ -7,7 +7,12 @@ export const IDS = {
         EnableNftCache: Symbol('EnableNftCache'),
         PageToken: Symbol('PageToken'),
         COINGECKO_PRICE_CACHE_TTL_IN_SECONDS: Symbol('COINGECKO_PRICE_CACHE_TTL_IN_SECONDS'),
-        PageNftContractAddress: Symbol('PageNftContractAddress')
+        PageNftContractAddress: Symbol('PageNftContractAddress'),
+        NftReadAsProxy:{
+            ContractAddress: Symbol('NftReadAsProxyContractAddress'),
+            Abi: Symbol('NftReadAsProxyAbi')
+        }
+
     },
     UTIL:{
         Logger:Symbol('logger')
@@ -23,6 +28,8 @@ export const IDS = {
         NftCache: Symbol('NftsCache'),
         TokenManager: Symbol('TokenManager'),
         TokenManagerFactory: Symbol('TokenManagerFactory'),
+        NftDashboard: Symbol('NftDasboard'),
+        NftDashboardFactory: Symbol('NftDasboardFactory'),
     },
     SERVICE:{
         EtherscanApi: Symbol('EtherscanApi'),
@@ -40,12 +47,11 @@ export const IDS = {
             Web3ManagerFactory: Symbol('Web3ManagerFactory'),
             CommunityWeb3SmartContract: Symbol('CommunityWeb3SmartContract'),
             ContractFactory: Symbol('Web3ContractFactory'),
-            Web3Util: Symbol('Web3Util')
+            Web3Util: Symbol('Web3Util'),
         },
         CryptoPageCommunity: Symbol('CryptoPageCommunity'),
         CoingeckoApi: Symbol('CoingeckoApi'),
         CoingeckoPriceCache: Symbol('CoingeckoPriceCache'),
-
     },
     NODE_MODULES:{
         axios: Symbol('axios'),
