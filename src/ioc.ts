@@ -48,6 +48,7 @@ import { MumbaiCommunity } from "./services/web3/social-smart-contract/mumbai/mu
 import { mumbaiCommunityAbi, mumbaiNFTReadASProxyAbi } from "./services/web3/social-smart-contract/mumbai/abi";
 import { getChainIdFromAncestor, injectChainDecorator } from "./ioc-util";
 import { NftDashboard } from "./modules/nfts/NftDashboard";
+import { PostStatisticRepo } from "./orm/repo/post-statistic-repo";
 
 export const container = new Container();
 
@@ -282,3 +283,4 @@ container.bind(IDS.ORM.REPO.ContractDetailsRepo).to(ContractDetailsRepo)
 container.bind(IDS.ORM.REPO.NftTokenDetailsRepo).to(NftTokenDetailsRepo)
 container.bind(IDS.ORM.REPO.ErrorLogRepo).to(ErrorLogRepo)
 container.bind(IDS.ORM.REPO.BlockDetailsRepo).to(BlockDetailsRepo)
+container.bind(IDS.ORM.REPO.PostStatisticRepo).to(PostStatisticRepo)

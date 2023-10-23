@@ -15,5 +15,8 @@ PostStatistic.init({
     postId: DataTypes.STRING(18),
     totalCommentsCount: DataTypes.INTEGER
 },{
-    sequelize: db
+    sequelize: db,
+    indexes:[
+        {unique: false, fields:['chain','totalCommentsCount']},
+      ]
 })

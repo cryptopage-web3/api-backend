@@ -1,25 +1,17 @@
 import { inject, injectable } from "inversify";
+import { PostStatisticRepo } from "../../orm/repo/post-statistic-repo";
 import { IDS } from "../../types";
 
 @injectable()
 export class NftDashboard {
-    @inject(IDS.SERVICE.WEB3.ContractFactory) _contractFactory: Function
-    @inject(IDS.CONFIG.NftReadAsProxy.ContractAddress) _constractAddress:string
-    @inject(IDS.CONFIG.NftReadAsProxy.Abi) _abi
+    @inject(IDS.ORM.REPO.PostStatisticRepo) _repo: PostStatisticRepo
 
-    async getLastTokenIds(count: number){
-        const contract = this._contractFactory(this._abi, this._constractAddress),
-            totalSupplyStr = await contract.methods.totalSupply().call(),
-            totalSupply = parseInt(totalSupplyStr),
-            end = totalSupply >= count ? totalSupply - count : 0
+    async getTokensDasboard(chain, pageNumber: number, pageSize:number){
+        const items = await this._repo.getDashboard(chain, pageNumber, pageSize)
 
-        const tokens:any[] = []
-
-        for(let id = totalSupply; id > end; id--){
-            const idStr = `80001${id.toString().padStart(12,'0')}`
-            tokens.push({tokenId: idStr} as any)
-        }
-
-        return tokens
+        return items.map( i =>({
+            tokenId: i.postId,
+            commentsCount: i.totalCommentsCount
+        }));
     }
 }

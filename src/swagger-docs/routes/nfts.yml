@@ -199,12 +199,8 @@ paths:
             enum: [mumbai]
             default: mumbai
           description: chain name
-        - in: query
-          name: count
-          schema:
-            type: number
-            required: false
-            default: 10
+        - $ref: '#/parameters/pagination/page'
+        - $ref: '#/parameters/pagination/pageSize'
       responses:
         "200":
           description: OK

@@ -28,7 +28,8 @@ parameters:
       schema:
         type: integer
         minimum: 1
-      description: Items per pege (min=1)
+        default: 10
+      description: Items per page (min=1)
     pageKey:
       in: query
       name: continue[pageKey]

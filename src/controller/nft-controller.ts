@@ -124,11 +124,12 @@ export class NftsController implements interfaces.Controller {
     @errorHandler()
     async dashboard(
         @requestParam('chain') chain: ChainId,
-        @queryParam('count') count: number = 10,
+        @queryParam('page') page: number = 1,
+        @queryParam('pageSize') pageSize: number = 10,
         @response() res: express.Response
     ){
         const dashboard = this._nftDasboardFactory(chain),
-            tokens = await dashboard.getLastTokenIds(count)
+            tokens = await dashboard.getTokensDasboard(chain, page, pageSize)
 
         res.json({tokens})
     }
