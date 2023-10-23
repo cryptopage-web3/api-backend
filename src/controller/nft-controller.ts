@@ -120,7 +120,7 @@ export class NftsController implements interfaces.Controller {
         return token
     }
 
-    @httpGet(`/dashboard/:chain(${chainValidator})`, ...buildNftDashboardValidator())
+    @httpGet(`/dashboard/:chain(${chainValidator})`, ...paginationValidator())
     @errorHandler()
     async dashboard(
         @requestParam('chain') chain: ChainId,
