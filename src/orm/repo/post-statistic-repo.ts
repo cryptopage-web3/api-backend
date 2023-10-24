@@ -3,7 +3,7 @@ import { PostStatistic } from "../model/post-statistic";
 
 @injectable()
 export class PostStatisticRepo {
-    getDashboard(chain, pageNumber, pageSize){
+    async getDashboard(chain, pageNumber, pageSize){
         return PostStatistic.findAll({
             where:{ chain}, 
             limit: pageSize, 

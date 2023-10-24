@@ -18,6 +18,7 @@ import { BlockDetails } from '../../../src/orm/model/block-details';
 import { Application } from 'express';
 import { MumbaiCommunity } from '../../../src/services/web3/social-smart-contract/mumbai/mumbai-community';
 import { NftTxType } from '../../../src/modules/nfts/types';
+import { PostStatisticRepo } from '../../../src/orm/repo/post-statistic-repo';
 
 let app: Application
 let testAgent: SuperAgentTest
@@ -991,36 +992,36 @@ describe('test nfts api endpoints', ()=>{
     })
 
     it('should return last nft tokens dashboard', async() =>{
-        const totalSupplyMethodStub = Sinon.stub(),
-            totalSupplyCallStub = Sinon.stub()
+        const repo = container.get<PostStatisticRepo>(IDS.ORM.REPO.PostStatisticRepo),
+            getDashboardStub = Sinon.stub(repo, 'getDashboard')
 
-        testContainer.rebind(IDS.SERVICE.WEB3.ContractFactory).toFactory(context => testWeb3ContractFactory({
-            [MumbaiCommunity.cryptoPageNftContractAddress]:{
-                totalSupply:{
-                    method: totalSupplyMethodStub,
-                    call: totalSupplyCallStub
-                }
-                
-            }
-        }))
-
-        totalSupplyCallStub.resolves('15')
+        getDashboardStub.returns([{
+            postId: '80001000000000015',
+            totalCommentsCount: 3
+        },{
+            postId: '80001000000000016',
+            totalCommentsCount: 6
+        }] as any)
 
         const response = await testAgent
-            .get(`/nfts/dashboard/mumbai?count=2`)
+            .get(`/nfts/dashboard/mumbai?page=2&pageSize=3`)
             .expect('Content-Type',/json/)
 
         expect(response.body.tokens).to.be.an('array')
         expect(response.body.tokens.length).to.eq(2)
         expect(response.body.tokens[0]).to.contain({
-            tokenId: '80001000000000015'
+            tokenId: '80001000000000015',
+            commentsCount: 3
         })
         expect(response.body.tokens[1]).to.contain({
-            tokenId: '80001000000000014'
+            tokenId: '80001000000000016',
+            commentsCount: 6
         })
 
-        expect(totalSupplyCallStub.calledOnce).to.be.true
-        expect(totalSupplyMethodStub.calledOnce).to.be.true
+        expect(getDashboardStub.calledOnce).to.be.true
+        expect(getDashboardStub.getCall(0).args[0]).to.be.eq('mumbai')
+        expect(getDashboardStub.getCall(0).args[1]).to.be.eq(2)
+        expect(getDashboardStub.getCall(0).args[2]).to.be.eq(3)
     })
 
 })
