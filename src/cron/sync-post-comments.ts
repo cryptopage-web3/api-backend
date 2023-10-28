@@ -47,7 +47,7 @@ async function getBlockRange(lastSynced:PostSyncedBlock | null){
     const map = new Map<string,PostStatistic>()
 
     for (let i = 0; i < comments.length; i++ ) {
-        const commentedPostId = (comments[i] as any).args[1];
+        const commentedPostId = (comments[i] as any).args[1].toString();
         const blockNumber = comments[i].blockNumber;
         
         let cachedStat = map.get(commentedPostId)

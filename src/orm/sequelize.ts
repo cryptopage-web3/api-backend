@@ -11,7 +11,7 @@ export const db = new sequelize.Sequelize(
         connectTimeout: 60000,
         pool: {
             min: 1,
-            max: 10,
+            max: 100,
             acquire: 30000,
             idle: 20000,
         },
