@@ -37,6 +37,7 @@ async function getBlockRange(lastSynced:PostSyncedBlock | null){
 }
 
 (async function main(){
+    console.log('started:', new Date())
     const lastSyncedBlock = await PostSyncedBlock.findOne({where:{ chain }}),
         [fromBlock, toBlock] = await getBlockRange(lastSyncedBlock),
         filter = contract.filters.WriteComment(),
