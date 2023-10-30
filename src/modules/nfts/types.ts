@@ -66,6 +66,7 @@ export interface Web3NftTokenData {
     description: string
     tokenId: string
     contractAddress: string
+    creator?: string
     attributes: any[]
     attachments?: any[]
     isEncrypted?: boolean

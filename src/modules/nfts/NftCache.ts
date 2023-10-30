@@ -52,6 +52,7 @@ export class NftCache {
             tokenId: token.tokenId,
             chain,
             contractAddress: token.contractAddress,
+            creator: token.creator,
             contentUrl: token.contentUrl,
             name: token.name,
             description: token.description,
