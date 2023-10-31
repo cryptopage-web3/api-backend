@@ -17,4 +17,6 @@ safeStart(async()=>{
     const removed = await repo.removeOldRecords(ttl)
 
     console.log(`Removed ${removed} NftTokenDetails cache rows`)
+
+    process.exit(0)
 })

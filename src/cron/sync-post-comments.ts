@@ -24,6 +24,9 @@ const ethersProvider = new ethers.JsonRpcProvider(alchemyUrl);
 const signer = new ethers.Wallet(privateKey, ethersProvider);
 const contract = new ethers.Contract(contractAddress, abi, signer);
 
+const skipLtTokens = {
+    [ChainId.mumbai]: 155
+}
 
 async function getBlockRange(lastSynced:PostSyncedBlock | null){
     const lastSyncedBlockNumber = lastSynced?.blockNumber,
@@ -34,6 +37,17 @@ async function getBlockRange(lastSynced:PostSyncedBlock | null){
     }
 
     return [lastSyncedBlockNumber, lastBlockNumberInBlockchain]
+}
+
+function canSkip(tokenId:string){
+    if(!skipLtTokens[chain]){
+        return false
+    }
+
+    const tId = tokenId.substring(5),
+        intTid = parseInt(tId)
+
+    return intTid <= skipLtTokens[chain]
 }
 
 (async function main(){
@@ -49,7 +63,11 @@ async function getBlockRange(lastSynced:PostSyncedBlock | null){
 
     for (let i = 0; i < comments.length; i++ ) {
         const commentedPostId = (comments[i] as any).args[1].toString();
-        const blockNumber = comments[i].blockNumber;
+        
+        if(canSkip(commentedPostId)){
+            console.log('skipped', commentedPostId)
+            continue
+        }
         
         let cachedStat = map.get(commentedPostId)
 
@@ -61,6 +79,7 @@ async function getBlockRange(lastSynced:PostSyncedBlock | null){
         if(cachedStat){
             cachedStat.totalCommentsCount += 1
             await cachedStat.save()
+            console.log(commentedPostId,'updated from cache')
             continue
         }
 
@@ -69,6 +88,8 @@ async function getBlockRange(lastSynced:PostSyncedBlock | null){
             postId: commentedPostId,
             totalCommentsCount: 1,
         })
+
+        console.log(commentedPostId,'inserted new row')
 
         map.set(commentedPostId, cachedStat)
     }
