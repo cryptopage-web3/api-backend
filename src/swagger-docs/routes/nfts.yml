@@ -185,3 +185,29 @@ paths:
                   $ref: '#/responses/examples/MumbaiNftDetailsExample'
         "429":
           $ref: '#/responses/RateLimit'
+
+  /nfts/dashboard/{chain}:
+    get:
+      summary: Nft tokens dashboard.
+      tags: [NFT]
+      parameters:
+        - in: path
+          name: chain
+          required: true
+          schema:
+            type: string
+            enum: [mumbai]
+            default: mumbai
+          description: chain name
+        - $ref: '#/parameters/pagination/page'
+        - $ref: '#/parameters/pagination/pageSize'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                MumbaiNftdashboard:
+                  $ref: '#/responses/examples/MumbaiNftdashboard'
+        "429":
+          $ref: '#/responses/RateLimit'

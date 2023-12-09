@@ -45,9 +45,11 @@ import { pageTokenMumbai } from "./modules/tokens/types";
 import { CoinGeckoApi } from "./services/coingecko/coingecko-api";
 import { CoingeckoPriceCache } from "./services/coingecko/price-cache";
 import { MumbaiCommunity } from "./services/web3/social-smart-contract/mumbai/mumbai-community";
-import { mumbaiCommunityAbi } from "./services/web3/social-smart-contract/mumbai/abi";
+import { mumbaiCommunityAbi, mumbaiNFTReadASProxyAbi } from "./services/web3/social-smart-contract/mumbai/abi";
 import { getChainIdFromAncestor, injectChainDecorator } from "./ioc-util";
 import { FrontErrorsRepo } from "./orm/repo/front-error-repo";
+import { NftDashboard } from "./modules/nfts/NftDashboard";
+import { PostStatisticRepo } from "./orm/repo/post-statistic-repo";
 
 export const container = new Container();
 
@@ -71,10 +73,15 @@ container.bind(IDS.NODE_MODULES.web3).toDynamicValue(context => {
 container.bind(IDS.SERVICE.WEB3.Web3Manager)
     .to(EthWeb3Manager)
     .when(request =>{
-        const chain = getChainIdFromAncestor(request),
-            allowedChains = [ChainId.matic, ChainId.mumbai];
+        const chain = getChainIdFromAncestor(request) || request.target.getNamedTag()?.value,
+            allowedChains:string[] = [ChainId.matic, ChainId.mumbai];
 
         return !!chain && allowedChains.indexOf(chain) !== -1;
+    })
+
+container.bind(IDS.SERVICE.WEB3.Web3ManagerFactory)
+    .toFactory(context => (chain:ChainId) =>{ 
+        return container.getNamed(IDS.SERVICE.WEB3.Web3Manager, chain)
     })
 
 container.onActivation(IDS.SERVICE.WEB3.Web3Manager, injectChainDecorator)
@@ -116,6 +123,13 @@ container.bind(IDS.CONFIG.EnableNftCache).toConstantValue(envToBool('ENABLE_NFT_
 
 container.bind(IDS.CONFIG.PageToken).toConstantValue(pageTokenMumbai).whenAnyAncestorNamed(ChainId.mumbai)
 container.bind(IDS.CONFIG.PageToken).toConstantValue(pageTokenMumbai).whenAnyAncestorNamed(ChainId.matic)
+
+container.bind(IDS.CONFIG.PageNftContractAddress).toConstantValue(MumbaiCommunity.cryptoPageNftContractAddress).whenAnyAncestorNamed(ChainId.mumbai)
+container.bind(IDS.CONFIG.PageNftContractAddress).toConstantValue('stub').whenAnyAncestorNamed(ChainId.matic)
+
+container.bind(IDS.CONFIG.NftReadAsProxy.ContractAddress).toConstantValue(MumbaiCommunity.cryptoPageNftContractAddress).whenAnyAncestorNamed(ChainId.mumbai)
+container.bind(IDS.CONFIG.NftReadAsProxy.Abi).toConstantValue(mumbaiNFTReadASProxyAbi).whenAnyAncestorNamed(ChainId.mumbai)
+
 container.bind(IDS.CONFIG.COINGECKO_PRICE_CACHE_TTL_IN_SECONDS).toConstantValue(envToInt('COINGECKO_PRICE_CACHE_TTL_IN_SECONDS', 300))
 
 container.bind(IDS.CACHE.PriceCache).to(PriceCache)
@@ -148,8 +162,8 @@ container.bind(IDS.SERVICE.CryptoPageCommunity)
 container.bind(IDS.SERVICE.CryptoPageCommunity)
     .to(DefaultSocialSmartContract)
     .whenAnyAncestorMatches(request =>{
-        const excludeChains = [ChainId.goerli, ChainId.mumbai],
-            chainId = getChainIdFromAncestor(request)
+        const excludeChains:string[] = [ChainId.goerli, ChainId.mumbai],
+            chainId = getChainIdFromAncestor(request) || request.target.getNamedTag()?.value
 
         if(!chainId){
             return false
@@ -260,8 +274,16 @@ container.bind(IDS.MODULES.TokenManager)
 container.bind(IDS.MODULES.TokenManagerFactory)
     .toAutoNamedFactory(IDS.MODULES.TokenManager)
 
+container.bind(IDS.MODULES.NftDashboard).to(NftDashboard)
+container.bind(IDS.MODULES.NftDashboardFactory)
+    .toAutoNamedFactory(IDS.MODULES.NftDashboard)
+
+
+
 container.bind(IDS.ORM.REPO.ContractDetailsRepo).to(ContractDetailsRepo)
 container.bind(IDS.ORM.REPO.NftTokenDetailsRepo).to(NftTokenDetailsRepo)
 container.bind(IDS.ORM.REPO.ErrorLogRepo).to(ErrorLogRepo)
 container.bind(IDS.ORM.REPO.BlockDetailsRepo).to(BlockDetailsRepo)
 container.bind(IDS.ORM.REPO.FrontErrorsRepo).to(FrontErrorsRepo)
+container.bind(IDS.ORM.REPO.BlockDetailsRepo).to(BlockDetailsRepo)
+container.bind(IDS.ORM.REPO.PostStatisticRepo).to(PostStatisticRepo).inSingletonScope()

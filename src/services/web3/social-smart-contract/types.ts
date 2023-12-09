@@ -16,9 +16,8 @@ export interface ISocialComment {
 
 export interface IBaseSocialPost {
     isEncrypted: boolean
-    payAmount: string | number
-    paymentType: string
-    accessDuration: string | number
+    payAmount: string
+    paymentType: number
 }
 
 export interface ISocialPost extends IBaseSocialPost {

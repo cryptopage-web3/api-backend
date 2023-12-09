@@ -1,7 +1,7 @@
 import { Alchemy, AssetTransfersCategory, AssetTransfersOrder, AssetTransfersWithMetadataResult, OwnedNft } from 'alchemy-sdk';
 import BigNumber from 'bignumber.js';
 import { inject, injectable } from 'inversify';
-import { ICommunity } from '../../services/web3/social-smart-contract/types';
+import { ICommunity, ISocialComment } from '../../services/web3/social-smart-contract/types';
 import { IWeb3Manager } from '../../services/web3/types';
 import { IDS } from '../../types';
 import { IToken } from '../tokens/types';
@@ -10,17 +10,17 @@ import { NftCache } from './NftCache';
 import { INftsList, INftsManager, INftTransaction, INftPagination, NftTxType, Web3NftTokenData, INftItem } from './types';
 import { Web3Util } from '../../services/web3/web3-util';
 import { normalizeUrl } from '../../util/url-util';
+import { ErrorLogRepo } from '../../orm/repo/error-log-repo';
 
 @injectable()
 export class AlchemyNftsManager implements INftsManager {
     _chain: ChainId;
 
     @inject(IDS.SERVICE.AlchemySdk) _alchemy:Alchemy
-    @inject(IDS.SERVICE.WEB3.Web3Manager) private _web3Manager: IWeb3Manager
-    @inject(IDS.MODULES.NftCache) _nftCache: NftCache
     @inject(IDS.SERVICE.CryptoPageCommunity) _community: ICommunity
-    @inject(IDS.CONFIG.PageToken) _pageToken: IToken
     @inject(IDS.SERVICE.WEB3.Web3Util) _web3Util: Web3Util
+    @inject(IDS.ORM.REPO.ErrorLogRepo) _errorRepo: ErrorLogRepo
+    @inject(IDS.CONFIG.PageNftContractAddress) _pageNftContractAddress: string
 
     async getWalletAllNFTs(address: string, opts: INftPagination): Promise<INftsList> {
         const addressNfts = await this._alchemy.nft.getNftsForOwner(address, {
@@ -40,23 +40,28 @@ export class AlchemyNftsManager implements INftsManager {
     }
 
     async buildNftData(data:OwnedNft):Promise<INftItem> {
-        const tokenId = data.tokenId ? BigNumber(data.tokenId).toString() : '',
-            comments = await this._community.getComments(data.contract.address, tokenId).catch(err => [])
+        const tokenId = data.tokenId ? BigNumber(data.tokenId).toString() : ''
 
-        return {
+        const nftItem = {
             name: data.title,
             symbol: data.contract.symbol,
             description: data.description,
-            contract_address: data.contract.address,
+            contractAddress: data.contract.address,
             tokenId: data.tokenId,
             collectionName: data.contract?.name,
             contentUrl: normalizeUrl(data.media?.[0]?.raw || data.media?.[0]?.gateway),
             attributes: data.rawMetadata?.attributes as any[],
-            likes: 0,
-            dislikes: 0,
-            comments,
             date: data.timeLastUpdated,
+            comments: [] as ISocialComment[]
         }
+
+        const [comments, post] = await Promise.all([
+            await this._community.getComments(data.contract.address, tokenId).catch(err => []),
+            await this._community.readPostForContract(data.contract.address, tokenId),
+            this._updateCryptoPageMeta(nftItem, data.tokenUri?.raw).catch(err => null)
+        ])
+
+        return Object.assign({}, nftItem, {comments}, post)
     }
 
     async getWalletNFTTransactions(address: string, opts: INftPagination) {
@@ -99,7 +104,7 @@ export class AlchemyNftsManager implements INftsManager {
             type: NftTxType.baseInfo,
             txHash: data.hash,
             blockNumber: parseInt(data.blockNum),
-            contract_address: contractAddress,
+            contractAddress: contractAddress,
             category: data.category,
             tokenId,
             to: data.to || '',
@@ -107,54 +112,47 @@ export class AlchemyNftsManager implements INftsManager {
         }
     }
 
-    getNftTransactionDetails(contractAddress: string, tokenId: string, blockNumber: number | null, tokenCategory?: AssetTransfersCategory) {
-        return this._nftCache.getNftTransactionDetails(
-            this._web3Manager,
-            this._chain,
-            contractAddress,
-            tokenId,
-            blockNumber,
-            ()=> this._getTokenData(contractAddress, tokenId)
-        )
-    }
-
-    getNftDetails(contractAddress: string, tokenId: string, tokenCategory?: AssetTransfersCategory) {
-        return this._nftCache.getNftTransactionDetails(
-            this._web3Manager,
-            this._chain,
-            contractAddress,
-            tokenId,
-            null,
-            ()=> this._getTokenData(contractAddress, tokenId)
-        )
-    }
-
-    async _getTokenData(contractAddress: string, tokenId: string):Promise<Web3NftTokenData>{
+    async getNftDetails(contractAddress: string, tokenId: string):Promise<Web3NftTokenData>{
         const alchemyResponse = await this._alchemy.nft.getNftMetadata(contractAddress, tokenId)
 
         const nftItem = {
             tokenId,
             contractAddress,
             contentUrl: normalizeUrl(alchemyResponse.media?.[0]?.raw || alchemyResponse.media?.[0]?.gateway),
-            name: alchemyResponse.title || alchemyResponse.contract.symbol || '',
-            description: alchemyResponse.description || alchemyResponse.contract.name || '',
+            name: alchemyResponse.title || '',
+            description: alchemyResponse.description || '',
             attributes: alchemyResponse.rawMetadata?.attributes || [],
+            attachments: undefined
         }
 
-        if(!nftItem.contentUrl && alchemyResponse.tokenUri?.raw && contractAddress == this._pageToken.address){
-            const [meta, post] = await Promise.all([
-                this._web3Util.loadTokenMetadata(alchemyResponse.tokenUri?.raw),
-                this._community.readPostForContract(contractAddress, tokenId)
+        if(/*!nftItem.contentUrl && alchemyResponse.tokenUri?.raw &&*/ contractAddress.toLowerCase() == this._pageNftContractAddress){
+            const [post] = await Promise.all([
+                this._community.readPostForContract(contractAddress, tokenId),
+                this._updateCryptoPageMeta(nftItem, alchemyResponse.tokenUri?.raw)
             ])
-            nftItem.contentUrl = normalizeUrl(meta?.contentUrl)
-            nftItem.description = meta?.description
-            const {
-                isEncrypted,payAmount,accessDuration, commentCount, upCount, downCount
-            } = post
 
-            return Object.assign({}, nftItem, {isEncrypted,payAmount,accessDuration, commentCount, upCount, downCount}) as Web3NftTokenData
+            return Object.assign({}, nftItem, post)
         }
 
         return nftItem
+    }
+
+    async _updateCryptoPageMeta(nftItem:Web3NftTokenData, tokenUri:string | undefined){
+        if(/*nftItem.contentUrl ||*/ nftItem.contractAddress !== this._pageNftContractAddress || !tokenUri){
+            return
+        }
+
+        const meta = await this._web3Util.loadTokenMetadata(tokenUri).catch(err =>{
+            this._errorRepo.log('load_crypto_page_meta', err.message, {
+                tokenId: nftItem.tokenId,
+                tokenUri
+            })
+        })
+
+        nftItem.contentUrl = normalizeUrl(meta?.contentUrl) || nftItem.contentUrl
+        nftItem.name = meta?.name || nftItem.name || ''
+        nftItem.attachments = meta?.attachments
+        nftItem.description = meta?.description
+        nftItem.attributes = meta?.attributes
     }
 }

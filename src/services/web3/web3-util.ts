@@ -25,13 +25,9 @@ export class Web3Util {
                 
                 return Promise.reject(err)
             });
-            return {
+            return Object.assign ({},{
                 contentUrl: data.image || data.animation_url,
-                //type: data.image ? 'image' : '721',
-                name: data.name,
-                description: data.description,
-                attributes: data.attributes || []
-            }
+            }, data)
         }
 
         return null

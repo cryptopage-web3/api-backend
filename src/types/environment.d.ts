@@ -44,6 +44,8 @@ export interface Env {
     COINGECKO_TOKEN_IDS_PATH: string | undefined
     COINGECKO_PRICE_CACHE_TTL_IN_SECONDS: string | undefined
     ALLOWED_FRONT_ERROR_REFFERER: string
+
+    COMMENTS_SYNC_PRIVATE_KEY: string
 }
 
 export type EnvVarName = keyof Env

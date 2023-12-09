@@ -37,7 +37,7 @@ export class GoerliNFTsManager implements INftsManager {
             name: data.title,
             symbol: data.contract.symbol,
             description: data.description,
-            contract_address: data.contract.address,
+            contractAddress: data.contract.address,
             tokenId: data.tokenId,
             collectionName: data.contract?.name,
             contentUrl: data.media[0]?.gateway,
@@ -83,14 +83,14 @@ export class GoerliNFTsManager implements INftsManager {
             type: NftTxType.baseInfo,
             txHash: data.hash,
             blockNumber: parseInt(data.blockNum, 16),
-            contract_address: data.rawContract.address as string,
+            contractAddress: data.rawContract.address as string,
             tokenId: parseInt(tokenId as string, 16).toString(),
             to: data.to as string,
             from: data.from,
             comments
         }
     }
-
+/*
     getNftTransactionDetails(contractAddress: string, tokenId: string, blockNumber: number) {
         return this._nftCache.getNftTransactionDetails(
             this._web3Manager,
@@ -100,8 +100,8 @@ export class GoerliNFTsManager implements INftsManager {
             blockNumber,
             ()=> this._getTokenData(contractAddress, tokenId)
         )
-    }
-
+    }*/
+/*
     getNftDetails(contractAddress: string, tokenId: string) {
         return this._nftCache.getNftTransactionDetails(
             this._web3Manager,
@@ -111,16 +111,16 @@ export class GoerliNFTsManager implements INftsManager {
             null,
             ()=> this._getTokenData(contractAddress, tokenId)
         )
-    }
+    }*/
 
-    async _getTokenData(contractAddress: string, tokenId: string){
+    async getNftDetails(contractAddress: string, tokenId: string){
         const [tokenData, postInfo] = await Promise.all([
             this._web3Manager.getTokenData(contractAddress, tokenId),
             this._socialSmartContract.readPostForContract(contractAddress, tokenId)
         ])
 
-        const {isEncrypted,payAmount,accessDuration} = postInfo
+        const {isEncrypted,payAmount} = postInfo
 
-        return Object.assign({}, tokenData,{isEncrypted, payAmount, accessDuration})
+        return Object.assign({}, tokenData,{isEncrypted, payAmount})
     }
 }

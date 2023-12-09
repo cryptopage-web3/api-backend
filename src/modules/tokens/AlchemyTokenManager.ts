@@ -72,6 +72,6 @@ export class AlchemyTokenManager implements ITokenManager {
     }
 
     _hasPageToken(balances:IToken[]){
-        return balances.find(t => t.address == this._pageToken.address) !== undefined
+        return balances.find(t => t.address.toLowerCase() == this._pageToken.address) !== undefined
     }
 }

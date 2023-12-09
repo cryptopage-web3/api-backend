@@ -9,9 +9,6 @@ import { NftCache } from './NftCache';
 
 @injectable()
 export class UnmarshalNftsManager implements INftsManager {
-    @inject(IDS.SERVICE.WEB3.Web3Manager) private _web3Manager: IWeb3Manager
-
-    @inject(IDS.MODULES.NftCache) _nftCache: NftCache
     _unmarshalApi: UnmarshalApi
     _chain: ChainId
     
@@ -39,13 +36,13 @@ export class UnmarshalNftsManager implements INftsManager {
             type: NftTxType.baseInfo,
             txHash: data.transaction_hash,
             blockNumber: data.block_number,
-            contract_address: data.contract_address,
+            contractAddress: data.contract_address,
             tokenId: data.token_id,
             to: data.to,
             from: data.sender,
         }
     }
-
+/*
     async getNftTransactionDetails(contractAddress: string, tokenId: string, blockNumber:number) {
         return this._nftCache.getNftTransactionDetails(
             this._web3Manager,
@@ -55,9 +52,9 @@ export class UnmarshalNftsManager implements INftsManager {
             blockNumber,
             () => this._unmarshalApi.getNFTDetailsFromApi(contractAddress, tokenId)
         )
-    }
+    }*/
 
     async getNftDetails(contractAddress: string, tokenId: string) {
-        throw new ApiError('Method not implemented')
+        return this._unmarshalApi.getNFTDetailsFromApi(contractAddress, tokenId)
     }
 }

@@ -119,7 +119,7 @@ sleep 5
 
 echo sleep 5 sec
 
-http_response=$(curl -s -w "%{http_code}" -o /dev/null  --connect-timeout 1  "http://127.0.0.1:$run_port")
+http_response=$(curl -s -w "%{http_code}" -o /dev/null  --connect-timeout 10  "http://127.0.0.1:$run_port")
 
 echo "port $run_port response: $http_response"
 

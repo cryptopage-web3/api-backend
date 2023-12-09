@@ -1,14 +1,13 @@
 import { ChainId } from '../transactions/types';
 import { ISocialComment } from '../../services/web3/social-smart-contract/types';
-import { AssetTransfersCategory } from 'alchemy-sdk';
 
 export interface INftsManager {
     _chain: ChainId
     
     getWalletAllNFTs(address: string, opts: INftPagination): Promise<INftsList>
     getWalletNFTTransactions(address: string, opts: INftPagination)
-    getNftTransactionDetails(contractAddress: string, tokenId: string, blockNumber:number | null, tokenCategory?: AssetTransfersCategory)
-    getNftDetails(contractAddress: string, tokenId: string, tokenCategory?: AssetTransfersCategory)
+    //getNftTransactionDetails(contractAddress: string, tokenId: string, blockNumber:number | null, tokenCategory?: AssetTransfersCategory)
+    getNftDetails(contractAddress: string, tokenId: string):Promise<Web3NftTokenData>
 }
 
 export interface INftPagination {
@@ -17,22 +16,8 @@ export interface INftPagination {
     pageKey?: string
 }
 
-export interface INftItem {
-    likes: number,
-    dislikes: number,
-    comments: ISocialComment[],
-    date: string | Date,
-    name: string,
-    symbol?: string
-    collectionName?: string,
-    description: string,
-    type?: string,
-    usdPrice?: number,
-    contentUrl: string | undefined,
-    image?: string,
-    contract_address: string,
-    tokenId: string,
-    attributes: any[]
+export interface INftItem extends Web3NftTokenData {
+    
 }
 
 export interface INftsList {
@@ -62,7 +47,7 @@ export interface INftTransaction {
     to: string
     txHash: string
     blockNumber: number
-    contract_address: string
+    contractAddress: string
     tokenId: string
     likes?: number
     dislikes?: number
@@ -75,14 +60,23 @@ export interface INftTxList {
 }
 
 export interface Web3NftTokenData {
-    contentUrl: string | undefined,
-    name: string,
-    price?: string,
-    description: string,
-    attributes: any[],
-    isEncrypted?: boolean,
-    accessPrice?: string,
-    accessDuration?: string
+    contentUrl: string | undefined
+    name: string
+    price?: string
+    description: string
+    tokenId: string
+    contractAddress: string
+    creator?: string
+    attributes: any[]
+    attachments?: any[]
+    isEncrypted?: boolean
+    payAmount?: string
+    paymentType?: number
+    comments?: ISocialComment[]
+    date?: string | Date
+    type?: string
+    usdPrice?: number
+    minimalPeriod?: string
 }
 
 export type GetTokenFromApiCallback = () => Promise<Web3NftTokenData>

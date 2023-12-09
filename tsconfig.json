@@ -20,7 +20,7 @@
     "noUnusedParameters": false,
     "noUnusedLocals": false,
     "strictNullChecks": true,
-    "typeRoots": ["node_modules"],
+    "typeRoots": ["node_modules/@types"],
     "types":["reflect-metadata","node","@types/mocha", "@types/chai"],
 
     "moduleResolution": "Node",
