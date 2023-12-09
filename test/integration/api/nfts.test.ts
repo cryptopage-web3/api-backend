@@ -670,6 +670,7 @@ describe('test nfts api endpoints', ()=>{
         getCommentsContractAddressCall.resolves(readCommentsContractAddress)
         readCommentsCall.onCall(0).resolves([]).onCall(1).throws('unexpeted call')
         readPostCall.resolves({isEncrypted:true, payAmount: 10, paymentType: 1, minimalPeriod: 250 })
+        getCacheTokenDetailsStub.resolves(null)
         saveTokenStub.resolves()
 
         const contractAddress = '0xc0fc66ba41bea0a1266c681bbc781014e7c67612',
@@ -680,7 +681,7 @@ describe('test nfts api endpoints', ()=>{
             .get(`/nfts/transaction/mumbai/details/${contractAddress}/${tokenId}/${blockNumber}`)
             .expect('Content-Type',/json/)
 
-        expect(getNftMetadata.calledOnce).to.eq(true)
+        expect(getNftMetadata.callCount).to.eq(1)
         expect(getNftMetadata.getCall(0).args).deep.equal([contractAddress, tokenId])
         expect(readCommentsCall.callCount).to.be.eq(1)
         expect(readPostCall.callCount).to.be.eq(1)

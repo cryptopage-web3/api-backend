@@ -106,6 +106,11 @@ export class NftsController implements interfaces.Controller {
 
         if(this._isNftCacheEnabled){
             token = await this._nftCache.getTokenDetails(chain, contractAddress, tokenId)
+            //console.log('cached token data', token)
+
+            if(token){
+                return token
+            }
         }
 
         if(!token){
