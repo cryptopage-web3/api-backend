@@ -20,7 +20,7 @@ const privateKey = envToString('COMMENTS_SYNC_PRIVATE_KEY')
 const alchemyUrl = envToString('WEB3_RPC_URL_MUMBAI')
 const contractAddress = '0x561F88B50289d37928c6AE8cbb49aEa00881B838';
 
-const ethersProvider = new ethers.providers.JsonRpcProvider(alchemyUrl);
+const ethersProvider = new ethers.JsonRpcProvider(alchemyUrl);
 const signer = new ethers.Wallet(privateKey, ethersProvider);
 const contract = new ethers.Contract(contractAddress, abi, signer);
 
