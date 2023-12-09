@@ -20,3 +20,36 @@ paths:
               examples:
                 LastErrorsResponse:
                   $ref: '#/responses/examples/LastErrorsResponse'
+  /front-error:
+    post:
+      summary: Post frontend error.
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      description: Post frontend error.
+      tags: [DEBUG]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - message
+                - callStack
+              properties:
+                message:
+                  type: string
+                callStack:
+                  type: string
+              description: Error message
+      responses:
+        "403":
+          description: Forbidden
+        "200":
+          content:
+            application/json:
+              examples:
+                OKResponse:
+                  summary: 'ok'
+                  value: {"status":"ok"}
