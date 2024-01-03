@@ -53,3 +53,24 @@ paths:
                 OKResponse:
                   summary: 'ok'
                   value: {"status":"ok"}
+  /last-front-errors:
+    get:
+      summary: Get last front errors.
+      description: Get last front errors.
+      tags: [DEBUG]
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+          description: Pagination for eth chain from prev page response
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                LastErrorsResponse:
+                  $ref: '#/responses/examples/LastErrorsResponse'
