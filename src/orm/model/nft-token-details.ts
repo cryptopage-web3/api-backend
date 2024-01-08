@@ -1,10 +1,12 @@
-import { InferAttributes, Model, InferCreationAttributes, DataTypes } from 'sequelize';
+import { InferAttributes, Model, InferCreationAttributes, DataTypes, CreationOptional } from 'sequelize';
 import { db } from '../sequelize';
 import { ChainId } from '../../modules/transactions/types';
 
 export type NftTokenDetailsInferAttr = InferAttributes<NftTokenDetails>
 
-export class NftTokenDetails extends Model<NftTokenDetailsInferAttr, InferCreationAttributes<NftTokenDetails>> {
+export type NftTokenDetailsCreateAttr = InferCreationAttributes<NftTokenDetails>
+
+export class NftTokenDetails extends Model<NftTokenDetailsInferAttr, NftTokenDetailsCreateAttr> {
     declare tokenId: string
     declare chain: string
     declare contractAddress: string
@@ -18,6 +20,7 @@ export class NftTokenDetails extends Model<NftTokenDetailsInferAttr, InferCreati
     declare paymentType: number
     declare payAmount: string | undefined
     declare minimalPeriod: string | undefined
+    declare date: CreationOptional<Date>
 }
 
 NftTokenDetails.init({
@@ -33,7 +36,8 @@ NftTokenDetails.init({
     isEncrypted: DataTypes.BOOLEAN,
     paymentType: DataTypes.INTEGER,
     payAmount: DataTypes.STRING,
-    minimalPeriod: DataTypes.STRING(20)
+    minimalPeriod: DataTypes.STRING(20),
+    date: { type: DataTypes.DATE, allowNull: true }
 },{
     sequelize: db
 })

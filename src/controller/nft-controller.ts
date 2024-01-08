@@ -105,7 +105,7 @@ export class NftsController implements interfaces.Controller {
         let token:Web3NftTokenData | null = null
 
         if(this._isNftCacheEnabled){
-            token = await this._nftCache.getTokenDetails(chain, contractAddress, tokenId)
+            token = await this._nftCache.getTokenDetails(chain, contractAddress, tokenId) as any
             //console.log('cached token data', token)
 
             if(token){

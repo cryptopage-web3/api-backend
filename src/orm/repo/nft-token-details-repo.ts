@@ -1,4 +1,4 @@
-import { NftTokenDetails, NftTokenDetailsInferAttr } from '../model/nft-token-details';
+import { NftTokenDetails, NftTokenDetailsCreateAttr } from '../model/nft-token-details';
 import { ChainId } from '../../modules/transactions/types';
 import { injectable } from 'inversify';
 import { Op } from 'sequelize';
@@ -9,7 +9,7 @@ export class NftTokenDetailsRepo {
         return NftTokenDetails.findOne({ where:{ tokenId, chain, contractAddress} })
     }
 
-    createToken(nftToken:NftTokenDetailsInferAttr){
+    createToken(nftToken:NftTokenDetailsCreateAttr){
         return NftTokenDetails.create(nftToken)
     }
 

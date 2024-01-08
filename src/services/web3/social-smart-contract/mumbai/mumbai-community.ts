@@ -35,10 +35,10 @@ export class MumbaiCommunity implements ICommunity {
         const readPostWeb3Contract = this._web3ContractFactory(mumbaiSingleReadPostAbi, pluginAddress, ChainId.mumbai)
         
         const post = await readPostWeb3Contract.methods.read(tokenId).call(), {
-            isEncrypted, payAmount, commentCount, upCount, downCount, paymentType, ipfsHash, creator, minimalPeriod
+            isEncrypted, payAmount, commentCount, upCount, downCount, paymentType, ipfsHash, creator, minimalPeriod, timestamp
         } = post
 
-        return { isEncrypted, payAmount, commentCount, upCount, downCount, paymentType, ipfsHash, creator, minimalPeriod }
+        return { isEncrypted, payAmount, commentCount, upCount, downCount, paymentType, ipfsHash, creator, minimalPeriod, date: (new Date(parseInt(timestamp)*1000).toISOString()) }
     }
 
     async getComments(contractAddress: string, tokenId: string): Promise<ISocialComment[]> {

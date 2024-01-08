@@ -136,7 +136,7 @@ describe('test nfts api endpoints', ()=>{
         getPluginPostContractCall.resolves(readPostContractAddress)
             
         readCommentsCall.resolves([])
-        readPostCall.resolves({ipfsHash:'test_hash'})
+        readPostCall.resolves({ipfsHash:'test_hash', timestamp: '1704709767'})
 
         const walletAddress = '0x7d9d209f124dffb488308a1350001c353ba04afb'
 
@@ -669,7 +669,7 @@ describe('test nfts api endpoints', ()=>{
         getPostContractAddressCall.resolves(readPostAddress)
         getCommentsContractAddressCall.resolves(readCommentsContractAddress)
         readCommentsCall.onCall(0).resolves([]).onCall(1).throws('unexpeted call')
-        readPostCall.resolves({isEncrypted:true, payAmount: 10, paymentType: 1, minimalPeriod: 250 })
+        readPostCall.resolves({isEncrypted:true, payAmount: 10, paymentType: 1, minimalPeriod: 250, timestamp: '1704709767' })
         getCacheTokenDetailsStub.resolves(null)
         saveTokenStub.resolves()
 
@@ -961,7 +961,7 @@ describe('test nfts api endpoints', ()=>{
         getPostContractAddressCall.resolves(readPostAddress)
         getCommentsContractAddressCall.resolves(readCommentsContractAddress)
         readCommentsCall.onCall(0).resolves([]).onCall(1).throws('unexpeted call')
-        readPostCall.resolves({isEncrypted:true, payAmount: 10, paymentType: 1, minimalPeriod: 250 })
+        readPostCall.resolves({isEncrypted:true, payAmount: 10, paymentType: 1, minimalPeriod: 250, timestamp: '1704709767' })
         saveTokenStub.resolves()
 
         const contractAddress = '0xc0fc66ba41bea0a1266c681bbc781014e7c67612',

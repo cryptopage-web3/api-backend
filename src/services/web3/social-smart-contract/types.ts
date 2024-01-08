@@ -26,4 +26,5 @@ export interface ISocialPost extends IBaseSocialPost {
     upCount: number
     downCount: number
     commentCount: number
+    date: string
 }
