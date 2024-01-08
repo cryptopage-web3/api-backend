@@ -10,4 +10,8 @@ export class FrontErrorsRepo {
             ip
         })
     }
+
+    getLastErrors(limit:number){
+        return FrontError.findAll({ order:[['id','desc']], limit})
+    }
 }

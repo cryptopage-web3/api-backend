@@ -40,7 +40,17 @@ class IndexController implements interfaces.Controller {
             res.json({errors})
     }
 
-    @httpPost('front-error', reffererValidator(envToArray('ALLOWED_FRONT_ERROR_REFFERER',['app.crypto.page','api-m.crypto.page'])), ...frontErrorValidator())
+    @httpGet('last-front-errors')
+    @errorHandler()
+    async getLastFrontErrors(
+        @request() req: express.Request,
+        @response() res: express.Response, 
+        @queryParam('limit') limit = '10'){
+            const errors = await this._frontErrorsRepo.getLastErrors(parseInt(limit))
+            res.json({errors})
+    }
+
+    @httpPost('front-error', reffererValidator(envToArray('ALLOWED_FRONT_ERROR_REFFERER',['app.crypto.page','api-m.crypto.page','localhost:3000'])), ...frontErrorValidator())
     @errorHandler()
     async saveFrontError(
         @request() req: express.Request,
