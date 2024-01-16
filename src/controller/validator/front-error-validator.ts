@@ -6,7 +6,7 @@ export function frontErrorValidator(){
         body('message')
             .notEmpty().withMessage('Message can not be empty'),
         body('callStack')
-            .notEmpty().withMessage('Call stack cannot be empty'),
+            .notEmpty().withMessage('Call stack can not be empty'),
         handleValidationErrors
     ]
 }

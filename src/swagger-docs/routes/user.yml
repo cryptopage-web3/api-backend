@@ -1,0 +1,45 @@
+paths:
+  /user/log:
+    post:
+      summary: Log connected wallet.
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      description: Wallet info.
+      tags: [User]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - address
+              properties:
+                address:
+                  type: string
+              description: Address info
+      responses:
+        "403":
+          description: Forbidden
+        "200":
+          content:
+            application/json:
+              examples:
+                OKResponse:
+                  summary: 'ok'
+                  value: {"status":"ok"}
+
+  /user/last-registered:
+    get:
+      summary: Get new users.
+      description: Get new users.
+      tags: [User]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                LastRegisteredUsers:
+                  $ref: '#/responses/examples/LastRegisteredUsers'

@@ -50,6 +50,7 @@ import { getChainIdFromAncestor, injectChainDecorator } from "./ioc-util";
 import { FrontErrorsRepo } from "./orm/repo/front-error-repo";
 import { NftDashboard } from "./modules/nfts/NftDashboard";
 import { PostStatisticRepo } from "./orm/repo/post-statistic-repo";
+import { UserRepo } from "./orm/repo/user-repor";
 
 export const container = new Container();
 
@@ -286,3 +287,4 @@ container.bind(IDS.ORM.REPO.ErrorLogRepo).to(ErrorLogRepo)
 container.bind(IDS.ORM.REPO.BlockDetailsRepo).to(BlockDetailsRepo)
 container.bind(IDS.ORM.REPO.FrontErrorsRepo).to(FrontErrorsRepo)
 container.bind(IDS.ORM.REPO.PostStatisticRepo).to(PostStatisticRepo).inSingletonScope()
+container.bind(IDS.ORM.REPO.UserRepo).to(UserRepo).inSingletonScope()

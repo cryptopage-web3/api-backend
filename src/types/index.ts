@@ -1,4 +1,5 @@
 import { ChainId } from '../modules/transactions/types';
+import { envToArray } from '../util/env-util';
 export const IDS = {
     CONFIG:{
         EtherscanApiKey:Symbol('EtherscanApiKey'),
@@ -65,7 +66,8 @@ export const IDS = {
             ErrorLogRepo: Symbol('ErrorLogRepo'),
             BlockDetailsRepo: Symbol('BlockDetailsRepo'),
             FrontErrorsRepo: Symbol('FrontErrorsRepo'),
-            PostStatisticRepo: Symbol('PostStatisticRepo')
+            PostStatisticRepo: Symbol('PostStatisticRepo'),
+            UserRepo: Symbol('UserRepo'),
         }
     }
 }
@@ -75,3 +77,5 @@ export class ApiError extends Error {}
 export interface IChainContext {
     setChainId(chainId: ChainId)
 }
+
+export const defaultAllowedRefferers = envToArray('DEFAULT_ALLOWED_REFFERER',['app.crypto.page','api-m.crypto.page','localhost:3000'])

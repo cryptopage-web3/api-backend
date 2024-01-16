@@ -46,6 +46,7 @@ export interface Env {
     ALLOWED_FRONT_ERROR_REFFERER: string
 
     COMMENTS_SYNC_PRIVATE_KEY: string
+    DEFAULT_ALLOWED_REFFERER: string
 }
 
 export type EnvVarName = keyof Env

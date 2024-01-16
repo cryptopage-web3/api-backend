@@ -3,7 +3,7 @@ import { appleSiteJson } from '../enums/appleSite';
 import { errorHandler } from './decorator/error-handler';
 import * as express from 'express';
 import { inject } from 'inversify';
-import { IDS } from '../types/index';
+import { IDS, defaultAllowedRefferers } from '../types/index';
 import { ErrorLogRepo } from '../orm/repo/error-log-repo';
 import { FrontErrorsRepo } from "../orm/repo/front-error-repo";
 import { reffererValidator } from "./validator/refferer-validator";
@@ -50,7 +50,7 @@ class IndexController implements interfaces.Controller {
             res.json({errors})
     }
 
-    @httpPost('front-error', reffererValidator(envToArray('ALLOWED_FRONT_ERROR_REFFERER',['app.crypto.page','api-m.crypto.page','localhost:3000'])), ...frontErrorValidator())
+    @httpPost('front-error', reffererValidator(envToArray('ALLOWED_FRONT_ERROR_REFFERER', defaultAllowedRefferers)), ...frontErrorValidator())
     @errorHandler()
     async saveFrontError(
         @request() req: express.Request,

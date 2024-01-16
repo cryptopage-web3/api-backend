@@ -1,0 +1,6 @@
+responses:
+  examples:
+    LastRegisteredUsers:
+      summary: Last registerd users
+      value:
+        [{"address": "0x8E9FD4238376e79AAfcfAFB032e92957a5D3fB2E"},{"address":"0xCe473D30bB1DFda0747EdCCDaeb3DE30042cE948"}]
