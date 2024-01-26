@@ -8,7 +8,7 @@ export class PostStatisticRepo {
             where:{ chain}, 
             limit: pageSize, 
             offset: (pageNumber - 1) * pageSize,
-            order:[['totalCommentsCount','DESC']]
+            order:[['totalCommentsCount','DESC'],['id','DESC']]
         })
     }
 }
