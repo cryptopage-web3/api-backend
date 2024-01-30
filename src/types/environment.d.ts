@@ -47,6 +47,7 @@ export interface Env {
 
     COMMENTS_SYNC_PRIVATE_KEY: string
     DEFAULT_ALLOWED_REFFERER: string
+    DEBANK_API_KEY: string
 }
 
 export type EnvVarName = keyof Env

@@ -12,7 +12,8 @@ export const IDS = {
         NftReadAsProxy:{
             ContractAddress: Symbol('NftReadAsProxyContractAddress'),
             Abi: Symbol('NftReadAsProxyAbi')
-        }
+        },
+        DebankApiKey: Symbol('DebankApiKey')
 
     },
     UTIL:{
@@ -53,6 +54,7 @@ export const IDS = {
         CryptoPageCommunity: Symbol('CryptoPageCommunity'),
         CoingeckoApi: Symbol('CoingeckoApi'),
         CoingeckoPriceCache: Symbol('CoingeckoPriceCache'),
+        DebankApi: Symbol(`DebankApi`),
     },
     NODE_MODULES:{
         axios: Symbol('axios'),

@@ -51,6 +51,7 @@ import { FrontErrorsRepo } from "./orm/repo/front-error-repo";
 import { NftDashboard } from "./modules/nfts/NftDashboard";
 import { PostStatisticRepo } from "./orm/repo/post-statistic-repo";
 import { UserRepo } from "./orm/repo/user-repor";
+import { DebankApi } from "./services/debank/DebankApi";
 
 export const container = new Container();
 
@@ -121,6 +122,7 @@ container.bind(IDS.CONFIG.GoerliApiKey).toConstantValue(envToString('GOERLI_API_
 container.bind('ALCHEMY_API_KEY_GOERLI').toConstantValue(envToString('ALCHEMY_API_KEY_GOERLI'))
 container.bind('ALCHEMY_API_KEY_MUMBAI').toConstantValue(envToString('ALCHEMY_API_KEY_MUMBAI'))
 container.bind(IDS.CONFIG.EnableNftCache).toConstantValue(envToBool('ENABLE_NFT_CACHE', true))
+container.bind(IDS.CONFIG.DebankApiKey).toConstantValue(envToString('DEBANK_API_KEY'))
 
 container.bind(IDS.CONFIG.PageToken).toConstantValue(pageTokenMumbai).whenAnyAncestorNamed(ChainId.mumbai)
 container.bind(IDS.CONFIG.PageToken).toConstantValue(pageTokenMumbai).whenAnyAncestorNamed(ChainId.matic)
@@ -139,6 +141,7 @@ container.bind(IDS.SERVICE.EtherscanApi).to(EtherscanApi).inSingletonScope()
 container.bind(IDS.SERVICE.TrongridApi).to(TronGridApi).inSingletonScope()
 container.bind(IDS.SERVICE.SolScanApi).to(SolScanApi).inSingletonScope()
 container.bind(IDS.SERVICE.GoerliScanApi).to(GoerliScanApi).inSingletonScope()
+container.bind(IDS.SERVICE.DebankApi).to(DebankApi).inSingletonScope()
 container.bind(IDS.SERVICE.UnmarshalApi).to(UnmarshalApi).onActivation((context, instance:UnmarshalApi) =>{
     const chain: ChainId | undefined = getChainIdFromAncestor(context.currentRequest)
     if(!chain){

@@ -43,3 +43,18 @@ paths:
               examples:
                 LastRegisteredUsers:
                   $ref: '#/responses/examples/LastRegisteredUsers'
+  
+  /user/tokens/{address}:
+    get:
+      summary: Get  all user tokens on all chains
+      tags: [User]
+      parameters:
+        - $ref: '#/parameters/path/address'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                UserTokenBalances:
+                  $ref: '#/responses/examples/UserTokenBalances'

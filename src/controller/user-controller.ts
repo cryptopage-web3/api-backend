@@ -1,4 +1,4 @@
-import { controller, httpGet, httpPost, request, response } from "inversify-express-utils";
+import { controller, httpGet, httpPost, request, requestParam, response } from "inversify-express-utils";
 import * as express from 'express';
 import { errorHandler } from "./decorator/error-handler";
 import { userLogValidator } from "./validator/user-validator";
@@ -7,11 +7,13 @@ import { IDS, defaultAllowedRefferers } from "../types";
 import { UserRepo } from "../orm/repo/user-repor";
 import { getLogger } from "log4js";
 import { reffererValidator } from "./validator/refferer-validator";
+import { DebankApi } from "../services/debank/DebankApi";
 const logger = getLogger('controller-user')
 
 @controller('/user')
 class UserController {
     @inject(IDS.ORM.REPO.UserRepo) _repo:UserRepo
+    @inject(IDS.SERVICE.DebankApi) _debank: DebankApi
 
     @httpPost('/log', reffererValidator(defaultAllowedRefferers), ...userLogValidator())
     @errorHandler()
@@ -37,5 +39,20 @@ class UserController {
         const users = await this._repo.getNewUsers()
 
         res.json(users.map(u => ({address: u.address})))
+    }
+
+    @httpGet('/tokens/:address')
+    @errorHandler()
+    async tokens(
+        @requestParam('address') address: string,
+        @response() res: express.Response
+    ){
+        const tokens = await this._debank.getWalletTokensInAllChains(address)
+
+        res.json({tokens: tokens.map(({
+            chain, name, symbol, display_symbol, optimized_symbol, logo_url, price,is_core, amount
+        })=>({
+            chain, name, symbol: optimized_symbol || display_symbol, logo_url, price, amount
+        }))})
     }
 }
