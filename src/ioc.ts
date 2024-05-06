@@ -121,6 +121,8 @@ container.bind(IDS.CONFIG.EtherscanApiKey).toConstantValue(envToString('ETHERSCA
 container.bind(IDS.CONFIG.GoerliApiKey).toConstantValue(envToString('GOERLI_API_KEY'))
 container.bind('ALCHEMY_API_KEY_GOERLI').toConstantValue(envToString('ALCHEMY_API_KEY_GOERLI'))
 container.bind('ALCHEMY_API_KEY_MUMBAI').toConstantValue(envToString('ALCHEMY_API_KEY_MUMBAI'))
+container.bind('ALCHEMY_API_KEY_MATIC').toConstantValue(envToString('ALCHEMY_API_KEY_MATIC'))
+
 container.bind(IDS.CONFIG.EnableNftCache).toConstantValue(envToBool('ENABLE_NFT_CACHE', true))
 container.bind(IDS.CONFIG.DebankApiKey).toConstantValue(envToString('DEBANK_API_KEY'))
 
@@ -236,7 +238,7 @@ container.bind(IDS.MODULES.NftsManager)
     .whenTargetNamed(ChainId.bsc)
     .onActivation(nftManagerDecorator)
 container.bind(IDS.MODULES.NftsManager)
-    .to(UnmarshalNftsManager)
+    .to(AlchemyNftsManager)
     .whenTargetNamed(ChainId.matic)
     .onActivation(nftManagerDecorator)
 container.bind(IDS.MODULES.NftsManager)

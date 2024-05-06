@@ -23,6 +23,7 @@ export interface Env {
 
     ALCHEMY_API_KEY_GOERLI: string
     ALCHEMY_API_KEY_MUMBAI: string
+    ALCHEMY_API_KEY_MATIC: string
 
     API_RATE_LIMIT: string
 
@@ -30,6 +31,7 @@ export interface Env {
 
     WEB3_RPC_URL_GOERLI: string
     WEB3_RPC_URL_MUMBAI: string
+    WEB3_RPC_URL_MATIC: string
 
     POLYSCAN_API_KEY: string
 

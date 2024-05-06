@@ -1,11 +1,15 @@
 import { Network } from 'alchemy-sdk';
 import { ChainId } from '../../modules/transactions/types';
 
+const chainMap = {
+    [ChainId.goerli]: Network.ETH_GOERLI,
+    [ChainId.mumbai]: Network.MATIC_MUMBAI,
+    [ChainId.matic]: Network.MATIC_MAINNET
+}
+
 export function getAlchemyNetwork(chain:ChainId):Network{
-    if(chain == ChainId.goerli){
-        return Network.ETH_GOERLI
-    } else if(ChainId.mumbai){
-        return Network.MATIC_MUMBAI
+    if(chainMap[chain]){
+        return chainMap[chain]
     }
 
     throw new Error(`Network not found for chain '${chain}'`)

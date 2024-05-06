@@ -35,7 +35,7 @@ export const chainConfig = {
         nativeCoinSymbol: 'MATIC',
         apiUrl: 'https://api.polygonscan.com/api?',
         apiKey: envToString('POLYSCAN_API_KEY'),
-        rpc: 'https://polygon-rpc.com',
+        rpc: envToString('WEB3_RPC_URL_MATIC'),
         nativeCoinId: 'matic-network'
     },
     [ChainId.mumbai]:{
