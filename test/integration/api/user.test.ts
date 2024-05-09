@@ -18,12 +18,18 @@ describe('test user api endpoints', ()=>{
         const app = new InversifyExpressServer(testContainer).build()
         
         testAgent = agent(app)
-        axios = testContainer.get(IDS.NODE_MODULES.axios)
-        axiosGetStub  = Sinon.stub(axios,'get')
     })
     after(()=>{
         cleanUpMetadata()
         Sinon.restore()
+    })
+    beforeEach(()=>{
+        testContainer.snapshot()
+        axios = testContainer.get(IDS.NODE_MODULES.axios)
+        axiosGetStub  = Sinon.stub(axios,'get')
+    })
+    afterEach(()=>{
+        testContainer.restore()
     })
 
     it('wallet tokens on all chains',async()=>{

@@ -26,6 +26,12 @@ describe('test get transactions list', ()=>{
         axios = testContainer.get(IDS.NODE_MODULES.axios)
         axiosGetStub  = Sinon.stub(axios,'get')
     })
+    beforeEach(()=>{
+        testContainer.snapshot()
+    })
+    afterEach(()=>{
+        testContainer.restore()
+    })
     after(()=>{
         cleanUpMetadata()
         Sinon.restore()
@@ -70,7 +76,7 @@ describe('test get transactions list', ()=>{
         expect(axiosGetStub.callCount).to.eq(1)
     })
 
-    it('should return polygon transactions list', async () => {
+    it.skip('should return polygon transactions list unmarshal', async () => {
         axiosGetStub
             .resolves({data: unmarshalPolygonTransactionResponse})
 
@@ -86,6 +92,38 @@ describe('test get transactions list', ()=>{
             expect(response.body.transactions[0].type).to.eq('send')
 
             expect(axiosGetStub.callCount).to.eq(1)
+    })
+
+    it('should return matic transactions alchemy', async () => {
+        const alchemy:TestAlchemyMock = testContainer.get<Function>(IDS.SERVICE.AlchemySdkFactory)(ChainId.matic)
+        
+        const getAssettransfersStub = Sinon.stub(alchemy.core, 'getAssetTransfers')
+
+        getAssettransfersStub.resolves(mumbaiAlchemyAddrestransactionsResponse)
+
+        const walletAddress = '0x36925EedB4ffa635E34CA6469e4Fc2eDaD885376'
+
+        const response = await testAgent
+            .get(`/transactions/matic/${walletAddress}`)
+            .expect('Content-Type',/json/)
+
+        expect(response.body.transactions).to.be.an('array')
+        expect(response.body.transactions.length).to.eq(10)
+        expect(response.body.transactions[0]).to.contain(({
+            hash: "0x4c4a3248f9c2feae486a99f37b518f705901e6f93f27fc82f8f4891f87f9e6ba",
+            blockNum: 35822644,
+            from: "0x358cb02bebe8a7c36755639f55567ce8fc637bd7",
+            to: "0x36925eedb4ffa635e34ca6469e4fc2edad885376",
+            value: 188.36907000000002,
+            asset: "MATIC",
+            category: "external",
+            date: "2023-05-20T10:44:56.000Z"
+        }))
+        expect(response.body.continue).to.contain({
+            pageKey: "005f49fe-a628-4cd4-8976-d2da48b2e06c"
+        })
+
+        expect(getAssettransfersStub.calledOnce).to.eq(true)
     })
 
     it('should return mumbai transactions', async () => {
@@ -191,7 +229,7 @@ describe('test get transactions list', ()=>{
         expect(axiosGetStub.callCount).to.eq(3)
     })
 
-    it('should not return error when no polygon transactions list', async () => {
+    it.skip('should not return error when no polygon transactions list unmarshal', async () => {
         axiosGetStub
             .resolves({data: unmarshalEmptyResponse})
 
@@ -204,6 +242,25 @@ describe('test get transactions list', ()=>{
             expect(response.body.transactions.length).to.eq(0)
 
             expect(axiosGetStub.callCount).to.eq(1)
+    })
+
+    it('should not return error when no polygon transactions list alchemy', async () => {
+        const alchemy:TestAlchemyMock = testContainer.get<Function>(IDS.SERVICE.AlchemySdkFactory)(ChainId.mumbai)
+        
+        const getAssettransfersStub = Sinon.stub(alchemy.core, 'getAssetTransfers')
+
+        getAssettransfersStub.resolves({transfers:[]})
+
+        const walletAddress = '0x36925EedB4ffa635E34CA6469e4Fc2eDaD885376'
+
+        const response = await testAgent
+            .get(`/transactions/mumbai/${walletAddress}`)
+            .expect('Content-Type',/json/)
+
+        expect(response.body.transactions).to.be.an('array')
+        expect(response.body.transactions.length).to.eq(0)
+
+        expect(getAssettransfersStub.calledOnce).to.eq(true)
     })
 
     it.skip('should not return error when no bsc transactions', async () =>{

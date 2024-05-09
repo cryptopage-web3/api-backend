@@ -2,19 +2,19 @@ import { ChainId } from '../modules/transactions/types';
 import { envToArray } from '../util/env-util';
 export const IDS = {
     CONFIG:{
+        Web3RpcUrl: Symbol('Web3RpcUrl'),
         EtherscanApiKey:Symbol('EtherscanApiKey'),
         GoerliApiKey:Symbol('GoerliApiKey'),
         Web3RpcFactory: Symbol('Web3RpcFactory'),
         EnableNftCache: Symbol('EnableNftCache'),
         PageToken: Symbol('PageToken'),
         COINGECKO_PRICE_CACHE_TTL_IN_SECONDS: Symbol('COINGECKO_PRICE_CACHE_TTL_IN_SECONDS'),
-        PageNftContractAddress: Symbol('PageNftContractAddress'),
         NftReadAsProxy:{
             ContractAddress: Symbol('NftReadAsProxyContractAddress'),
-            Abi: Symbol('NftReadAsProxyAbi')
+            Abi: Symbol('NftReadAsProxyAbi'),
         },
-        DebankApiKey: Symbol('DebankApiKey')
-
+        DebankApiKey: Symbol('DebankApiKey'),
+        SmartContractsConf: Symbol('SmartContractsConf'),
     },
     UTIL:{
         Logger:Symbol('logger')

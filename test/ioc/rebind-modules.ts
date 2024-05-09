@@ -10,7 +10,7 @@ import { TestErrorLogRepoMock } from '../mock/test-error-log-repo-mock';
 const web3Mocks = {}
 
 export function rebindModules(container: Container){
-    container.rebind(IDS.NODE_MODULES.axios).toConstantValue(TestAxiosMock)
+    container.rebind(IDS.NODE_MODULES.axios).to(TestAxiosMock).inSingletonScope()
     container.rebind(IDS.NODE_MODULES.web3Factory).toFactory(context => (chain:ChainId) =>{
         const key = `web3_${chain}`
 

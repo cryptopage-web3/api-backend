@@ -28,6 +28,12 @@ describe('test tokens api endpoints', ()=>{
         cleanUpMetadata()
         Sinon.restore()
     })
+    beforeEach(()=>{
+        testContainer.snapshot()
+    })
+    afterEach(()=>{
+        testContainer.restore()
+    })
     it.skip('should return eth tokens', async ()=>{
         axiosGetStub
             .resolves({data: unmarshalEthTokensResponse})

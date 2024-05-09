@@ -5,6 +5,8 @@ import { MumbaiCommunity } from '../../../src/services/web3/social-smart-contrac
 import { testWeb3ContractFactory, TestWeb3Mock } from '../../mock/test-web3-mock';
 import { expect } from "chai";
 import { TestErrorLogRepoMock } from '../../mock/test-error-log-repo-mock';
+import { ChainId } from "../../../src/modules/transactions/types";
+import { mumbaiSmartContracts } from "../../../src/services/web3/social-smart-contract/constants";
 
 describe('polygon mumbai community',()=>{
     const container = new Container()
@@ -24,6 +26,7 @@ describe('polygon mumbai community',()=>{
 
         container.bind(IDS.ORM.REPO.ErrorLogRepo).to(TestErrorLogRepoMock)
         container.bind(IDS.SERVICE.CryptoPageCommunity).to(MumbaiCommunity)
+        container.bind(IDS.CONFIG.SmartContractsConf).toConstantValue(mumbaiSmartContracts)
         
         container.bind(IDS.SERVICE.WEB3.CommunityWeb3SmartContract).toConstantValue({
             methods:{
@@ -69,7 +72,7 @@ describe('polygon mumbai community',()=>{
         readCommentMethodStub.returns({ call: readCommentCallStub })
 
         container.bind(IDS.SERVICE.WEB3.ContractFactory).toFactory(context => testWeb3ContractFactory({
-            [MumbaiCommunity.communityContractAddress]: {
+            [mumbaiSmartContracts.communityContract.address]: {
                 getPluginContract: {method: getPluginContractMethodStub, call: getPluginContractCallStub}
             },
             [commentsPluginAddress]:{
@@ -79,7 +82,7 @@ describe('polygon mumbai community',()=>{
 
         const community = container.get<MumbaiCommunity>(IDS.SERVICE.CryptoPageCommunity);
         
-        const comments = await community.getComments(MumbaiCommunity.cryptoPageNftContractAddress, tokenId)
+        const comments = await community.getComments(mumbaiSmartContracts.cryptoPageNftContractAddress, tokenId)
 
         expect(comments).to.be.a('array')
         expect(comments.length).to.be.eq(0)
@@ -111,7 +114,7 @@ describe('polygon mumbai community',()=>{
         readCommentCallStub.resolves([[creator, owner, communityId,timestamp,gasConsumption,isUp,isDown, isView,isEncrypted,isGasCompensation,ipfsHash]])
 
         container.bind(IDS.SERVICE.WEB3.ContractFactory).toFactory(context => testWeb3ContractFactory({
-            [MumbaiCommunity.communityContractAddress]: {
+            [mumbaiSmartContracts.communityContract.address]: {
                 getPluginContract: {method: getPluginContractMethodStub, call: getPluginContractCallStub}
             },
             [commentsPluginAddress]:{
@@ -121,7 +124,7 @@ describe('polygon mumbai community',()=>{
 
         const community = container.get<MumbaiCommunity>(IDS.SERVICE.CryptoPageCommunity);
         
-        const comments = await community.getComments(MumbaiCommunity.cryptoPageNftContractAddress, tokenId)
+        const comments = await community.getComments(mumbaiSmartContracts.cryptoPageNftContractAddress, tokenId)
 
         expect(comments).to.be.a('array')
         expect(comments.length).to.be.eq(1)

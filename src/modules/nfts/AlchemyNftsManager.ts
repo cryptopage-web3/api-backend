@@ -11,6 +11,8 @@ import { INftsList, INftsManager, INftTransaction, INftPagination, NftTxType, We
 import { Web3Util } from '../../services/web3/web3-util';
 import { normalizeUrl } from '../../util/url-util';
 import { ErrorLogRepo } from '../../orm/repo/error-log-repo';
+import { IChainConf } from '../../services/web3/social-smart-contract/constants';
+import { isEqAddr } from '../../util/string-util';
 
 @injectable()
 export class AlchemyNftsManager implements INftsManager {
@@ -20,7 +22,7 @@ export class AlchemyNftsManager implements INftsManager {
     @inject(IDS.SERVICE.CryptoPageCommunity) _community: ICommunity
     @inject(IDS.SERVICE.WEB3.Web3Util) _web3Util: Web3Util
     @inject(IDS.ORM.REPO.ErrorLogRepo) _errorRepo: ErrorLogRepo
-    @inject(IDS.CONFIG.PageNftContractAddress) _pageNftContractAddress: string
+    @inject(IDS.CONFIG.SmartContractsConf) _smConf: IChainConf
 
     async getWalletAllNFTs(address: string, opts: INftPagination): Promise<INftsList> {
         const addressNfts = await this._alchemy.nft.getNftsForOwner(address, {
@@ -125,7 +127,7 @@ export class AlchemyNftsManager implements INftsManager {
             attachments: undefined
         }
 
-        if(/*!nftItem.contentUrl && alchemyResponse.tokenUri?.raw &&*/ contractAddress.toLowerCase() == this._pageNftContractAddress){
+        if(isEqAddr( contractAddress, this._smConf.cryptoPageNftContractAddress)){
             const [post] = await Promise.all([
                 this._community.readPostForContract(contractAddress, tokenId),
                 this._updateCryptoPageMeta(nftItem, alchemyResponse.tokenUri?.raw)
@@ -138,7 +140,7 @@ export class AlchemyNftsManager implements INftsManager {
     }
 
     async _updateCryptoPageMeta(nftItem:Web3NftTokenData, tokenUri:string | undefined){
-        if(/*nftItem.contentUrl ||*/ nftItem.contractAddress !== this._pageNftContractAddress || !tokenUri){
+        if(!isEqAddr(nftItem.contractAddress, this._smConf.cryptoPageNftContractAddress) || !tokenUri){
             return
         }
 

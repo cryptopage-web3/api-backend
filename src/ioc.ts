@@ -1,4 +1,4 @@
-import { Container, interfaces } from "inversify"
+import { Container, interfaces, namedConstraint, taggedConstraint, traverseAncerstors } from "inversify"
 import { IDS } from './types/index';
 import { envToBool, envToString, envToInt } from './util/env-util';
 import { EtherscanApi } from './services/etherscan/etherscan-api';
@@ -31,7 +31,6 @@ import { EthWeb3Manager } from './services/web3/eth-web3-manager';
 import { NftCache } from './modules/nfts/NftCache';
 import { GoerliSocialSmartContract } from './services/web3/social-smart-contract/goerli-social-smart-contract';
 import { DefaultSocialSmartContract } from './services/web3/social-smart-contract/default-social-smart-contract';
-import { goerliSocialAbi } from './services/web3/social-smart-contract/goerli-social-abi';
 import { getAlchemyNetwork, buildAlchemyChainApiKeyVarname } from './services/alchemy/alchemy-util';
 import { Alchemy } from "alchemy-sdk";
 import { ErrorLogRepo } from './orm/repo/error-log-repo';
@@ -46,12 +45,13 @@ import { CoinGeckoApi } from "./services/coingecko/coingecko-api";
 import { CoingeckoPriceCache } from "./services/coingecko/price-cache";
 import { MumbaiCommunity } from "./services/web3/social-smart-contract/mumbai/mumbai-community";
 import { mumbaiCommunityAbi, mumbaiNFTReadASProxyAbi } from "./services/web3/social-smart-contract/mumbai/abi";
-import { getChainIdFromAncestor, injectChainDecorator } from "./ioc-util";
+import { getChainIdFromAncestor, injectChainDecorator, whenNamedChainOrAncestorChainIs } from "./ioc-util";
 import { FrontErrorsRepo } from "./orm/repo/front-error-repo";
 import { NftDashboard } from "./modules/nfts/NftDashboard";
 import { PostStatisticRepo } from "./orm/repo/post-statistic-repo";
 import { UserRepo } from "./orm/repo/user-repor";
 import { DebankApi } from "./services/debank/DebankApi";
+import { IChainConf, maticSmartContracts, mumbaiSmartContracts } from "./services/web3/social-smart-contract/constants";
 
 export const container = new Container();
 
@@ -82,19 +82,12 @@ container.bind(IDS.SERVICE.WEB3.Web3Manager)
     })
 
 container.bind(IDS.SERVICE.WEB3.Web3ManagerFactory)
-    .toFactory(context => (chain:ChainId) =>{ 
+    .toFactory(context => (chain:ChainId) =>{
         return container.getNamed(IDS.SERVICE.WEB3.Web3Manager, chain)
     })
 
 container.onActivation(IDS.SERVICE.WEB3.Web3Manager, injectChainDecorator)
-    /*
-container.bind(IDS.SERVICE.WEB3.Web3Manager)
-    .to(DefaultWebManager).when((request)=> {
-        const name = request.parentRequest?.target.getNamedTag()?.value as any
-        const implementedChains = [ChainId.eth, ChainId.bsc, ChainId.matic,ChainId.goerli]
-        
-        return implementedChains.indexOf(name) === -1
-    })*/
+
 container.bind(IDS.SERVICE.WEB3.ContractFactory).toFactory(context => (abi: any[], contractAddress: string, chain?:ChainId) =>{
     const web3Factory:Function = context.container.get(IDS.NODE_MODULES.web3Factory)
     const web3:Web3 = web3Factory(chain || getChainIdFromAncestor(context.currentRequest))
@@ -103,17 +96,16 @@ container.bind(IDS.SERVICE.WEB3.ContractFactory).toFactory(context => (abi: any[
 })
 
 container.bind(IDS.SERVICE.WEB3.CommunityWeb3SmartContract).toDynamicValue((context) => {
-    const contractFactory:Function = context.container.get(IDS.SERVICE.WEB3.ContractFactory)
-    
-    return contractFactory(goerliSocialAbi as any[], GoerliSocialSmartContract.communityContractAddress, ChainId.goerli)
-}).whenAnyAncestorNamed(ChainId.goerli)
+    const chain:ChainId | undefined = getChainIdFromAncestor(context.currentRequest)
+    if(!chain){
+        throw new Error(`Failed to init CommunityWeb3SmartContract. Invalid chainid ${chain}`)
+    }
 
-
-container.bind(IDS.SERVICE.WEB3.CommunityWeb3SmartContract).toDynamicValue((context) => {
-    const contractFactory:Function = context.container.get(IDS.SERVICE.WEB3.ContractFactory)
+    const contractFactory:Function = context.container.get(IDS.SERVICE.WEB3.ContractFactory),
+        chainConf:IChainConf = context.container.getNamed(IDS.CONFIG.SmartContractsConf, chain)
     
-    return contractFactory(mumbaiCommunityAbi as any[], MumbaiCommunity.communityContractAddress, ChainId.mumbai)
-}).whenAnyAncestorNamed(ChainId.mumbai)
+    return contractFactory(mumbaiCommunityAbi as any[], chainConf.communityContract.address, chain)
+})
 
 container.bind(IDS.SERVICE.WEB3.Web3Util).to(Web3Util)
 
@@ -129,11 +121,11 @@ container.bind(IDS.CONFIG.DebankApiKey).toConstantValue(envToString('DEBANK_API_
 container.bind(IDS.CONFIG.PageToken).toConstantValue(pageTokenMumbai).whenAnyAncestorNamed(ChainId.mumbai)
 container.bind(IDS.CONFIG.PageToken).toConstantValue(pageTokenMumbai).whenAnyAncestorNamed(ChainId.matic)
 
-container.bind(IDS.CONFIG.PageNftContractAddress).toConstantValue(MumbaiCommunity.cryptoPageNftContractAddress).whenAnyAncestorNamed(ChainId.mumbai)
-container.bind(IDS.CONFIG.PageNftContractAddress).toConstantValue('stub').whenAnyAncestorNamed(ChainId.matic)
+//container.bind(IDS.CONFIG.Web3RpcUrl).toConstantValue(envToString('WEB3_RPC_URL_MUMBAI')).when(whenNamedChainOrAncestorChainIs(ChainId.mumbai))
+//container.bind(IDS.CONFIG.Web3RpcUrl).toConstantValue(envToString('WEB3_RPC_URL_MATIC')).when(whenNamedChainOrAncestorChainIs(ChainId.matic))
 
-container.bind(IDS.CONFIG.NftReadAsProxy.ContractAddress).toConstantValue(MumbaiCommunity.cryptoPageNftContractAddress).whenAnyAncestorNamed(ChainId.mumbai)
-container.bind(IDS.CONFIG.NftReadAsProxy.Abi).toConstantValue(mumbaiNFTReadASProxyAbi).whenAnyAncestorNamed(ChainId.mumbai)
+container.bind(IDS.CONFIG.SmartContractsConf).toConstantValue(mumbaiSmartContracts).when(whenNamedChainOrAncestorChainIs(ChainId.mumbai))
+container.bind(IDS.CONFIG.SmartContractsConf).toConstantValue(maticSmartContracts).when(whenNamedChainOrAncestorChainIs(ChainId.matic))
 
 container.bind(IDS.CONFIG.COINGECKO_PRICE_CACHE_TTL_IN_SECONDS).toConstantValue(envToInt('COINGECKO_PRICE_CACHE_TTL_IN_SECONDS', 300))
 
@@ -164,11 +156,14 @@ container.bind(IDS.SERVICE.CryptoPageCommunity)
     .whenAnyAncestorNamed(ChainId.goerli)
 container.bind(IDS.SERVICE.CryptoPageCommunity)
     .to(MumbaiCommunity)
-    .whenAnyAncestorNamed(ChainId.mumbai)
+    .whenAnyAncestorNamed(ChainId.mumbai).onActivation(injectChainDecorator)
+container.bind(IDS.SERVICE.CryptoPageCommunity)
+    .to(MumbaiCommunity)
+    .whenAnyAncestorNamed(ChainId.matic).onActivation(injectChainDecorator)
 container.bind(IDS.SERVICE.CryptoPageCommunity)
     .to(DefaultSocialSmartContract)
     .whenAnyAncestorMatches(request =>{
-        const excludeChains:string[] = [ChainId.goerli, ChainId.mumbai],
+        const excludeChains:string[] = [ChainId.goerli, ChainId.mumbai, ChainId.matic],
             chainId = getChainIdFromAncestor(request) || request.target.getNamedTag()?.value
 
         if(!chainId){
@@ -205,7 +200,7 @@ container.bind(IDS.MODULES.TransactionManager)
     .to(UnmarshalTransactionsManager)
     .whenTargetNamed(ChainId.bsc)
 container.bind(IDS.MODULES.TransactionManager)
-    .to(UnmarshalTransactionsManager)
+    .to(AlchemyTransactionsManager)
     .whenTargetNamed(ChainId.matic)
 container.bind(IDS.MODULES.TransactionManager)
     .to(AlchemyTransactionsManager)

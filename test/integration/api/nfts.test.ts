@@ -2,7 +2,7 @@ import { cleanUpMetadata, InversifyExpressServer } from 'inversify-express-utils
 import { agent, SuperAgentTest } from "supertest";
 import { Axios } from 'axios';
 import { IDS } from '../../../src/types/index';
-import { unmarshalEthNftsResponse, unmarshalNftTransactionsEmptyResponse, unmarshalEthNftTransactionsResponse, unmarshalMaticNftsResponse, unmarshalBscNtsResponse, unmarshalNtsEmptyResponse, unmarshalMaticNftTransactionsResponse, unmarshalBscNfttransactionsResponse, unmarshalEthNftDetailsResponse, unmarshalMaticNftDetailsResponse, unmarshalBscNftDetailsResponse, goerlyErrorResponse, goerliNftTransactionsResponse, goerliNftListTransactionsResponse, alchemyAddressNftsResponse, alchemyNftTransfersResponse, goerliNftComment, mumbaiAlchemyAddressNftsResponse, mumbaiAlchemyAddressNftTransactionsResponse, mumbaiAlchemyNftMetadataResponse } from './nfts-response';
+import { unmarshalEthNftsResponse, unmarshalNftTransactionsEmptyResponse, unmarshalEthNftTransactionsResponse, unmarshalMaticNftsResponse, unmarshalBscNtsResponse, unmarshalNtsEmptyResponse, unmarshalMaticNftTransactionsResponse, unmarshalBscNfttransactionsResponse, unmarshalEthNftDetailsResponse, unmarshalMaticNftDetailsResponse, unmarshalBscNftDetailsResponse, goerlyErrorResponse, goerliNftTransactionsResponse, goerliNftListTransactionsResponse, alchemyAddressNftsResponse, alchemyNftTransfersResponse, goerliNftComment, mumbaiAlchemyAddressNftsResponse, mumbaiAlchemyAddressNftTransactionsResponse, mumbaiAlchemyNftMetadataResponse, maticAlchemyAddressNftsResponse, maticAlchemyNftMetadataResponse } from './nfts-response';
 import Sinon, { SinonStub } from 'sinon';
 import { expect } from 'chai';
 import { testContainer } from '../../ioc/test-container';
@@ -10,23 +10,19 @@ import { testWeb3ContractFactory as testWeb3ContractFactory, TestWeb3Mock } from
 import { interfaces } from 'inversify';
 import { TestAlchemyMock } from '../../mock/test-alchemy-mock';
 import { AssetTransfersCategory } from 'alchemy-sdk';
-import { container } from '../../../src/ioc';
 import { ChainId } from '../../../src/modules/transactions/types';
 import { NftTokenDetails } from '../../../src/orm/model/nft-token-details';
 import { GoerliSocialSmartContract } from '../../../src/services/web3/social-smart-contract/goerli-social-smart-contract';
 import { BlockDetails } from '../../../src/orm/model/block-details';
 import { Application } from 'express';
-import { MumbaiCommunity } from '../../../src/services/web3/social-smart-contract/mumbai/mumbai-community';
 import { NftTxType } from '../../../src/modules/nfts/types';
 import { PostStatisticRepo } from '../../../src/orm/repo/post-statistic-repo';
+import { maticSmartContracts, mumbaiSmartContracts } from '../../../src/services/web3/social-smart-contract/constants';
+import { TestAxiosMock } from '../../mock/test-axios-mock';
 
 let app: Application
 let testAgent: SuperAgentTest
 
-let axios:Axios 
-let axiosGetStub: Sinon.SinonStub
-
-let axiosHeadStub: SinonStub
 let getCacheTokenDetailsStub: SinonStub
 let saveTokenStub: SinonStub 
 let getBlockDetailsStub: SinonStub
@@ -38,9 +34,7 @@ describe('test nfts api endpoints', ()=>{
         app = new InversifyExpressServer(testContainer).build()
         testAgent = agent(app)
 
-        axios = testContainer.get(IDS.NODE_MODULES.axios)
-        axiosGetStub = Sinon.stub(axios,'get')
-        axiosHeadStub = Sinon.stub(axios, 'head')
+        
         getCacheTokenDetailsStub = Sinon.stub(NftTokenDetails, 'findOne')
         saveTokenStub = Sinon.stub(NftTokenDetails, 'create')
         getBlockDetailsStub = Sinon.stub(BlockDetails, 'findOne')
@@ -55,8 +49,13 @@ describe('test nfts api endpoints', ()=>{
     })
     afterEach(()=>{
         testContainer.restore()
+        //testContainer.rebind(IDS.NODE_MODULES.axios).toConstantValue(TestAxiosMock)
+        //console.log('after ntst each')
     })
     it.skip('should return eth nfts', async ()=>{
+        const axios:Axios = testContainer.get(IDS.NODE_MODULES.axios), 
+            axiosGetStub: Sinon.SinonStub = Sinon.stub(axios, 'get')
+
         axiosGetStub
             .resolves({data: unmarshalEthNftsResponse})
 
@@ -78,7 +77,10 @@ describe('test nfts api endpoints', ()=>{
             expect(axiosGetStub.calledOnce).to.eq(true)
     })
 
-    it('should return polygon nfts', async () => {
+    it.skip('should return polygon nfts unmarshal', async () => {
+        const axios:Axios = testContainer.get(IDS.NODE_MODULES.axios), 
+            axiosGetStub: Sinon.SinonStub = Sinon.stub(axios, 'get')
+
         axiosGetStub
             .resolves({data: unmarshalMaticNftsResponse})
 
@@ -100,7 +102,10 @@ describe('test nfts api endpoints', ()=>{
         }))
     })
 
-    it('should return mumbai nfts', async () => {
+    it('should return matic nfts alchemy', async () => {
+        const axios:TestAxiosMock = testContainer.get(IDS.NODE_MODULES.axios), 
+            axiosGetStub: Sinon.SinonStub = Sinon.stub(axios, 'get')
+
         const getPluginContractMethodStub = Sinon.stub(),
             getPluginCommentsContractCall = Sinon.stub(),
             getPluginPostContractCall = Sinon.stub(),
@@ -112,7 +117,80 @@ describe('test nfts api endpoints', ()=>{
             readPostCall = Sinon.stub()
 
         testContainer.rebind(IDS.SERVICE.WEB3.ContractFactory).toFactory(context => testWeb3ContractFactory({
-            [MumbaiCommunity.communityContractAddress]:{
+            [maticSmartContracts.communityContract.address]:{
+                getPluginContract:{ method: getPluginContractMethodStub }
+            },
+            [readCommentsContractAddress]:{
+                read:{method:readCommentsMethod, call: readCommentsCall}
+            },
+            [readPostContractAddress]:{
+                read:{ method: readPostMethod, call: readPostCall}
+            }
+        }))
+
+        const alchemy:TestAlchemyMock = testContainer.get<Function>(IDS.SERVICE.AlchemySdkFactory)(ChainId.matic)
+             
+        const getNftsForOwnerStub = Sinon.stub(alchemy.nft, 'getNftsForOwner')
+
+        getNftsForOwnerStub.resolves(maticAlchemyAddressNftsResponse)
+        getPluginContractMethodStub
+            .withArgs(maticSmartContracts.plugins.singleReadAllComments.address, 1).returns({call: getPluginCommentsContractCall})
+            .withArgs(maticSmartContracts.plugins.singleReadPost.address, 1).returns({call: getPluginPostContractCall})
+        
+        getPluginCommentsContractCall.resolves(readCommentsContractAddress)
+        getPluginPostContractCall.resolves(readPostContractAddress)
+            
+        readCommentsCall.resolves([])
+        readPostCall.resolves({ipfsHash:'test_hash', timestamp: '1704709767'})
+
+        axiosGetStub.callsFake(url =>{
+            return Promise.resolve({data: {contentUrl2: url}})
+        })
+
+        const walletAddress = '0x7d9d209f124dffb488308a1350001c353ba04afb'
+
+        const response = await testAgent
+            .get(`/nfts/matic/${walletAddress}`)
+            .expect('Content-Type',/json/)
+
+        expect(getNftsForOwnerStub.calledOnce).to.eq(true)
+        expect(getPluginContractMethodStub.callCount).to.eq(10)
+        expect(readPostCall.callCount).to.eq(5)
+        expect(readCommentsCall.callCount).to.eq(5)
+
+        expect(response.body.count).to.eq(5)
+        expect(response.body.list).to.be.an('array')
+        expect(response.body.list.length).to.eq(5)
+        
+        expect(axiosGetStub.callCount).to.eq(5)
+
+        expect(response.body.list[1]).to.contain(({
+            name: maticAlchemyAddressNftsResponse.ownedNfts[1].rawMetadata.name,
+            symbol: maticAlchemyAddressNftsResponse.ownedNfts[1].contract.symbol,
+            contractAddress: maticAlchemyAddressNftsResponse.ownedNfts[1].contract.address,
+            tokenId: maticAlchemyAddressNftsResponse.ownedNfts[1].tokenId,
+            contentUrl: maticAlchemyAddressNftsResponse.ownedNfts[1].media[0].raw,
+        }))
+        expect(response.body.list[1].comments).to.be.a('array')
+        expect(response.body.list[1].comments.length).to.eq(0)
+    })
+
+    it('should return mumbai nfts', async () => {
+        const axios:Axios = testContainer.get(IDS.NODE_MODULES.axios), 
+            axiosGetStub: Sinon.SinonStub = Sinon.stub(axios, 'get')
+        
+        const getPluginContractMethodStub = Sinon.stub(),
+            getPluginCommentsContractCall = Sinon.stub(),
+            getPluginPostContractCall = Sinon.stub(),
+            readCommentsContractAddress = 'read_comments_address',
+            readPostContractAddress = 'read_post_contract_address',
+            readCommentsMethod = Sinon.stub(),
+            readCommentsCall = Sinon.stub(),
+            readPostMethod = Sinon.stub(),
+            readPostCall = Sinon.stub()
+
+        testContainer.rebind(IDS.SERVICE.WEB3.ContractFactory).toFactory(context => testWeb3ContractFactory({
+            [mumbaiSmartContracts.communityContract.address]:{
                 getPluginContract:{ method: getPluginContractMethodStub }
             },
             [readCommentsContractAddress]:{
@@ -129,14 +207,18 @@ describe('test nfts api endpoints', ()=>{
 
         getNftsForOwnerStub.resolves(mumbaiAlchemyAddressNftsResponse)
         getPluginContractMethodStub
-            .withArgs(MumbaiCommunity.plugins.singleReadAllComments, 1).returns({call: getPluginCommentsContractCall})
-            .withArgs(MumbaiCommunity.plugins.singleReadPost, 1).returns({call: getPluginPostContractCall})
+            .withArgs(mumbaiSmartContracts.plugins.singleReadAllComments.address, 1).returns({call: getPluginCommentsContractCall})
+            .withArgs(mumbaiSmartContracts.plugins.singleReadPost.address, 1).returns({call: getPluginPostContractCall})
         
         getPluginCommentsContractCall.resolves(readCommentsContractAddress)
         getPluginPostContractCall.resolves(readPostContractAddress)
             
         readCommentsCall.resolves([])
         readPostCall.resolves({ipfsHash:'test_hash', timestamp: '1704709767'})
+
+        axiosGetStub.callsFake(url =>{
+            return Promise.resolve({data: {contentUrl2: url}})
+        })
 
         const walletAddress = '0x7d9d209f124dffb488308a1350001c353ba04afb'
 
@@ -167,6 +249,9 @@ describe('test nfts api endpoints', ()=>{
     })
 
     it.skip('should return bsc nfts', async () => {
+        const axios:Axios = testContainer.get(IDS.NODE_MODULES.axios), 
+            axiosGetStub: Sinon.SinonStub = Sinon.stub(axios, 'get')
+
         axiosGetStub
             .resolves({data: unmarshalBscNtsResponse})
 
@@ -189,6 +274,9 @@ describe('test nfts api endpoints', ()=>{
     })
 
     it.skip('should return goerli nfts', async ()=>{
+        const axios:Axios = testContainer.get(IDS.NODE_MODULES.axios), 
+            axiosGetStub: Sinon.SinonStub = Sinon.stub(axios, 'get')
+
         let alchemyGetNftsStub:SinonStub
         
         testContainer.onActivation(IDS.SERVICE.AlchemySdk, function(context:interfaces.Context, instance:TestAlchemyMock){
@@ -257,6 +345,9 @@ describe('test nfts api endpoints', ()=>{
     })
 
     it.skip('should not return error eth nfts', async ()=>{
+        const axios:Axios = testContainer.get(IDS.NODE_MODULES.axios), 
+            axiosGetStub: Sinon.SinonStub = Sinon.stub(axios, 'get')
+
         axiosGetStub
             .resolves({data: unmarshalNtsEmptyResponse})
 
@@ -271,7 +362,10 @@ describe('test nfts api endpoints', ()=>{
             expect(axiosGetStub.calledOnce).to.eq(true)
     })
 
-    it('should not return error polygon nfts', async () => {
+    it.skip('should not return error matic nfts unmarshal', async () => {
+        const axios:Axios = testContainer.get(IDS.NODE_MODULES.axios), 
+            axiosGetStub: Sinon.SinonStub = Sinon.stub(axios, 'get')
+
         axiosGetStub
             .resolves({data: unmarshalNtsEmptyResponse})
 
@@ -286,9 +380,33 @@ describe('test nfts api endpoints', ()=>{
             expect(axiosGetStub.calledOnce).to.eq(true)
     })
 
+    it('should not return error matic nfts alchemy', async () => {
+        testContainer.rebind(IDS.SERVICE.WEB3.ContractFactory).toFactory(context => testWeb3ContractFactory({
+            [maticSmartContracts.communityContract.address]:{},
+        }))
+
+        const alchemy:TestAlchemyMock = testContainer.get<Function>(IDS.SERVICE.AlchemySdkFactory)(ChainId.matic)
+             
+        const getNftsForOwnerStub = Sinon.stub(alchemy.nft, 'getNftsForOwner')
+
+        getNftsForOwnerStub.resolves({totalCount:0, ownedNfts:[]})
+
+        const walletAddress = '0x7d9d209f124dffb488308a1350001c353ba04afb'
+
+        const response = await testAgent
+            .get(`/nfts/matic/${walletAddress}`)
+            .expect('Content-Type',/json/)
+
+        expect(response.body.count).to.eq(0)
+        expect(response.body.list).to.be.an('array')
+        expect(response.body.list.length).to.eq(0)
+
+        expect(getNftsForOwnerStub.calledOnce).to.eq(true)
+    })
+
     it('should not return error mumbai nfts', async () => {
         testContainer.rebind(IDS.SERVICE.WEB3.ContractFactory).toFactory(context => testWeb3ContractFactory({
-            [MumbaiCommunity.communityContractAddress]:{},
+            [mumbaiSmartContracts.communityContract.address]:{},
         }))
 
         const alchemy:TestAlchemyMock = testContainer.get<Function>(IDS.SERVICE.AlchemySdkFactory)(ChainId.mumbai)
@@ -311,6 +429,9 @@ describe('test nfts api endpoints', ()=>{
     })
 
     it.skip('should not return error bsc nfts', async () => {
+        const axios:Axios = testContainer.get(IDS.NODE_MODULES.axios), 
+            axiosGetStub: Sinon.SinonStub = Sinon.stub(axios, 'get')
+
         axiosGetStub
             .resolves({data: unmarshalNtsEmptyResponse})
 
@@ -326,6 +447,9 @@ describe('test nfts api endpoints', ()=>{
     })
 
     it.skip('should return eth nft transactions', async ()=>{
+        const axios:Axios = testContainer.get(IDS.NODE_MODULES.axios), 
+            axiosGetStub: Sinon.SinonStub = Sinon.stub(axios, 'get')
+
         axiosGetStub.resolves({data: unmarshalEthNftTransactionsResponse})
 
         const response = await testAgent
@@ -416,7 +540,10 @@ describe('test nfts api endpoints', ()=>{
         expect(readCommentMethodStub.calledOnceWith('contract_2', '2'))
     })
 
-    it('should return matic nft transactions', async ()=>{
+    it.skip('should return matic nft transactions unmarshal', async ()=>{
+        const axios:Axios = testContainer.get(IDS.NODE_MODULES.axios), 
+            axiosGetStub: Sinon.SinonStub = Sinon.stub(axios, 'get')
+
         axiosGetStub.resolves({data: unmarshalMaticNftTransactionsResponse})
 
         const response = await testAgent
@@ -437,9 +564,44 @@ describe('test nfts api endpoints', ()=>{
         expect(axiosGetStub.calledOnce).to.eq(true)
     })
 
+    it('should return matic nft transactions alchemy', async () => {
+        testContainer.rebind(IDS.SERVICE.WEB3.ContractFactory).toFactory(context => testWeb3ContractFactory({
+            [maticSmartContracts.communityContract.address]:{}
+        }))
+        const alchemy:TestAlchemyMock = testContainer.get<Function>(IDS.SERVICE.AlchemySdkFactory)(ChainId.matic)
+             
+        const getAssetTransfers = Sinon.stub(alchemy.core, 'getAssetTransfers')
+
+        getAssetTransfers.resolves(mumbaiAlchemyAddressNftTransactionsResponse)
+
+        const walletAddress = '0x7d9d209f124dffb488308a1350001c353ba04afb'
+
+        const response = await testAgent
+            .get(`/nfts/transactions/matic/${walletAddress}`)
+            .expect('Content-Type',/json/)
+
+        expect(response.body.transactions).to.be.an('array')
+        expect(response.body.transactions.length).to.eq(5)
+        expect(response.body.transactions[0]).to.contain(({
+            type: NftTxType.baseInfo,
+            txHash: mumbaiAlchemyAddressNftTransactionsResponse.transfers[0].hash,
+            blockNumber: parseInt(mumbaiAlchemyAddressNftTransactionsResponse.transfers[0].blockNum),
+            contractAddress: mumbaiAlchemyAddressNftTransactionsResponse.transfers[0].rawContract.address,
+            tokenId: '80001000000000052',
+            to: mumbaiAlchemyAddressNftTransactionsResponse.transfers[0].to,
+            from: mumbaiAlchemyAddressNftTransactionsResponse.transfers[0].from,
+        }))
+
+        expect(getAssetTransfers.calledOnce).to.eq(true)
+        expect(getAssetTransfers.getCall(0).args.at(0)).to.contain({
+            toAddress: walletAddress
+        })
+    })
+
+
     it('should return mumbai nft transactions', async () => {
         testContainer.rebind(IDS.SERVICE.WEB3.ContractFactory).toFactory(context => testWeb3ContractFactory({
-            [MumbaiCommunity.communityContractAddress]:{}
+            [mumbaiSmartContracts.communityContract.address]:{}
         }))
         const alchemy:TestAlchemyMock = testContainer.get<Function>(IDS.SERVICE.AlchemySdkFactory)(ChainId.mumbai)
              
@@ -472,6 +634,9 @@ describe('test nfts api endpoints', ()=>{
     })
 
     it.skip('should return bsc nft transactions', async ()=>{
+        const axios:Axios = testContainer.get(IDS.NODE_MODULES.axios), 
+            axiosGetStub: Sinon.SinonStub = Sinon.stub(axios, 'get')
+
         axiosGetStub.resolves({data: unmarshalBscNfttransactionsResponse})
 
         const response = await testAgent
@@ -493,6 +658,9 @@ describe('test nfts api endpoints', ()=>{
     })
 
     it.skip('should not return error eth nfts transactions', async ()=>{
+        const axios:Axios = testContainer.get(IDS.NODE_MODULES.axios), 
+            axiosGetStub: Sinon.SinonStub = Sinon.stub(axios, 'get')
+
         axiosGetStub
             .resolves({data: unmarshalNftTransactionsEmptyResponse})
 
@@ -507,7 +675,10 @@ describe('test nfts api endpoints', ()=>{
             expect(axiosGetStub.calledOnce).to.eq(true)
     })
 
-    it('should not return error matic nft transactions', async ()=>{
+    it.skip('should not return error matic nft transactions unmarshal', async ()=>{
+        const axios:Axios = testContainer.get(IDS.NODE_MODULES.axios), 
+            axiosGetStub: Sinon.SinonStub = Sinon.stub(axios, 'get')
+
         axiosGetStub.resolves({data: unmarshalNftTransactionsEmptyResponse})
 
         const response = await testAgent
@@ -521,9 +692,34 @@ describe('test nfts api endpoints', ()=>{
         expect(axiosGetStub.calledOnce).to.eq(true)
     })
 
+    it('should not return error matic nft transactions alchemy', async () => {
+        testContainer.rebind(IDS.SERVICE.WEB3.ContractFactory).toFactory(context => testWeb3ContractFactory({
+            [maticSmartContracts.communityContract.address]:{}
+        }))
+        const alchemy:TestAlchemyMock = testContainer.get<Function>(IDS.SERVICE.AlchemySdkFactory)(ChainId.matic)
+             
+        const getAssetTransfers = Sinon.stub(alchemy.core, 'getAssetTransfers')
+
+        getAssetTransfers.resolves({transfers:[]})
+
+        const walletAddress = '0x7d9d209f124dffb488308a1350001c353ba04afb'
+
+        const response = await testAgent
+            .get(`/nfts/transactions/matic/${walletAddress}`)
+            .expect('Content-Type',/json/)
+
+        expect(response.body.transactions).to.be.an('array')
+        expect(response.body.transactions.length).to.eq(0)
+
+        expect(getAssetTransfers.calledOnce).to.eq(true)
+        expect(getAssetTransfers.getCall(0).args.at(0)).to.contain({
+            toAddress: walletAddress
+        })
+    })
+
     it('should not return error mumbai nft transactions', async () => {
         testContainer.rebind(IDS.SERVICE.WEB3.ContractFactory).toFactory(context => testWeb3ContractFactory({
-            [MumbaiCommunity.communityContractAddress]:{}
+            [mumbaiSmartContracts.communityContract.address]:{}
         }))
         const alchemy:TestAlchemyMock = testContainer.get<Function>(IDS.SERVICE.AlchemySdkFactory)(ChainId.mumbai)
              
@@ -547,6 +743,9 @@ describe('test nfts api endpoints', ()=>{
     })
 
     it.skip('should not return error bsc nft transactions', async ()=>{
+        const axios:Axios = testContainer.get(IDS.NODE_MODULES.axios), 
+            axiosGetStub: Sinon.SinonStub = Sinon.stub(axios, 'get')
+
         axiosGetStub.resolves({data: unmarshalNftTransactionsEmptyResponse})
 
         const response = await testAgent
@@ -561,7 +760,10 @@ describe('test nfts api endpoints', ()=>{
     })
 
     it.skip('should return eth nfts transaction details', async ()=>{
-        const web3Factory: Function = container.get(IDS.NODE_MODULES.web3Factory)
+        const axios:Axios = testContainer.get(IDS.NODE_MODULES.axios), 
+            axiosGetStub: Sinon.SinonStub = Sinon.stub(axios, 'get')
+
+        const web3Factory: Function = testContainer.get(IDS.NODE_MODULES.web3Factory)
         const web3: TestWeb3Mock = web3Factory(ChainId.eth)
         const web3GetBlockStub:SinonStub = Sinon.stub(web3.eth, 'getBlock')
     
@@ -593,8 +795,11 @@ describe('test nfts api endpoints', ()=>{
         expect(saveBlockDetailsStub.callCount).to.eq(1)
     })
 
-    it('should return matic nft transaction details', async ()=>{
-        const web3Factory: Function = container.get(IDS.NODE_MODULES.web3Factory)
+    it.skip('should return matic nft transaction details unmarshal', async ()=>{
+        const axios:Axios = testContainer.get(IDS.NODE_MODULES.axios), 
+            axiosGetStub: Sinon.SinonStub = Sinon.stub(axios, 'get')
+
+        const web3Factory: Function = testContainer.get(IDS.NODE_MODULES.web3Factory)
         const web3: TestWeb3Mock = web3Factory(ChainId.matic)
         const web3GetBlockStub:SinonStub = Sinon.stub(web3.eth, 'getBlock')
     
@@ -626,7 +831,10 @@ describe('test nfts api endpoints', ()=>{
         expect(saveBlockDetailsStub.callCount).to.eq(1)
     })
 
-    it('should return mumbai nft transaction details', async () => {
+    it('should return matic nft transaction details alchemy', async () => {
+        const axios:Axios = testContainer.get(IDS.NODE_MODULES.axios), 
+            axiosGetStub: Sinon.SinonStub = Sinon.stub(axios, 'get')
+
         const getPluginContractMethodStub = Sinon.stub(),
             getPostContractAddressCall = Sinon.stub(),
             getCommentsContractAddressCall = Sinon.stub(),
@@ -638,7 +846,89 @@ describe('test nfts api endpoints', ()=>{
             readPostCall = Sinon.stub()
 
         testContainer.rebind(IDS.SERVICE.WEB3.ContractFactory).toFactory(context => testWeb3ContractFactory({
-            [MumbaiCommunity.communityContractAddress]:{
+            [maticSmartContracts.communityContract.address]:{
+                getPluginContract:{ method: getPluginContractMethodStub}
+            },
+            [readCommentsContractAddress]:{
+                read:{method:readCommentsMethod, call: readCommentsCall}
+            },
+            [readPostAddress]:{
+                read: {method: readPostMethod, call: readPostCall }
+            }
+        }))
+
+        const alchemy:TestAlchemyMock = testContainer.get<Function>(IDS.SERVICE.AlchemySdkFactory)(ChainId.matic)
+             
+        const getNftMetadata = Sinon.stub(alchemy.nft, 'getNftMetadata')
+
+        const web3Factory: Function = testContainer.get(IDS.NODE_MODULES.web3Factory)
+        const web3: TestWeb3Mock = web3Factory(ChainId.matic)
+        const web3GetBlockStub:SinonStub = Sinon.stub(web3.eth, 'getBlock')
+    
+        const tokenMetaResponse = {data: {image: 'image_content_or_url', name: 'test token',description:'Crypto.Page NFT'}}
+
+        web3GetBlockStub.resolves({timestamp: 1659520065})
+        axiosGetStub.resolves(tokenMetaResponse)
+        getNftMetadata.resolves(maticAlchemyNftMetadataResponse)
+        getPluginContractMethodStub
+            .withArgs(maticSmartContracts.plugins.singleReadPost.address, 1).returns({call: getPostContractAddressCall})
+            .withArgs(maticSmartContracts.plugins.singleReadAllComments.address, 1).returns({call: getCommentsContractAddressCall})
+        
+        getPostContractAddressCall.resolves(readPostAddress)
+        getCommentsContractAddressCall.resolves(readCommentsContractAddress)
+        readCommentsCall.onCall(0).resolves([]).onCall(1).throws('unexpeted call')
+        readPostCall.resolves({isEncrypted:true, payAmount: 10, paymentType: 1, minimalPeriod: 250, timestamp: '1704709767' })
+        getCacheTokenDetailsStub.resolves(null)
+        saveTokenStub.resolves()
+
+        const contractAddress = maticSmartContracts.cryptoPageNftContractAddress,
+            tokenId = '80001000000000052',
+            blockNumber = 31467970
+
+        const response = await testAgent
+            .get(`/nfts/transaction/matic/details/${contractAddress}/${tokenId}/${blockNumber}`)
+            .expect('Content-Type',/json/)
+
+        expect(getNftMetadata.callCount).to.eq(1)
+        expect(getNftMetadata.getCall(0).args).deep.equal([contractAddress, tokenId])
+        expect(readCommentsCall.callCount).to.be.eq(1)
+        expect(readPostCall.callCount).to.be.eq(1)
+        expect(saveTokenStub.calledOnce).to.be.true
+        expect(web3GetBlockStub.calledOnce).to.be.true
+        expect(getCacheTokenDetailsStub.calledOnce).to.be.true
+        expect(saveTokenStub.getCall(0).args[0]).contain({
+            minimalPeriod: 250
+        })
+
+        expect(response.body).contain({
+            tokenId,
+            contractAddress,
+            name: tokenMetaResponse.data.name,
+            description: tokenMetaResponse.data.description,
+            contentUrl: tokenMetaResponse.data.image,
+            isEncrypted: true,
+            minimalPeriod: 250,
+            date: '2022-08-03T09:47:45.000Z'
+        })
+    })
+
+    it('should return mumbai nft transaction details', async () => {
+        const axios:Axios = testContainer.get(IDS.NODE_MODULES.axios), 
+            axiosGetStub: Sinon.SinonStub = Sinon.stub(axios, 'get')
+
+
+        const getPluginContractMethodStub = Sinon.stub(),
+            getPostContractAddressCall = Sinon.stub(),
+            getCommentsContractAddressCall = Sinon.stub(),
+            readCommentsContractAddress = 'read_comments_address',
+            readPostAddress = 'read_post_address',
+            readCommentsMethod = Sinon.stub(),
+            readCommentsCall = Sinon.stub(),
+            readPostMethod = Sinon.stub(),
+            readPostCall = Sinon.stub()
+
+        testContainer.rebind(IDS.SERVICE.WEB3.ContractFactory).toFactory(context => testWeb3ContractFactory({
+            [mumbaiSmartContracts.communityContract.address]:{
                 getPluginContract:{ method: getPluginContractMethodStub}
             },
             [readCommentsContractAddress]:{
@@ -663,8 +953,8 @@ describe('test nfts api endpoints', ()=>{
         axiosGetStub.resolves(tokenMetaResponse)
         getNftMetadata.resolves(mumbaiAlchemyNftMetadataResponse)
         getPluginContractMethodStub
-            .withArgs(MumbaiCommunity.plugins.singleReadPost, 1).returns({call: getPostContractAddressCall})
-            .withArgs(MumbaiCommunity.plugins.singleReadAllComments, 1).returns({call: getCommentsContractAddressCall})
+            .withArgs(mumbaiSmartContracts.plugins.singleReadPost.address, 1).returns({call: getPostContractAddressCall})
+            .withArgs(mumbaiSmartContracts.plugins.singleReadAllComments.address, 1).returns({call: getCommentsContractAddressCall})
         
         getPostContractAddressCall.resolves(readPostAddress)
         getCommentsContractAddressCall.resolves(readCommentsContractAddress)
@@ -705,7 +995,11 @@ describe('test nfts api endpoints', ()=>{
     })
 
     it.skip('should return bsc nft transaction details', async ()=>{
-        const web3Factory: Function = container.get(IDS.NODE_MODULES.web3Factory)
+        const axios:Axios = testContainer.get(IDS.NODE_MODULES.axios), 
+            axiosGetStub: Sinon.SinonStub = Sinon.stub(axios, 'get'),
+            axiosHeadStub: SinonStub = Sinon.stub(axios, 'head')
+
+        const web3Factory: Function = testContainer.get(IDS.NODE_MODULES.web3Factory)
         const web3: TestWeb3Mock = web3Factory(ChainId.bsc)
         const web3GetBlockStub:SinonStub = Sinon.stub(web3.eth, 'getBlock')
     
@@ -741,11 +1035,14 @@ describe('test nfts api endpoints', ()=>{
     })
 
     it.skip('should return goerli nfts transaction details', async ()=>{
+        const axios:Axios = testContainer.get(IDS.NODE_MODULES.axios), 
+            axiosGetStub: Sinon.SinonStub = Sinon.stub(axios, 'get')
+            
         const contractAddress = GoerliSocialSmartContract.cryptoPageNftContractAddress,
             tokenId = '64',
             blockNumber = 15300497
 
-        const web3Factory: Function = container.get(IDS.NODE_MODULES.web3Factory)
+        const web3Factory: Function = testContainer.get(IDS.NODE_MODULES.web3Factory)
         const web3: TestWeb3Mock = web3Factory(ChainId.goerli)
         const web3GetBlockStub = Sinon.stub(web3.eth, 'getBlock')
     
@@ -832,11 +1129,14 @@ describe('test nfts api endpoints', ()=>{
     it.skip('should return error goerli nfts transaction details', async ()=>{
         process.env.PREVENT_LOG_ERRORS = 'yes'
 
+        const axios:Axios = testContainer.get(IDS.NODE_MODULES.axios), 
+            axiosGetStub: Sinon.SinonStub = Sinon.stub(axios, 'get')
+
         const contractAddress = '0x495f947276749ce646f68ac8c248420045cb7b5e',
             tokenId = '86322540947695616051707333350443506684962566151002367173878109827558281315304',
             blockNumber = 15300497
 
-        const web3Factory: Function = container.get(IDS.NODE_MODULES.web3Factory)
+        const web3Factory: Function = testContainer.get(IDS.NODE_MODULES.web3Factory)
         const web3: TestWeb3Mock = web3Factory(ChainId.goerli)
         const web3GetBlockStub = Sinon.stub(web3.eth, 'getBlock')
     
@@ -924,6 +1224,9 @@ describe('test nfts api endpoints', ()=>{
     })
 
     it('should return mumbai nft token details', async () => {
+        const axios:Axios = testContainer.get(IDS.NODE_MODULES.axios), 
+            axiosGetStub: Sinon.SinonStub = Sinon.stub(axios, 'get')
+
         const getPluginContractMethodStub = Sinon.stub(),
             getPostContractAddressCall = Sinon.stub(),
             getCommentsContractAddressCall = Sinon.stub(),
@@ -935,7 +1238,7 @@ describe('test nfts api endpoints', ()=>{
             readPostCall = Sinon.stub()
 
         testContainer.rebind(IDS.SERVICE.WEB3.ContractFactory).toFactory(context => testWeb3ContractFactory({
-            [MumbaiCommunity.communityContractAddress]:{
+            [mumbaiSmartContracts.communityContract.address]:{
                 getPluginContract:{ method: getPluginContractMethodStub}
             },
             [readCommentsContractAddress]:{
@@ -955,8 +1258,8 @@ describe('test nfts api endpoints', ()=>{
         axiosGetStub.resolves(tokenMetaResponse)
         getNftMetadata.resolves(mumbaiAlchemyNftMetadataResponse)
         getPluginContractMethodStub
-            .withArgs(MumbaiCommunity.plugins.singleReadPost, 1).returns({call: getPostContractAddressCall})
-            .withArgs(MumbaiCommunity.plugins.singleReadAllComments, 1).returns({call: getCommentsContractAddressCall})
+            .withArgs(mumbaiSmartContracts.plugins.singleReadPost.address, 1).returns({call: getPostContractAddressCall})
+            .withArgs(mumbaiSmartContracts.plugins.singleReadAllComments.address, 1).returns({call: getCommentsContractAddressCall})
         
         getPostContractAddressCall.resolves(readPostAddress)
         getCommentsContractAddressCall.resolves(readCommentsContractAddress)
@@ -993,7 +1296,7 @@ describe('test nfts api endpoints', ()=>{
     })
 
     it('should return last nft tokens dashboard', async() =>{
-        const repo = container.get<PostStatisticRepo>(IDS.ORM.REPO.PostStatisticRepo),
+        const repo = testContainer.get<PostStatisticRepo>(IDS.ORM.REPO.PostStatisticRepo),
             getDashboardStub = Sinon.stub(repo, 'getDashboard')
 
         getDashboardStub.returns([{

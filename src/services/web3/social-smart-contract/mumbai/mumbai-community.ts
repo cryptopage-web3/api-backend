@@ -4,35 +4,37 @@ import { ErrorLogRepo } from "../../../../orm/repo/error-log-repo";
 import { IDS } from "../../../../types";
 import { ISocialComment, ISocialPost, ICommunity } from "../types";
 import { mumbaiSingleReadAllCommentsAbi, mumbaiSingleReadPostAbi } from "./abi";
+import { IChainConf } from "../constants";
+import { isEqAddr } from "../../../../util/string-util";
 
 @injectable()
 export class MumbaiCommunity implements ICommunity {
-    static communityContractAddress = '0x7e754f7d127eea39a3f7078ad4a8e9c61d6cd534'
-    static cryptoPageNftContractAddress = '0xc0fc66ba41bea0a1266c681bbc781014e7c67612'
-    
-    static plugins = {
-        singleReadPost: '0x9e5224d23f22a6d0daa46d942305d0c94d3739ee0bd58cb2725e2f7f71c2ff73',
-        singleReadAllComments: '0x4109142687fb920f2169e9f03a6c4544f567cb8d156347cdfbdb34b589e10879'
-    }
+    _chainId:ChainId
 
     @inject(IDS.SERVICE.WEB3.CommunityWeb3SmartContract) _web3CommunityContract
     @inject(IDS.SERVICE.WEB3.ContractFactory) _web3ContractFactory: Function
     @inject(IDS.ORM.REPO.ErrorLogRepo) _errorLogRepo: ErrorLogRepo
+
+    @inject(IDS.CONFIG.SmartContractsConf) _smConf:IChainConf
+
+    setChainId(chain:ChainId){
+        this._chainId = chain;
+    }
 
     async getCommentCount(tokenId: string): Promise<number> {
         throw new Error('method deprecated')
     }
 
     async readPostForContract(contractAddress: string, tokenId: string): Promise<ISocialPost>{
-        if(contractAddress.toLowerCase() != MumbaiCommunity.cryptoPageNftContractAddress){
+        if(!isEqAddr( contractAddress, this._smConf.cryptoPageNftContractAddress)){
             return {} as ISocialPost
         }
 
         const pluginAddress = await this._web3CommunityContract.methods.getPluginContract(
-            MumbaiCommunity.plugins.singleReadPost, 1
+            this._smConf.plugins.singleReadPost.address, 1
         ).call()
         
-        const readPostWeb3Contract = this._web3ContractFactory(mumbaiSingleReadPostAbi, pluginAddress, ChainId.mumbai)
+        const readPostWeb3Contract = this._web3ContractFactory(mumbaiSingleReadPostAbi, pluginAddress, this._chainId)
         
         const post = await readPostWeb3Contract.methods.read(tokenId).call(), {
             isEncrypted, payAmount, commentCount, upCount, downCount, paymentType, ipfsHash, creator, minimalPeriod, timestamp
@@ -42,22 +44,22 @@ export class MumbaiCommunity implements ICommunity {
     }
 
     async getComments(contractAddress: string, tokenId: string): Promise<ISocialComment[]> {
-        if(contractAddress !== MumbaiCommunity.cryptoPageNftContractAddress){
+        if(!isEqAddr( contractAddress, this._smConf.cryptoPageNftContractAddress)){
             return []
         }
 
         const pluginAddress = await this._web3CommunityContract.methods.getPluginContract(
-            MumbaiCommunity.plugins.singleReadAllComments, 1
+            this._smConf.plugins.singleReadAllComments.address, 1
         ).call().catch(err =>{
             this._errorLogRepo.log('mumbai_community_get_plugin_read_all_comments', err.message,{
-                pluginAddress: MumbaiCommunity.plugins.singleReadAllComments
+                pluginAddress: this._smConf.plugins.singleReadAllComments.address
             })
 
             return Promise.reject(err)
         })
 
         const readCommentsWeb3Contract = this._web3ContractFactory(
-            mumbaiSingleReadAllCommentsAbi, pluginAddress, ChainId.mumbai
+            mumbaiSingleReadAllCommentsAbi, pluginAddress, this._chainId
         )
 
         const comments = await readCommentsWeb3Contract.methods.read(tokenId).call().catch(err =>{

@@ -1,4 +1,4 @@
-import { interfaces } from "inversify"
+import { interfaces, namedConstraint, traverseAncerstors } from "inversify"
 import { ChainId } from "./modules/transactions/types"
 
 export function getChainIdFromAncestor(request: interfaces.Request):ChainId | undefined {
@@ -17,6 +17,16 @@ export function getChainIdFromAncestor(request: interfaces.Request):ChainId | un
     return getChainIdFromAncestor(parent)
 }
 
+export function getChainIdFromAncestorStrict(request: interfaces.Request): ChainId {
+    const chain = getChainIdFromAncestor(request);
+
+    if(!chain){
+        throw new Error(`Failed to get chainId`)
+    }
+
+    return chain
+}
+
 export function injectChainDecorator(context: interfaces.Context, instance): interfaces.Next {
     if(typeof instance['setChainId'] !== 'function'){
         throw new Error(`${instance.constructor.name} does not have implemented method 'setChainId'`)
@@ -32,4 +42,8 @@ export function injectChainDecorator(context: interfaces.Context, instance): int
 
     return instance
     
+}
+
+export const whenNamedChainOrAncestorChainIs = (chain:ChainId) => (request: interfaces.Request) => {
+    return namedConstraint(chain)(request) || traverseAncerstors(request, namedConstraint(chain))
 }
