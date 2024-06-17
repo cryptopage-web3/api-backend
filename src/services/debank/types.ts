@@ -10,6 +10,7 @@ export interface IUserToken {
     "protocol_id": string
     "price": number
     "is_core": boolean
+    is_verified: boolean
     "is_wallet": boolean
     "time_at": number
     "amount": number

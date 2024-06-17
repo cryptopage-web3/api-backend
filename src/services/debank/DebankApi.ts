@@ -11,8 +11,10 @@ export class DebankApi {
     @inject(IDS.NODE_MODULES.axios) _axios: Axios
     @inject(IDS.CONFIG.DebankApiKey) _apiKey: string
 
-    getWalletTokensInAllChains(address:string):Promise<IUserToken[]>{
-        return this.apiGet('v1/user/all_token_list', {id: address, is_all: false})
+    async getWalletTokensInAllChains(address:string):Promise<IUserToken[]>{
+        const tokens:IUserToken[] = await this.apiGet('v1/user/all_token_list', {id: address, is_all: false})
+
+        return tokens.filter(t => t.is_verified)
     }
 
     async apiGet(path:string, params:any = null){

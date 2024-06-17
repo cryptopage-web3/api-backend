@@ -40,7 +40,7 @@ describe('test user api endpoints', ()=>{
             .expect('Content-Type',/json/)
 
         expect(Array.isArray(response.body.tokens)).to.eq(true)
-        expect(response.body.tokens.length).to.eq(debankUserTokensResponse.length)
+        expect(response.body.tokens.length).to.eq(2)
         expect(response.body.tokens[0].name).to.eq('ETH')
         expect(response.body.tokens[0].chain).to.eq('eth')
         expect(response.body.tokens[0].symbol).to.eq(debankUserTokensResponse[0].optimized_symbol)
