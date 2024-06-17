@@ -12,7 +12,7 @@ export class DebankApi {
     @inject(IDS.CONFIG.DebankApiKey) _apiKey: string
 
     getWalletTokensInAllChains(address:string):Promise<IUserToken[]>{
-        return this.apiGet('v1/user/all_token_list', {id: address})
+        return this.apiGet('v1/user/all_token_list', {id: address, is_all: false})
     }
 
     async apiGet(path:string, params:any = null){
