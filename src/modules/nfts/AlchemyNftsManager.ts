@@ -2,11 +2,8 @@ import { Alchemy, AssetTransfersCategory, AssetTransfersOrder, AssetTransfersWit
 import BigNumber from 'bignumber.js';
 import { inject, injectable } from 'inversify';
 import { ICommunity, ISocialComment } from '../../services/web3/social-smart-contract/types';
-import { IWeb3Manager } from '../../services/web3/types';
 import { IDS } from '../../types';
-import { IToken } from '../tokens/types';
 import { ChainId } from '../transactions/types';
-import { NftCache } from './NftCache';
 import { INftsList, INftsManager, INftTransaction, INftPagination, NftTxType, Web3NftTokenData, INftItem } from './types';
 import { Web3Util } from '../../services/web3/web3-util';
 import { normalizeUrl } from '../../util/url-util';
@@ -26,6 +23,7 @@ export class AlchemyNftsManager implements INftsManager {
 
     async getWalletAllNFTs(address: string, opts: INftPagination): Promise<INftsList> {
         const addressNfts = await this._alchemy.nft.getNftsForOwner(address, {
+            contractAddresses: [this._smConf.cryptoPageNftContractAddress],
             pageSize: opts.pageSize,
             pageKey: opts.pageKey
         })
