@@ -71,6 +71,7 @@ export class AlchemyNftsManager implements INftsManager {
             toAddress: address,
             order: AssetTransfersOrder.DESCENDING,
             category: [AssetTransfersCategory.ERC721, AssetTransfersCategory.ERC1155],
+            contractAddresses:[this._smConf.cryptoPageNftContractAddress],
             withMetadata: true,
             maxCount: opts.pageSize,
             pageKey: opts.pageKey
