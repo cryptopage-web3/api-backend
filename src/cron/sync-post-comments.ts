@@ -9,16 +9,17 @@ import {abi} from "../services/web3/social-smart-contract/mumbai/comments-data-a
 import { db } from "../orm/sequelize";
 import { PostStatistic } from "../orm/model/post-statistic";
 
-const allowedChains:string[] = [ChainId.mumbai];
+const allowedChains:string[] = [ChainId.matic];
 
+const chain:ChainId = ChainId.matic;
+/*
 if(allowedChains.indexOf(process.argv[2]) == -1){
     throw new Error(`Invalid chain: ${process.argv[2]}. Allowed chains: ${allowedChains.join(',')}`)
-}
+}*/
 
-const chain:ChainId = process.argv[2] as ChainId;
 const privateKey = envToString('COMMENTS_SYNC_PRIVATE_KEY')
-const alchemyUrl = envToString('WEB3_RPC_URL_MUMBAI')
-const contractAddress = '0x561F88B50289d37928c6AE8cbb49aEa00881B838';
+const alchemyUrl = envToString('WEB3_RPC_URL_MATIC')
+const contractAddress = '0x9d09470Ff713CeC6BdFe3Ed5E5a241ED2d850b4c';
 
 const ethersProvider = new ethers.JsonRpcProvider(alchemyUrl);
 const signer = new ethers.Wallet(privateKey, ethersProvider);
