@@ -79,7 +79,7 @@ sleep_time=${START_WAIT_TIME:-5}
 echo "Sleep $sleep_time sec"
 sleep $sleep_time
 
-http_response=$(curl -s -w "%{http_code}" -o /dev/null  --connect-timeout 1  "http://127.0.0.1:$deploy_port")
+http_response=$(curl -s -w "%{http_code}" -o /dev/null  --connect-timeout 10  "http://127.0.0.1:$deploy_port")
 
 echo "port $deploy_port response: $http_response"
 

@@ -34,10 +34,12 @@ jobs:
         TG_TEXT_PREFIX: ${{ vars.TG_TEXT_PREFIX }}
         TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
         TG_BOT_ID: ${{ secrets.TG_BOT_ID }}
+        START_WAIT_TIME: ${{ secrets.START_WAIT_TIME }}
+        NVM_NODE_VERSION: ${{ vars.NVM_NODE_VERSION }}
       with:
-        envs: PM2_NAME,DEPLOY_DIR,RUN_DIR,DEPLOY_PORT,RUN_PORT,TG_TEXT_PREFIX,TG_CHAT_ID,TG_BOT_ID
+        envs: PM2_NAME,DEPLOY_DIR,RUN_DIR,DEPLOY_PORT,RUN_PORT,TG_TEXT_PREFIX,TG_CHAT_ID,TG_BOT_ID,START_WAIT_TIME,NVM_NODE_VERSION
         host: ${{ secrets.PROD_SSH_HOST }}
         port: ${{ secrets.PROD_SSH_PORT }}
         username: ${{ vars.PROD_SSH_USER }}
         key: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
-        script: \[ -s "/home/user/.nvm/nvm.sh" ] && \. "/home/user/.nvm/nvm.sh" && nvm use 16 && /bin/bash /tmp/${{ vars.DEPLOY_TEMP_DIRNAME }}/deploy.sh > "/tmp/${{ vars.DEPLOY_TEMP_DIRNAME }}/deploy.log"
+        script: \[ -s "/home/user/.nvm/nvm.sh" ] && \. "/home/user/.nvm/nvm.sh" && nvm use ${{NVM_NODE_VERSION}} && /bin/bash /tmp/${{ vars.DEPLOY_TEMP_DIRNAME }}/deploy.sh > "/tmp/${{ vars.DEPLOY_TEMP_DIRNAME }}/deploy.log"
