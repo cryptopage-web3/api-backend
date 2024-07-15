@@ -74,9 +74,10 @@ export PORT=$deploy_port
 
 pm2 start --name=$pm2_deploy_name dist/index.js
 
-echo "Sleep 5 sec"
+sleep_time=${START_WAIT_TIME:-5}
 
-sleep 5
+echo "Sleep $sleep_time sec"
+sleep $sleep_time
 
 http_response=$(curl -s -w "%{http_code}" -o /dev/null  --connect-timeout 1  "http://127.0.0.1:$deploy_port")
 

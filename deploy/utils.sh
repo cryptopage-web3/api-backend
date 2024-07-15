@@ -56,6 +56,7 @@ tg_message()
 exit_if_error()
 {
     if [ "$?" != "0" ]; then
+        echo "exit_if_error: $1"
         tg_message "$1" "${DEPLOY_LOG_FILE}"
         exit 1
     fi
