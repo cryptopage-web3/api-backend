@@ -42,4 +42,4 @@ jobs:
         port: ${{ secrets.PROD_SSH_PORT }}
         username: ${{ vars.PROD_SSH_USER }}
         key: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
-        script: \[ -s "/home/user/.nvm/nvm.sh" ] && \. "/home/user/.nvm/nvm.sh" && nvm use ${{NVM_NODE_VERSION}} && /bin/bash /tmp/${{ vars.DEPLOY_TEMP_DIRNAME }}/deploy.sh > "/tmp/${{ vars.DEPLOY_TEMP_DIRNAME }}/deploy.log"
+        script: \[ -s "/home/user/.nvm/nvm.sh" ] && \. "/home/user/.nvm/nvm.sh" && nvm use ${{ vars.NVM_NODE_VERSION }} && /bin/bash /tmp/${{ vars.DEPLOY_TEMP_DIRNAME }}/deploy.sh > "/tmp/${{ vars.DEPLOY_TEMP_DIRNAME }}/deploy.log"
