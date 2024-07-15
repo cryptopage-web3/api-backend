@@ -11,10 +11,13 @@ jobs:
     environment: production
     steps:
     - uses: actions/checkout@v3
+    - name: Create temp folder
+        run: |
+          mkdir -p tmp/${{ vars.DEPLOY_TEMP_DIRNAME }} && cp -R deploy tmp/${{ vars.DEPLOY_TEMP_DIRNAME }}
     - name: Copy deploy script to server
       uses: garygrossgarten/github-action-scp@release
       with:
-        local: deploy
+        local: tmp
         remote: /tmp
         host: ${{ secrets.PROD_SSH_HOST }}
         port: ${{ secrets.PROD_SSH_PORT }}
@@ -38,4 +41,4 @@ jobs:
         port: ${{ secrets.PROD_SSH_PORT }}
         username: ${{ vars.PROD_SSH_USER }}
         key: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
-        script: \[ -s "/home/usr/.nvm/nvm.sh" ] && \. "/home/usr/.nvm/nvm.sh" && /bin/bash /tmp/deploy.sh > "$DEPLOY_LOG_FILE"
+        script: \[ -s "/home/user/.nvm/nvm.sh" ] && \. "/home/user/.nvm/nvm.sh" && nvm use 16 && /bin/bash /tmp/${{ vars.DEPLOY_TEMP_DIRNAME }}/deploy.sh > "$DEPLOY_LOG_FILE"
