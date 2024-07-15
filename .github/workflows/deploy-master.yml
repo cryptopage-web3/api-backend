@@ -34,7 +34,7 @@ jobs:
         TG_TEXT_PREFIX: ${{ vars.TG_TEXT_PREFIX }}
         TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
         TG_BOT_ID: ${{ secrets.TG_BOT_ID }}
-        START_WAIT_TIME: ${{ secrets.START_WAIT_TIME }}
+        START_WAIT_TIME: ${{ vars.START_WAIT_TIME }}
         NVM_NODE_VERSION: ${{ vars.NVM_NODE_VERSION }}
       with:
         envs: PM2_NAME,DEPLOY_DIR,RUN_DIR,DEPLOY_PORT,RUN_PORT,TG_TEXT_PREFIX,TG_CHAT_ID,TG_BOT_ID,START_WAIT_TIME,NVM_NODE_VERSION
