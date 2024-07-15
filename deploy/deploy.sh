@@ -116,9 +116,9 @@ export PORT=$run_port
 
 pm2 start --name=$pm2_run_name dist/index.js
 
-sleep 5
+sleep $sleep_time
 
-echo sleep 5 sec
+echo sleep $sleep_time sec
 
 http_response=$(curl -s -w "%{http_code}" -o /dev/null  --connect-timeout 10  "http://127.0.0.1:$run_port")
 
