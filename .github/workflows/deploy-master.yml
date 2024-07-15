@@ -13,7 +13,7 @@ jobs:
     - uses: actions/checkout@v3
     - name: Create temp folder
       run: |
-        mkdir -p tmp/${{ vars.DEPLOY_TEMP_DIRNAME }} && cp -r deploy/ tmp/${{ vars.DEPLOY_TEMP_DIRNAME }}/
+        mkdir -p tmp/${{ vars.DEPLOY_TEMP_DIRNAME }} && cp -r deploy tmp/${{ vars.DEPLOY_TEMP_DIRNAME }}
     - name: Copy deploy script to server
       uses: garygrossgarten/github-action-scp@release
       with:
