@@ -57,5 +57,5 @@ parameters:
       schema:
         type: string
         enum: [mumbai, matic]
-        default: mumbai
+        default: matic
       description: chain name

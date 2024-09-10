@@ -134,7 +134,21 @@ export class NftsController implements interfaces.Controller {
         @response() res: express.Response
     ){
         const dashboard = this._nftDasboardFactory(chain),
-            tokens = await dashboard.getTokensDasboard(chain, page, pageSize)
+            tokens = await dashboard.getPostsWithCommentsTop(chain, page, pageSize)
+
+        res.json({tokens})
+    }
+
+    @httpGet(`/last-posts/:chain(${chainValidator})`, ...paginationValidator())
+    @errorHandler()
+    async getLastPosts(
+        @requestParam('chain') chain: ChainId,
+        @queryParam('page') page: number = 1,
+        @queryParam('pageSize') pageSize: number = 10,
+        @response() res: express.Response
+    ){
+        const dashboard = this._nftDasboardFactory(chain),
+            tokens = await dashboard.getLastPosts(chain, page, pageSize)
 
         res.json({tokens})
     }

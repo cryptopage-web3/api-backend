@@ -1,11 +1,12 @@
 export function safeStart(callback, opts?:ISafeStartOpts){
     async function _doSafeStart(){
+        let result
         try {
             if(opts?.verb){
                 console.log('safeStart run:', opts?.descr)
             }
-            
-            await callback()
+            const params = opts?.params || []
+            result = await callback(...params)
         } catch (error) {
             console.error('safeStart', opts?.descr, error);
         }
@@ -15,14 +16,17 @@ export function safeStart(callback, opts?:ISafeStartOpts){
                 console.log('safeStart', opts.descr, `next start in ${opts.intervalInSeconds} sec`)
             }
             setTimeout(_doSafeStart, opts.intervalInSeconds * 1000);
+        } else {
+            return !result ? Promise.resolve() : result
         }
     }
     
-    _doSafeStart();
+    return _doSafeStart();
 }
 
 export interface ISafeStartOpts {
     intervalInSeconds?:number
     descr?: string
     verb?: boolean
+    params?: any[]
 }

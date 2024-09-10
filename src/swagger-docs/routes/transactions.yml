@@ -117,7 +117,7 @@ paths:
           schema:
             type: string
             enum: [mumbai, matic]
-            default: mumbai
+            default: matic
           description: chain name
         - $ref: '#/parameters/path/address'
         - $ref: '#/parameters/pagination/pageSize'

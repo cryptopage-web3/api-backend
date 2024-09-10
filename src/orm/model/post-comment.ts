@@ -12,7 +12,7 @@ export class PostComment extends Model<PostCommentInferAttr, InferCreationAttrib
     declare commentId: number
     declare isUp: boolean
 }
-
+/*
 PostComment.init({
     blockNumber: DataTypes.INTEGER,
     blockDate: DataTypes.DATE,
@@ -22,4 +22,4 @@ PostComment.init({
     isUp: DataTypes.BOOLEAN
 },{
     sequelize: db
-})
+})*/

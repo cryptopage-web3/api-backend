@@ -11,7 +11,7 @@ paths:
           schema:
             type: string
             enum: [mumbai, matic]
-            default: mumbai
+            default: matic
           description: chain name
         - $ref: '#/parameters/path/address'
         - $ref: '#/parameters/pagination/pageSize'
@@ -66,7 +66,7 @@ paths:
           schema:
             type: string
             enum: [mumbai, matic]
-            default: mumbai
+            default: matic
           description: chain name
         - $ref: '#/parameters/path/address'
         - $ref: '#/parameters/pagination/pageSize'
@@ -126,7 +126,7 @@ paths:
           schema:
             type: string
             enum: [mumbai, matic]
-            default: mumbai
+            default: matic
           description: chain name
         - in: path
           name: contractAddress
@@ -167,7 +167,7 @@ paths:
           schema:
             type: string
             enum: [mumbai,matic]
-            default: mumbai
+            default: matic
           description: chain name
         - $ref: '#/parameters/path/contractAddress'
         - in: path
@@ -196,8 +196,33 @@ paths:
           required: true
           schema:
             type: string
-            enum: [mumbai]
-            default: mumbai
+            enum: [matic]
+            default: matic
+          description: chain name
+        - $ref: '#/parameters/pagination/page'
+        - $ref: '#/parameters/pagination/pageSize'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                MumbaiNftdashboard:
+                  $ref: '#/responses/examples/MumbaiNftdashboard'
+        "429":
+          $ref: '#/responses/RateLimit'
+  /nfts/last-posts/{chain}:
+    get:
+      summary: Last posts in desc order.
+      tags: [NFT]
+      parameters:
+        - in: path
+          name: chain
+          required: true
+          schema:
+            type: string
+            enum: [matic]
+            default: matic
           description: chain name
         - $ref: '#/parameters/pagination/page'
         - $ref: '#/parameters/pagination/pageSize'

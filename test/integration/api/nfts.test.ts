@@ -1295,9 +1295,9 @@ describe('test nfts api endpoints', ()=>{
         })
     })
 
-    it('should return last nft tokens dashboard', async() =>{
+    it('should return last nft tokens with comments dashboard', async() =>{
         const repo = testContainer.get<PostStatisticRepo>(IDS.ORM.REPO.PostStatisticRepo),
-            getDashboardStub = Sinon.stub(repo, 'getDashboard')
+            getDashboardStub = Sinon.stub(repo, 'getPostsWithCommentsTop')
 
         getDashboardStub.returns([{
             postId: '80001000000000015',
@@ -1326,6 +1326,39 @@ describe('test nfts api endpoints', ()=>{
         expect(getDashboardStub.getCall(0).args[0]).to.be.eq('mumbai')
         expect(getDashboardStub.getCall(0).args[1]).to.be.eq(2)
         expect(getDashboardStub.getCall(0).args[2]).to.be.eq(3)
+    })
+
+    it('should return last nft tokens', async() =>{
+        const repo = testContainer.get<PostStatisticRepo>(IDS.ORM.REPO.PostStatisticRepo),
+            getLastPostsStub = Sinon.stub(repo, 'getLastPosts')
+
+        getLastPostsStub.returns([{
+            postId: '80001000000000015',
+            totalCommentsCount: 3
+        },{
+            postId: '80001000000000016',
+            totalCommentsCount: 6
+        }] as any)
+
+        const response = await testAgent
+            .get(`/nfts/last-posts/mumbai?page=2&pageSize=3`)
+            .expect('Content-Type',/json/)
+
+        expect(response.body.tokens).to.be.an('array')
+        expect(response.body.tokens.length).to.eq(2)
+        expect(response.body.tokens[0]).to.contain({
+            tokenId: '80001000000000015',
+            commentsCount: 3
+        })
+        expect(response.body.tokens[1]).to.contain({
+            tokenId: '80001000000000016',
+            commentsCount: 6
+        })
+
+        expect(getLastPostsStub.calledOnce).to.be.true
+        expect(getLastPostsStub.getCall(0).args[0]).to.be.eq('mumbai')
+        expect(getLastPostsStub.getCall(0).args[1]).to.be.eq(2)
+        expect(getLastPostsStub.getCall(0).args[2]).to.be.eq(3)
     })
 
 })
